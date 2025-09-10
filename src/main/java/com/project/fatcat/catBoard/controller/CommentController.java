@@ -38,7 +38,7 @@ public class CommentController {
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("post", post);
-			return "post_detail";
+			return "catBoard/post_detail";
 		}
 
 		this.commentService.create(post, commentForm.getCommentContent());
@@ -57,7 +57,7 @@ public class CommentController {
 //		}
 
 		commentForm.getCommentContent();
-		return "comment_form";
+		return "catBoard/comment_form";
 	}
 
 	@PostMapping("/modify/{commentSeq}")
@@ -66,7 +66,7 @@ public class CommentController {
 			@PathVariable("commentSeq") Integer commentSeq) {
 
 		if (bindingResult.hasErrors()) {
-			return "comment_form";
+			return "catBoard/comment_form";
 		}
 
 		KnowledgeComment comment = this.commentService.getComment(commentSeq);

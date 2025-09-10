@@ -16,6 +16,6 @@ public class PostForm {
     @NotEmpty(message = "내용을 입력해주세요.")
     private String postContent; // 엔티티랑 맞춤
 
-    private Integer boardSeq;   // 게시판 선택할 때 필요
+   
 }
 
