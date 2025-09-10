@@ -158,4 +158,27 @@ body {
   margin-right: 50px;
 }
 
+.custom-container {
+  max-width: 1600px;  /* 원하는 크기 */
+  margin: 0 auto;     /* 가운데 정렬 */
+}
 
+/* 탭 기본 글자색 검정 */
+.nav-tabs .nav-link {
+  color: #000;          /* 검정 */
+  font-weight: 500;     /* 중간 두께 */
+  font-size:20px;
+}
+
+/* hover 시 */
+.nav-tabs .nav-link:hover {
+  color: #000;          /* 그대로 검정 유지 */
+}
+
+/* active (선택된 탭) */
+.nav-tabs .nav-link.active {
+  font-weight: 700;     /* 굵게 */
+  color: #000;          /* 검정 */
+  background-color: #fff; /* 선택된 탭 배경 흰색 유지 */
+  border-color: #dee2e6 #dee2e6 #fff; /* 아래쪽 경계선 지우기 */
+}
