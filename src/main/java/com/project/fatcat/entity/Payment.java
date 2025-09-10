@@ -39,25 +39,25 @@ public class Payment {
 	private Order order;
 	
 	@Column(nullable = false)
-	private Integer payPrice;
+	private Integer payPrice;	//totalAmount -> 결제금
 	
 	@Column(nullable = false)
-	private String merchantUid;
+	private String merchantUid;	//orderId -> 토스 시스템 주문번호
 	
 	@Column( nullable = false)
-	private String pgProvider;
+	private String pgProvider;	//provider or mId -> 결제 PG사 (토스페이먼츠 등)
 	
 	@Column(nullable = false)
-	private String method;
+	private String method;		//method -> 결제 방식 (CARD, ACCOUNT 등)
 	
 	@Column(nullable = false)
-	private String status;
+	private String status;		//status -> DONE, CANCELED, FAILED
 	
 	@Column(nullable = false)
-	private String pgTid;
+	private String pgTid;		//transactionKey or paymentKey -> PG사 거래 고유번호
 	
 	@Column(columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
-	private LocalDateTime approvedDate;
+	private LocalDateTime approvedDate;		//approvedAt
 	
 	private LocalDateTime failedDate;
 	
