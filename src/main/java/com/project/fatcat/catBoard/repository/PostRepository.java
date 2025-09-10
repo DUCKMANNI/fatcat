@@ -2,6 +2,7 @@ package com.project.fatcat.catBoard.repository;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -20,10 +21,27 @@ public interface PostRepository extends JpaRepository<KnowledgePost, Integer> {
 //    
 //    @Query("SELECT p FROM KnowledgePost p JOIN FETCH p.knowledgeBoard WHERE p.postSeq = :seq")
 //    Optional<KnowledgePost> findByIdWithBoard(@Param("seq") Integer seq);
-    
+
+	
+	
+	@Query("SELECT p FROM KnowledgePost p LEFT JOIN FETCH p.knowledgeCommentList WHERE p.postSeq = :postSeq")
+	Optional<KnowledgePost> findByIdWithComments(@Param("postSeq") Integer postSeq);
+	
+	
+	@Query("SELECT DISTINCT p FROM KnowledgePost p LEFT JOIN FETCH p.knowledgeCommentList WHERE p.knowledgeBoard.boardSeq = :boardSeq")
+	List<KnowledgePost> findAllWithCommentsByBoard(@Param("boardSeq") Integer boardSeq);
+
+	
+	
+	// KnowledgePostRepository
+	@Query("SELECT p FROM KnowledgePost p LEFT JOIN FETCH p.knowledgeCommentList WHERE p.postSeq = :postSeq")
+	List<KnowledgePost> findAllWithCommentsByBoardSeq(@Param("postSeq") Integer boardSeq);
+	
 	Page<KnowledgePost> findAll(Pageable pageable);
 	Page<KnowledgePost> findByKnowledgeBoard_BoardSeq(Integer boardSeq, Pageable pageable);
-
+	// boardCode 기준으로 페이징 조회
+    Page<KnowledgePost> findByKnowledgeBoard_BoardCode(String boardCode, Pageable pageable);
+    List<KnowledgePost> findByKnowledgeBoard_BoardSeq(Integer boardSeq);
     
 	 
 }

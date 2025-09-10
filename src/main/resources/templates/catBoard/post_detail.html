@@ -1,5 +1,10 @@
-<html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
+   
+<body>
+        <div layout:fragment="content">
 
 	<!-- 질문 -->
 	<h2 class="border-bottom py-2" th:text="${post.postTitle}"></h2>
@@ -147,7 +152,7 @@
 			rows="10" th:field=*{content}></textarea>
 		<input class="btn btn-warning my-3" type="submit" value="답변 등록하기">
 	</form>
-</div>
+
 
 <!-- delete -->
 <script type='text/javascript' layout:fragment="script">
@@ -165,5 +170,6 @@ Array.from(delete_elements).forEach(function(element){
 });
 
 </script>
-
+</div>
+</body>
 </html>

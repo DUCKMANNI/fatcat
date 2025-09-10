@@ -1,6 +1,7 @@
 package com.project.fatcat.catBoard.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.project.fatcat.DataNotFoundException;
 import com.project.fatcat.catBoard.repository.BoardRepository;
 import com.project.fatcat.catBoard.repository.PostRepository;
+import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,16 @@ public class PostService {
     private final BoardService boardService;
     private final BoardRepository boardRepository;
 
+    
+    // boardSeq로 글 가져오기
+    public List<KnowledgePost> getPostsByBoardSeq(Integer boardSeq) {
+        return postRepository.findByKnowledgeBoard_BoardSeq(boardSeq);
+    }
+    
+    
+    public Page<KnowledgePost> getPostsByBoardSeq(Integer boardSeq, Pageable pageable) {
+        return postRepository.findByKnowledgeBoard_BoardSeq(boardSeq, pageable);
+    }
 
 	public KnowledgePost getPost(Integer postSeq) {
 
@@ -73,12 +85,29 @@ public class PostService {
 	}
 	
 	
+	public Page<KnowledgePost> getPostsByBoardCode(String boardCode, Pageable pageable) {
+	    return postRepository.findByKnowledgeBoard_BoardCode(boardCode, pageable);
+	}
+	
+	public void createPostWithBoardCode(String title, String content, Integer boardSeq) {
+		
+	    KnowledgeBoard board = boardRepository.findById(boardSeq)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 게시판이 없습니다"));
+
+	    KnowledgePost post = new KnowledgePost();
+	    post.setPostTitle(title);
+	    post.setPostContent(content);
+	    post.setKnowledgeBoard(board);
+	    post.setCreateDate(LocalDateTime.now());
+
+	    postRepository.save(post);
+	}
 	
 	
-	
-	
-	
-    
+	public KnowledgePost getPostWithComments(Integer postSeq) {
+	    return postRepository.findByIdWithComments(postSeq)
+	        .orElseThrow(() -> new IllegalArgumentException("해당 게시글 없음"));
+	}
  
 
 //    // Optional 반환
