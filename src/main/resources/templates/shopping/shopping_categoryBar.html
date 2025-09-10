@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+	<div th:fragment="categoryBarFragment">
+	  <ul class="nav justify-content-center bg-light border-bottom">
+	
+	    <!-- 대분류 -->
+	    <li class="nav-item dropdown" th:each="dto : ${categoryDtos}">
+	      <a class="nav-link"
+	         th:text="${dto.mainCategory}"
+	         th:href="@{/products(category=${dto.mainCode})}">
+	      </a>
+	
+	      <!-- 중분류 -->
+	      <ul class="dropdown-menu">
+	        <li th:each="sub : ${dto.subCategories}" class="dropdown-submenu position-relative">
+	          <a class="dropdown-item"
+	             th:text="${sub.subCategory}"
+	             th:href="@{/products(category=${dto.mainCode}, sub=${sub.subCode})}">
+	          </a>
+	
+	          <!-- ✅ 소분류가 있을 때만 옆으로 팝업 -->
+	          <ul class="dropdown-menu" th:if="${#lists.size(sub.details) > 0}">
+	            <li th:each="detail : ${sub.details}">
+	              <a class="dropdown-item" id="detailCategory"
+	                 th:text="${detail.detailCategory}"
+	                 th:href="@{/products(category=${dto.mainCode}, sub=${sub.subCode}, detail=${detail.detailCategory})}">
+	              </a>
+	            </li>
+	          </ul>
+	        </li>
+	      </ul>
+	    </li>
+	
+	  </ul>
+	</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<div th:fragment="navbarFragment">
+		<!-- 네비게이션 바 -->
+		<nav class="navbar navbar-light bg-light border-bottom">
+			<div class="container-fluid">
+				<!-- 로고 + 브랜드 -->
+				<a class="navbar-brand d-flex align-items-center" href="/"> <img
+					th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100"
+					class="me-2"> <img th:src="@{/images/logo.png}" alt="로고"
+					width="70" height="100">
+				</a>
+
+				<!-- 오른쪽 영역 -->
+				<div class="d-flex align-items-center">
+					<a class="btn btn-fatcat me-3" th:href="@{/users/login}"
+						style="font-size: 20px;">로그인</a>
+
+					<!-- 햄버거 버튼 -->
+					<button class="navbar-toggler" type="button"
+						data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+						aria-controls="sidebarMenu" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				</div>
+			</div>
+		</nav>
+
+		<!-- 오프캔버스 (사이드바) -->
+		<div class="offcanvas offcanvas-end" tabindex="-1" id="sidebarMenu"
+			aria-labelledby="sidebarLabel">
+			<div
+				class="offcanvas-header border-bottom d-flex justify-content-between align-items-center mb-3">
+				<!-- 왼쪽 로고 -->
+				<img th:src="@{/images/fatcat.png}" alt="사이드바 문구" width="110"
+					height="90">
+				<!-- 오른쪽 버튼 그룹 -->
+				<div class="d-flex align-items-center">
+					<a class="btn btn-fatcat me-2" th:href="@{/users/login}"
+						style="font-size: 20px;">로그인</a>
+					<button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+				</div>
+			</div>
+			<div class="offcanvas-body">
+				<div class="d-flex align-items-start mb-3">
+					<img th:src="@{/images/mypage_cat.png}" alt="마이페이지" width="60"
+						height="50"> 
+					<a class="ms-2 mt-1 d-inline-block"
+						th:href="@{/}"
+						style="font-size: 30px; text-decoration: none; color: black;">마이페이지</a>
+				</div>
+				<div class="d-flex align-items-start mb-3">
+					<img th:src="@{/images/shopping_cat.png}" alt="쇼핑몰" width="60"
+						height="50"> 
+					<a class="ms-2 mt-1 d-inline-block"
+						th:href="@{/shopping}"
+						style="font-size: 30px; text-decoration: none; color: black;">고양이 전용 쇼핑몰</a>
+				</div>
+				<div class="d-flex align-items-start mb-3">
+					<img th:src="@{/images/vet_cat.png}" alt="동물병원" width="60"
+						height="50"> 
+					<a class="ms-2 mt-1 d-inline-block"
+						th:href="@{/}"
+						style="font-size: 30px; text-decoration: none; color: black;">동물병원 정보</a>
+				</div>
+				<div class="d-flex align-items-start mb-3">
+					<img th:src="@{/images/care_cat.png}" alt="돌봄" width="60"
+						height="50"> 
+					<a class="ms-2 mt-1 d-inline-block"
+						th:href="@{/}"
+						style="font-size: 30px; text-decoration: none; color: black;">돌봄서비스</a>
+				</div>
+				<div class="d-flex align-items-start mb-3">
+					<img th:src="@{/images/board_cat.png}" alt="고지방" width="60"
+						height="50"> 
+					<a class="ms-2 mt-1 d-inline-block"
+						th:href="@{/}"
+						style="font-size: 30px; text-decoration: none; color: black;">고양이 지식방</a>
+				</div>
+				<div class="d-flex align-items-start">
+					<img th:src="@{/images/Customer_cat.png}" alt="고객센터" width="60"
+						height="50"> 
+					<a class="ms-2 mt-1 d-inline-block"
+						th:href="@{/}"
+						style="font-size: 30px; text-decoration: none; color: black;">고객센터</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

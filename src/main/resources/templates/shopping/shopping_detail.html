@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shopping/layout}">
+<head>
+<meta charset="UTF-8">
+<title>쇼핑몰 상품 상세보기</title>
+</head>
+<body>
+	<div layout:fragment="shopContent"
+		class="container my-3 d-flex flex-column align-items-center">
+		<div class="row">
+      <!-- 상품 대표 이미지 -->
+      <div class="col-md-6 text-center">
+        <img th:src="${product.mainImage != null ? product.mainImage : '/images/no_image.jpg'}"
+             th:alt="${product.name}" class="img-fluid border rounded">
+        <p class="mt-2">상품 대표 이미지</p>
+      </div>
+
+      <!-- 상품 정보 -->
+      <div class="col-md-6">
+        <h3 th:text="${product.name}">상품명</h3>
+        <p>★★★★★ <span class="text-muted" th:text="'(' + ${product.reviewCount} + ' 리뷰)'">리뷰수</span></p>
+
+        <!-- 수량 & 가격 -->
+        <div class="d-flex align-items-center my-3">
+          <button class="btn btn-outline-secondary">-</button>
+          <input type="text" class="form-control text-center mx-2" style="width:70px;" value="1">
+          <button class="btn btn-outline-secondary">+</button>
+          <p class="ms-3 h5 mb-0" th:text="'₩ ' + ${#numbers.formatInteger(product.price, 3, 'COMMA')}">가격</p>
+        </div>
+
+        <!-- 장바구니 & 바로구매 버튼 -->
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-outline-dark flex-fill">장바구니</button>
+          <button class="btn btn-primary flex-fill">바로구매</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상세보기 이미지 -->
+    <div class="mt-5">
+      <h5>상세보기 이미지</h5>
+      <img th:src="${product.detailImage != null ? product.detailImage : '/images/no_image.jpg'}"
+           alt="상세 이미지" class="img-fluid border rounded w-100">
+    </div>
+
+		
+	</div>
+</body>
+</html>

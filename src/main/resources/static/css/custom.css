@@ -1,0 +1,161 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: 'BagelFat';
+	src:
+		url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_JAMO@1.0/BagelFatOne-Regular.woff2')
+		format('woff2');
+	font-weight: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'GangwonEducationModuche';
+	src:
+		url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFLightA.woff')
+		format('woff');
+	font-weight: 300;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Juache';
+	src:
+		url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMJUA.woff')
+		format('woff');
+	font-weight: normal;
+	font-display: swap;
+}
+
+/* 전체 페이지에 적용 */
+body {
+	font-family: 'Juache', sans-serif;
+}
+
+.btn-fatcat {
+	background-color: #D2B48C;
+	color: #fff;
+	border-radius: 20px; /* 둥글게 */
+	padding: 6px 16px;
+	border: none;
+	font-weight: 500;
+}
+
+.btn-fatcat:hover {
+	background-color: #a38b6a; /* hover 시 조금 진하게 */
+	color: #fff;
+}
+
+/* ◀ ▶ 화살표 아이콘 */
+.carousel-control-prev-icon, .carousel-control-next-icon {
+	filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg)
+		brightness(0%) contrast(100%);
+}
+
+/* 인디케이터 점 색상 */
+.carousel-indicators [data-bs-target] {
+	background-color: #000;
+}
+
+.carousel-indicators .active {
+	background-color: #f28b82;
+}
+
+/* 입력창 디자인 */
+.login-input {
+	width: 600px;
+	height: 80px;
+	background-color: #fffaf5;
+	border: 1px solid #ccc;
+	border-radius: 999px;
+	padding: 0 20px;
+	font-size: 20px;
+	outline: none;
+	display: block;
+	margin-bottom: 16px;
+}
+
+.login-input:focus {
+	border-color: #e57363;
+	box-shadow: 0 0 0 3px rgba(229, 115, 99, 0.25);
+}
+
+/* 버튼 디자인 */
+.login-btn {
+	width: 600px;
+	height: 70px;
+	background-color: #D2B48C;
+	color: #fff;
+	font-size: 18px;
+	font-weight: bold;
+	border-radius: 999px;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	display: block;
+}
+
+.login-btn:hover {
+	background-color: #a38b6a;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.product-card {
+  background: #fff;
+  text-align: center;
+}
+
+.product-card img {
+  width: 100%;      /* 칸 크기에 맞게 */
+  aspect-ratio: 1 / 1;
+  height: 280px;    /* 높이 고정 */
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
+
+
+/* 대분류 hover → 바로 아래 중분류 메뉴만 표시 */
+.nav-item.dropdown:hover > .dropdown-menu {
+  display: block;
+}
+
+/* 중분류 hover → 해당 소분류만 표시 */
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+
+.dropdown-submenu {
+  position: relative;
+}
+/* 기본적으로 소분류 숨김 */
+.dropdown-submenu > .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%; /* 오른쪽에 붙기 */
+  margin-top: -1px;
+}
+
+/* 중분류 hover 시 해당 소분류만 보이게 */
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+.nav-item.dropdown a.nav-link {
+  font-size:25px;
+  color:black;
+  margin-right: 50px;
+}
+
+

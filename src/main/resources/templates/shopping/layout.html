@@ -1,0 +1,20 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+  <title>쇼핑몰 전용 레이아웃</title>
+</head>
+<body>
+
+  <!-- 공통 레이아웃의 content 자리에 들어갈 블록 -->
+  <div layout:fragment="content">
+
+    <!-- 카테고리 바 -->
+    <th:block th:replace="~{shopping/shopping_categoryBar :: categoryBarFragment}"></th:block>
+
+    <!-- 하위 페이지의 content가 여기 들어옴 -->
+    <div layout:fragment="shopContent"></div>
+
+  </div>
+</body>
+</html>

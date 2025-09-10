@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shopping/layout}">
+<head>
+<title>쇼핑몰 목록 페이지</title>
+</head>
+<body>
+
+
+	<div layout:fragment="shopContent"
+		class="container my-3 d-flex flex-column align-items-center">
+
+		<!-- 상품목록 시작 -->
+
+		<div class="product-grid">
+			<div class="product-card me-5" th:each="product : ${products}">
+				<a th:href="@{/products/detail(productCode=${product['productCode']})}"
+					class="text-decoration-none text-dark"> 
+					<img
+					th:src="@{'https://picsum.photos/200/200?random=' + ${product['productCode']}}"
+					th:alt="${product['name']}">
+					<span th:text="${product['name']}"></span>
+				</a>
+				<p th:text="'가격 : ' + ${product['price']} + '원'"></p>
+			</div>
+		</div>
+		<!-- 상품목록 종료 -->
+
+	</div>
+</body>
+</html>
