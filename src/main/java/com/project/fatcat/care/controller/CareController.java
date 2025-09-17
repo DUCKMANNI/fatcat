@@ -16,6 +16,8 @@ public class CareController {
 		return "care/care_map";
 	}
 	
+	
+	
 
 	
 	

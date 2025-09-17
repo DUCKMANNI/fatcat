@@ -1,0 +1,301 @@
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{shared/layout}">
+
+<head>
+<meta charset="UTF-8">
+<title>돌봄서비스 구인등록</title>
+<style>
+/* 기존에 작성하신 CSS 스타일입니다. */
+#controls {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+#controls select, #controls button {
+    height: 36px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 0 10px;
+}
+
+#controls button {
+    cursor: pointer;
+    border: none;
+    background: #CD853F;
+    color: #fff;
+    font-weight: 600;
+}
+
+#mapListContainer {
+    display: flex;
+    width: calc(100% - 20px);
+    height: 80vh;
+    margin: 20px 15px 0;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+#mapListContainer>div:first-child {
+    flex: 1;
+}
+
+#map {
+    flex: 1;
+    height: 100%;
+    border: 1px solid #e5e5e5;
+    border-radius: 24px;
+    position: relative;
+}
+
+.fixed-element button {
+    display: block !important;
+}
+</style>
+</head>
+<body>
+    <div layout:fragment="content" class="container mt-5">
+        <script
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="my-3 border-bottom pb-2 text-center">돌봄서비스 구인등록</h2>
+
+                <form th:action="@{/care/create}" th:object="${careServiceBoardDto}"
+                    method="post" class="needs-validation" novalidate>
+                <input type="hidden" th:field="*{userSeq}" />
+                    
+                    <div class="mb-3">
+                        <label for="careTitle" class="form-label">제목</label>
+                        <input type="text" id="careTitle" th:field="*{careTitle}" class="form-control" required />
+                        <div class="invalid-feedback">제목을 입력해주세요.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="careContent" class="form-label">내용</label>
+                        <textarea id="careContent" th:field="*{careContent}" rows="10" class="form-control" required></textarea>
+                        <div class="invalid-feedback">내용을 입력해주세요.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label">가격</label>
+                        <input type="number" id="price" th:field="*{price}" class="form-control" required />
+                        <div class="invalid-feedback">가격을 입력해주세요.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">주소 검색</label>
+                        <div class="input-group">
+                            <select id="sido" class="form-select"></select>
+                            <select id="sigungu" class="form-select"></select>
+                            <select id="dong" class="form-select"></select>
+                            <button id="searchBtn" type="button" class="btn btn-warning">검색</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">   
+                        <input  type= "hidden" id="address1" th:field="*{address1}" class="form-control" required readonly />
+                        <div class="invalid-feedback">주소를 검색해주세요.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address2" class="form-label">상세주소</label>
+                        <input type="text" id="address2" th:field="*{address2}" class="form-control" required />
+                        <div class="invalid-feedback">상세주소를 입력해주세요.</div>
+                    </div>
+
+                    <input type="hidden" id="latitude" th:field="*{latitude}" />
+                    <input type="hidden" id="longitude" th:field="*{longitude}" />
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg">등록하기</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-6">
+                <div id="map"></div>
+            </div>
+        </div>
+<script>
+    let REGION_DATA={}, circle = null;
+
+    const markers = [];
+    const $sido = document.getElementById('sido');
+    const $sigungu = document.getElementById('sigungu');
+    const $dong = document.getElementById('dong');
+    const $searchBtn = document.getElementById('searchBtn');
+
+    const map = new kakao.maps.Map(document.getElementById('map'), {
+        center: new kakao.maps.LatLng(37.566826, 126.9786567),
+        level: 5
+    });
+    const geocoder = new kakao.maps.services.Geocoder();
+
+    window.addEventListener('DOMContentLoaded', () => {
+        // CSV 파일 로드 및 데이터 파싱을 먼저 완료
+        fetch('/data/korea_map_info.txt')
+            .then(res => res.text())
+            .then(text => {
+                parseCSV(text);
+                fillSido();
+
+                // CSV 데이터 로드 완료 후 위치 정보 가져오기 시작
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const loc = new kakao.maps.LatLng(lat, lng);
+                        
+                        geocoder.coord2Address(lng, lat, (result, status) => {
+                            if (status === kakao.maps.services.Status.OK) {
+                                const addr = result[0].address.address_name.split(' ');
+                                const sido = addr[0];
+                                const sigungu = addr[1];
+                                const dong = addr[2];
+                                
+                                // 드롭다운 자동 선택 (이제 REGION_DATA가 채워져 있음)
+                                $sido.value = sido;
+                                fillSigungu();
+                                $sigungu.value = sigungu;
+                                fillDong();
+                                $dong.value = dong;
+                                
+                                // 주소 입력 필드와 위경도 필드 자동 채움
+                                document.getElementById('address1').value = `${sido} ${sigungu} ${dong}`;
+                                document.getElementById('latitude').value = lat;
+                                document.getElementById('longitude').value = lng;
+                                
+                                // 지도에 마커 및 원 표시
+                                addCenterMarkerAndCircle(loc);
+
+                            } else {
+                                console.error('주소 변환 실패:', status);
+                                // 실패 시 기본 위치로 마커 설정
+                                addCenterMarkerAndCircle(loc);
+                            }
+                        });
+
+                    }, err => {
+                        console.warn("위치 가져오기 실패", err);
+                        // 위치 가져오기 실패 시 기본 지도로 설정
+                        addCenterMarkerAndCircle(new kakao.maps.LatLng(37.566826, 126.9786567));
+                    });
+                } else {
+                    console.warn("Geolocation API를 지원하지 않는 브라우저입니다.");
+                }
+            })
+            .catch(err => console.error('CSV 읽기 실패', err));
+    });
+
+    function parseCSV(csvText) {
+        REGION_DATA = {};
+        csvText.split('\n').slice(1).forEach(line => {
+            const [sido, sigungu, dong] = line.split(',').map(s => s.trim());
+            if (!sido || !sigungu || !dong) return;
+            REGION_DATA[sido] = REGION_DATA[sido] || {};
+            REGION_DATA[sido][sigungu] = REGION_DATA[sido][sigungu] || [];
+            REGION_DATA[sido][sigungu].push(dong);
+        });
+    }
+
+    function fillSido() {
+        $sido.innerHTML = '<option value="">시/도 선택</option>';
+        Object.keys(REGION_DATA).forEach(sd => $sido.innerHTML += `<option value="${sd}">${sd}</option>`);
+        $sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
+        $dong.innerHTML = '<option value="">동 선택</option>';
+    }
+
+    function fillSigungu() {
+        const sd = $sido.value;
+        $sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
+        $dong.innerHTML = '<option value="">동 선택</option>';
+        if (!sd) return;
+        Object.keys(REGION_DATA[sd]).forEach(gu => $sigungu.innerHTML += `<option value="${gu}">${gu}</option>`);
+    }
+
+    function fillDong() {
+        const sd = $sido.value;
+        const gu = $sigungu.value;
+        $dong.innerHTML = '<option value="">동 선택</option>';
+        if (!sd || !gu) return;
+        REGION_DATA[sd][gu].forEach(d => $dong.innerHTML += `<option value="${d}">${d}</option>`);
+    }
+
+    $sido.addEventListener('change', fillSigungu);
+    $sigungu.addEventListener('change', fillDong);
+
+    function buildRegionText() {
+        return [$sido.value, $sigungu.value, $dong.value].filter(Boolean).join(' ');
+    }
+
+    function addCenterMarkerAndCircle(position) {
+        markers.forEach(m => m.setMap(null));
+        markers.length = 0;
+        if (circle) {
+            circle.setMap(null);
+        }
+
+        const centerMarker = new kakao.maps.Marker({
+            map: map,
+            position: position,
+            image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(36, 46))
+        });
+        markers.push(centerMarker);
+
+        circle = new kakao.maps.Circle({
+            center: position,
+            radius: 3000,
+            strokeWeight: 5,
+            strokeColor: '#75B8FA',
+            strokeOpacity: 0.8,
+            strokeStyle: 'dashed',
+            fillColor: '#CFE7FF',
+            fillOpacity: 0.5
+        });
+
+        circle.setMap(map);
+        map.setCenter(position);
+        map.setLevel(7);
+    }
+
+    function searchLocation() {
+        if (!$sido.value || !$sigungu.value) {
+            alert('시/도와 시/군/구를 선택해주세요.');
+            return;
+        }
+
+        const address = buildRegionText();
+        
+        document.getElementById('address1').value = address;
+
+        geocoder.addressSearch(address, (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                addCenterMarkerAndCircle(coords);
+
+                document.getElementById('latitude').value = coords.getLat();
+                document.getElementById('longitude').value = coords.getLng();
+            } else {
+                alert('주소 검색에 실패했습니다.');
+            }
+        });
+    }
+    $searchBtn.addEventListener('click', searchLocation);
+
+</script>
+    </div>
+</body>
+</html>
