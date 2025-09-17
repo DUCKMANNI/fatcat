@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>돌봄서비스 등록</title>
+<link rel="stylesheet" th:href="@{/bootstrap.min.css}">
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+	overflow: hidden;
+}
+
+#controls {
+	position: fixed;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 1000;
+	background: rgba(255, 255, 255, 0.96);
+	border: 1px solid #ddd;
+	border-radius: 14px;
+	padding: 10px 14px;
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+#controls select, #controls button {
+	height: 36px;
+	font-size: 14px;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	padding: 0 10px;
+}
+
+#controls button {
+	cursor: pointer;
+	border: none;
+	background: #2b74e4;
+	color: #fff;
+	font-weight: 600;
+}
+
+#mapListContainer {
+	display: flex;
+	width: calc(100% - 20px);
+	height: 80vh;
+	margin: 80px 15px 0;
+	gap: 16px;
+	box-sizing: border-box;
+}
+
+#map, #menu_wrap, #detailPanel {
+	transition: all 0.3s ease;
+}
+
+#map {
+	flex: 0.9;
+	height: 100%;
+	border: 1px solid #e5e5e5;
+	border-radius: 24px;
+	position: relative;
+}
+
+#menu_wrap {
+	flex: 0.5;
+	background: rgba(255, 255, 255, 0.96);
+	border-radius: 24px;
+	padding: 8px;
+	font-size: 14px;
+	overflow-y: auto;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+#menu_wrap h3 {
+	margin: 6px 8px 10px;
+	font-size: 16px;
+}
+
+#placesList {
+	margin: 0;
+	padding: 0 6px 8px;
+}
+
+#placesList li {
+	list-style: none;
+}
+
+#placesList .item {
+	display: flex;
+	align-items: flex-start;
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+	cursor: pointer;
+}
+
+#placesList .marker-number {
+	width: 23px;
+	height: 23px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #007bff;
+	color: white;
+	border-radius: 20%;
+	font-size: 13px;
+	font-weight: bold;
+	margin-right: 10px;
+	flex-shrink: 0;
+}
+
+#placesList .info {
+	flex: 1;
+}
+
+#placesList .info h5 {
+	margin: 0 0 4px;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+#placesList .info p {
+	margin: 2px 0;
+	font-size: 13px;
+	color: #555;
+}
+
+#pagination {
+	text-align: center;
+	padding: 6px 0 10px;
+}
+
+#pagination a {
+	display: inline-block;
+	margin: 0 6px;
+	text-decoration: none;
+	color: #2b74e4;
+}
+
+#pagination .on {
+	font-weight: 700;
+	color: #444;
+	pointer-events: none;
+}
+
+.fixed-element {
+	position: fixed;
+	top: 5px;
+	right: 5px;
+}
+
+.fixed-element button {
+	display: block !important;
+}
+/* 상세창 */
+#detailPanel {
+	flex: 0;
+	width: 0;
+	padding: 0;
+	overflow: hidden;
+	background: #fff;
+	border-radius: 24px;
+	box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+#detailPanel.show {
+	flex: 0.5;
+	width: 300px;
+	padding: 10px;
+}
+
+#detailPanel #closeDetail {
+	float: right;
+	cursor: pointer;
+	border-radius: 60px;
+	background: white;
+	border-color: white;
+	color: #2b74e4;
+}
+</style>
+</head>
+<body>
+	<script
+		src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
+
+	<div id="controls">
+		<label>시/도<select id="sido"></select></label> <label>시/군/구<select
+			id="sigungu"></select></label> <label>동<select id="dong"></select></label>
+		<button id="searchBtn">검색</button>
+	</div>
+
+	<div class="fixed-element">
+		<button id="btn" class="btn btn-primary" onclick='toggleListView()'>리스트만보기</button>
+	</div>
+
+	<div id="mapListContainer">
+		<div id="map"></div>
+		<div id="menu_wrap">
+			<h3>동물병원 검색 결과</h3>
+			<ul id="placesList"></ul>
+			<div id="pagination"></div>
+		</div>
+		<div id="detailPanel">
+			<button id="closeDetail">X</button>
+			<div id="detailContent"></div>
+		</div>
+	</div>
+
+	<script>
+let REGION_DATA={}, allPlaces=[], currentPage=1, pageSize=7, maxItems=45;
+let openedPlaceId=null, originalCenter=null;
+
+const markers=[];
+const $sido=document.getElementById('sido');
+const $sigungu=document.getElementById('sigungu');
+const $dong=document.getElementById('dong');
+const $searchBtn=document.getElementById('searchBtn');
+const $placesList=document.getElementById('placesList');
+const $pagination=document.getElementById('pagination');
+
+// Kakao Map
+const map=new kakao.maps.Map(document.getElementById('map'), {center:new kakao.maps.LatLng(37.566826,126.9786567), level:5});
+const ps=new kakao.maps.services.Places();
+const infowindow=new kakao.maps.InfoWindow({zIndex:1});
+
+// 초기 시/도/구/동 데이터 로드
+window.addEventListener('DOMContentLoaded', ()=>{
+  fetch('/data/korea_map_info.txt')
+    .then(res=>res.text())
+    .then(text=>{ parseCSV(text); fillSido(); })
+    .catch(err=>console.error('CSV 읽기 실패', err));
+});
+
+function parseCSV(csvText){
+  REGION_DATA={};
+  csvText.split('\n').slice(1).forEach(line=>{
+    const [sido,sigungu,dong]=line.split(',').map(s=>s.trim());
+    if(!sido||!sigungu||!dong) return;
+    REGION_DATA[sido]=REGION_DATA[sido]||{};
+    REGION_DATA[sido][sigungu]=REGION_DATA[sido][sigungu]||[];
+    REGION_DATA[sido][sigungu].push(dong);
+  });
+}
+
+function fillSido(){
+  $sido.innerHTML='<option value="">시/도 선택</option>';
+  Object.keys(REGION_DATA).forEach(sd=>$sido.innerHTML+=`<option value="${sd}">${sd}</option>`);
+  $sigungu.innerHTML='<option value="">시/군/구 선택</option>';
+  $dong.innerHTML='<option value="">동 선택</option>';
+}
+function fillSigungu(){
+  const sd=$sido.value;
+  $sigungu.innerHTML='<option value="">시/군/구 선택</option>';
+  $dong.innerHTML='<option value="">동 선택</option>';
+  if(!sd) return;
+  Object.keys(REGION_DATA[sd]).forEach(gu=>$sigungu.innerHTML+=`<option value="${gu}">${gu}</option>`);
+}
+function fillDong(){
+  const sd=$sido.value, gu=$sigungu.value;
+  $dong.innerHTML='<option value="">동 선택</option>';
+  if(!sd||!gu) return;
+  REGION_DATA[sd][gu].forEach(d=>$dong.innerHTML+=`<option value="${d}">${d}</option>`);
+}
+$sido.addEventListener('change', fillSigungu);
+$sigungu.addEventListener('change', fillDong);
+
+function clearMarkers(){ markers.forEach(m=>{ m.marker.setMap(null); m.overlay.setMap(null); }); markers.length=0; }
+function clearList(){ $placesList.innerHTML=''; }
+function buildRegionText(){ return [$sido.value,$sigungu.value,$dong.value].filter(Boolean).join(' '); }
+
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const loc=new kakao.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
+    new kakao.maps.Marker({map:map, position:loc, image:new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(36,46))});
+    searchNearbyHospitals(loc);
+  }, err=>console.warn("위치 가져오기 실패", err));
+}
+
+function searchHospitals(){
+  if(!$sido.value||!$sigungu.value){ alert('시/도와 시/군/구를 선택해주세요.'); return; }
+  const keyword=buildRegionText()+' 동물병원';
+  allPlaces=[]; currentPage=1;
+  const getPlaces=(page=1)=>{
+    ps.keywordSearch(keyword,(data,status,pagination)=>{
+      if(status===kakao.maps.services.Status.OK){
+        allPlaces=allPlaces.concat(data);
+        if(page<3 && pagination.hasNextPage){ pagination.nextPage(); }
+        else { renderList(); }
+      } else if(status===kakao.maps.services.Status.ZERO_RESULT){
+        clearMarkers(); clearList(); $pagination.innerHTML='';
+        alert('검색 결과가 없습니다.');
+      } else { alert('검색 중 오류가 발생했습니다.'); }
+    }, {size:15, page});
+  }
+  getPlaces();
+}
+$searchBtn.addEventListener('click', searchHospitals);
+
+function searchNearbyHospitals(loc){
+  allPlaces=[]; currentPage=1;
+  ps.keywordSearch("동물병원",(data,status)=>{
+    if(status===kakao.maps.services.Status.OK){ allPlaces=data; renderList(); }
+    else if(status===kakao.maps.services.Status.ZERO_RESULT){ clearMarkers(); clearList(); $pagination.innerHTML=''; alert('내 위치 주변에 검색 결과가 없습니다.'); }
+  }, {location:loc, radius:500, size:15});
+}
+
+function addMarker(pos, idx){
+  const marker=new kakao.maps.Marker({position:pos, map:map, image:new kakao.maps.MarkerImage('/images/map_marker.png', new kakao.maps.Size(39,46))});
+  const overlay=new kakao.maps.CustomOverlay({position:pos, content:`<div style="width:20px;height:18px;color:white;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:15px;font-weight:bold;">${idx+1}</div>`, yAnchor:2.4});
+  overlay.setMap(map);
+  markers.push({marker, overlay});
+  return {marker, overlay};
+}
+
+function renderList(){
+  clearMarkers(); clearList();
+  const start=(currentPage-1)*pageSize, end=start+pageSize;
+  const pagePlaces=allPlaces.slice(start,end);
+
+  pagePlaces.forEach((place,i)=>{
+    const pos=new kakao.maps.LatLng(place.y, place.x);
+    const {marker}=addMarker(pos,i+start);
+
+    const li=document.createElement('li'); li.className='item';
+    li.innerHTML=`
+      <div class="marker-number">${i+start+1}</div>
+      <div class="info">
+        <h5>${place.place_name}</h5>
+        <p class="addr">${place.road_address_name || place.address_name || ''}</p>
+        <p class="tel">${place.phone || ''}</p>
+      </div>
+    `;
+
+    // 마우스 오버 시 마커가 지도 안에 보이도록 센터 이동
+    li.addEventListener('mouseover', ()=>{
+      showInfo(marker, place.place_name);
+      map.panTo(pos);
+    });
+    li.addEventListener('mouseout', ()=>infowindow.close());
+
+    // 클릭 시 상세보기
+    li.addEventListener('click', ()=>{
+      const detailPanel=document.getElementById('detailPanel');
+      const detailContent=document.getElementById('detailContent');
+
+      if(openedPlaceId===place.id || openedPlaceId===place.place_name){
+        detailPanel.classList.remove('show');
+        map.panTo(originalCenter || map.getCenter());
+        openedPlaceId=null;
+        return;
+      }
+
+      detailContent.innerHTML=`<h4>${place.place_name}</h4>
+        <p><strong>주소:</strong> ${place.road_address_name||place.address_name}</p>
+        <p><strong>전화:</strong> ${place.phone||'정보 없음'}</p>
+        <p><strong>카테고리:</strong> ${place.category_name||'-'}</p>`;
+
+      detailPanel.classList.add('show');
+
+      // 상세보기 열릴 때 지도 중앙 이동
+      if(!originalCenter) originalCenter=map.getCenter();
+      map.panBy(-detailPanel.offsetWidth/2,0);
+
+      openedPlaceId=place.id || place.place_name;
+    });
+
+    $placesList.appendChild(li);
+  });
+
+  // 닫기 버튼
+  document.getElementById('closeDetail').onclick=()=>{
+    const detailPanel=document.getElementById('detailPanel');
+    detailPanel.classList.remove('show');
+    map.panTo(originalCenter || map.getCenter());
+    openedPlaceId=null;
+  }
+
+  renderPagination();
+
+  // 지도에 마커 모두 보이도록 범위 조정
+  if(document.getElementById('map').style.display!=='none' && allPlaces.length>0){
+    const bounds=new kakao.maps.LatLngBounds();
+    allPlaces.forEach(p=>bounds.extend(new kakao.maps.LatLng(p.y,p.x)));
+    map.setBounds(bounds,20);
+  }
+}
+
+function renderPagination(){
+  $pagination.innerHTML='';
+  const totalPages=Math.ceil(allPlaces.length/pageSize);
+  for(let i=1;i<=totalPages;i++){
+    const a=document.createElement('a'); a.href='#'; a.textContent=i;
+    if(i===currentPage) a.className='on';
+    else a.addEventListener('click', e=>{ e.preventDefault(); currentPage=i; renderList(); });
+    $pagination.appendChild(a);
+  }
+}
+
+function showInfo(marker,title){ infowindow.setContent('<div style="padding:5px;font-size:13px;">'+title+'</div>'); infowindow.open(map,marker); }
+
+function toggleListView(){
+  const mapDiv=document.getElementById('map');
+  const btn=document.getElementById('btn');
+  const menuWrap=document.getElementById('menu_wrap');
+
+  if(mapDiv.style.display!=='none'){
+    mapDiv.style.display='none';
+    btn.innerText='지도랑 같이 보기';
+    $placesList.style.display='grid';
+    $placesList.style.gridTemplateColumns='repeat(3,1fr)';
+    $placesList.style.gap='10px';
+    pageSize=15; currentPage=1;
+    menuWrap.style.flex='1';
+    renderList();
+  } else {
+    mapDiv.style.display='block';
+    btn.innerText='리스트만 보기';
+    kakao.maps.event.trigger(map,'resize');
+    $placesList.style.display='block';
+    $placesList.style.gridTemplateColumns='none';
+    $placesList.style.gap='0';
+    pageSize=7; currentPage=1;
+    menuWrap.style.flex='0.5';
+    kakao.maps.event.trigger(map,'resize');
+    renderList();
+    
+    
+  }
+}
+</script>
+</body>
+</html>
