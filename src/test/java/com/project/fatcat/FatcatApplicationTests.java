@@ -106,20 +106,20 @@ class FatcatApplicationTests {
 //		
 //		// user
 //	    User user = new User();
-//	    user.setUserEmail("dbwjd00@test.com");
-//	    user.setUserPassword("dbwjd1123");
-//	    user.setUserName("유정");
-//	    user.setNickname("나는 유정");
-//	    user.setPhoneNumber("01012345678");
+//	    user.setUserEmail("dbwjd112316@naver.com");
+//	    user.setUserPassword("yj1123!!");
+//	    user.setUserName("김유정");
+//	    user.setNickname("관리왕");
+//	    user.setPhoneNumber("01051250691");
 //	    user.setLatitude(37.5665);
 //	    user.setLongitude(126.9780);
-//	    user.setRole("USER");
+//	    user.setRole("ADMIN");
 //	    user.setCreateDate(LocalDateTime.now());
 //	    user.setIsDeleted(false);
 //
 //	    User saved = userRepository.save(user);
 //	    System.out.println("저장된 userSeq = " + saved.getUserSeq());
-//		
+		
 		
 	
 

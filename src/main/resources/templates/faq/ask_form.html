@@ -1,0 +1,28 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
+
+<body>
+	<div layout:fragment="content">
+	
+	
+	
+	
+	
+	
+	 <h1>질문하기</h1>
+    <form th:action="@{/faq/ask}" method="post">
+        <textarea name="question" rows="10" cols="50" required></textarea>
+        <button type="submit">질문 등록</button>
+    </form>
+	
+	
+	
+	
+	
+	
+	
+	</div>
+	</body>
+	</html>
