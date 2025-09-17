@@ -11,7 +11,7 @@ import com.project.fatcat.entity.CareServiceBoard;
 @Controller
 public class CareController {
 	
-	@GetMapping("care")
+	@GetMapping("/care")
 	public String care() {
 		return "care/care_map";
 	}
