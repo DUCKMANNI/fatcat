@@ -32,30 +32,7 @@ public class BoardController {
     private final BoardService boardService;
     private final PostService postService;
     
-    
-    
-//    @GetMapping("/list")
-//    public String list(
-//            @RequestParam(name = "boardCode", required = false) String boardCode,
-//            @RequestParam(name = "page", defaultValue = "0") int page,
-//            Model model) {
-//    	
-//    	
-//        if(boardCode == null) boardCode = "main"; // 기본 코드
-//        
-//        List<KnowledgeBoard> boards = boardService.getBoard();
-//       
-//        System.out.println(boards.toString()); // 시뮬레이션 확인
-//        
-//        model.addAttribute("boards", boards);
-//
-//        Pageable pageable = PageRequest.of(page, 10, Sort.by("createDate").descending());
-////        Page<KnowledgePost> posts = postService.getPostsByBoardCode(boardCode, page);
-////        model.addAttribute("posts", posts);
-//        return "catBoard/board_list";
-//        
-//    }
-    
+
 
     @GetMapping("/list")
     public String list(
@@ -63,7 +40,7 @@ public class BoardController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             Model model) {
 
-        if (boardCode == null) boardCode = "main"; // 기본 코드
+        if (boardCode == null) boardCode = "1"; // 기본 코드
 
         // 전체 게시판 가져오기
         List<KnowledgeBoard> boards = boardService.getBoard();
@@ -72,10 +49,10 @@ public class BoardController {
         // 게시판 이름 설정
         String boardName;
         switch (boardCode) {
-            case "vet":
+            case "1":
                 boardName = "수의사에게 질문하기";
                 break;
-            case "tip":
+            case "2":
                 boardName = "냥꿀팁";
                 break;
             default:

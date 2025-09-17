@@ -1,67 +1,4 @@
 
-<!-- 
-<html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container">
-	<h5 class="my-3 border-bottom pb-2">질문 등록</h5>
-
-	<form action="/post/create/${board.boardSeq}" method="post">
-
-		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-
-		<div class="mb-3">
-			<label for="postTitle" class="form-label">제목</label> <input type="text"
-				th:field="*{postTitle}" class="form-control">
-		</div>
-
-		<div class="mb-3">
-			<label for="postContent" class="form-label">내용</label>
-			<textarea class="form-control" rows="10" th:field="*{postContent}"></textarea>
-		</div>
-		<div>
-			<input class="btn btn-warning my-2" type="submit" value="저장하기">
-		</div>
-	</form>
-</div>
-</html>
-
-
-
-<!-- 
-<html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container">
-	<h5 class="my-3 border-bottom pb-2">질문 등록</h5>
-
-	<form th:action="@{/post/create}" th:object="${postForm}"
-		method="post">
-
-		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-
-		<div class="mb-3">
-			<label for="postTitle" class="form-label">제목</label> <input type="text"
-				th:field="*{postTitle}" class="form-control">
-		</div>
-
-		<div class="mb-3">
-			<label for="postContent" class="form-label">내용</label>
-			<textarea class="form-control" rows="10" th:field="*{postContent}"></textarea>
-		</div>
-		
-		<select th:field="*{boardSeq}">
-        <option th:each="board : ${boards}" 
-                th:value="${board.boardSeq}" 
-                th:text="${board.boardCode}">
-        </option>
-    </select>
-		
-		
-		<div>
-			<input class="btn btn-warning my-2" type="submit" value="저장하기">
-		</div>
-	</form>
-</div>
-</html>
- -->
- 
 
  <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -72,7 +9,7 @@
         <div layout:fragment="content">
     <h5 class="my-3 border-bottom pb-2">질문 등록</h5>
 
-<form th:action="@{/post/create}" th:object="${postForm}" method="post"> 
+<form th:action="@{|/post/create/${boardCode}|}" th:object="${postForm}" method="post"> 
 
          <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div> 
 

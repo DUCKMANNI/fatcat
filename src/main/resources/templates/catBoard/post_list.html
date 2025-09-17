@@ -1,110 +1,3 @@
-<!-- 
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
-
-   
-<body>
-        <div layout:fragment="content">
-      
-         <center>
-         <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${currentBoardName}"></h5>
-         
- 
- <th:block th:if="${!paging.isEmpty()}">
-    <div th:each="post : ${paging.content}">
-        <h6 th:text="${post.postTitle}"></h6>
-        <p th:text="${post.postContent}"></p>
-    </div>
-</th:block>
- 
- 
- 
-
-<div class="mb-3">
-
-        
-        <a th:href="@{/post/list/1}" class="btn btn-primary">수의사에게 질문하기</a>
-<a th:href="@{/post/list/2}" class="btn btn-secondary">냥꿀팁</a>
-</div>
-
-
-
-<div th:each="post : ${posts}">
-    <div class="card my-2">
-        <div class="card-body">
-            <h6 th:text="${post.postTitle}"></h6>
-            <p th:text="${post.postContent}"></p>
-        </div>
-    </div>
-</div>
-    </center>    
-         
-          
-
-        <table class="table">
-            <thead class="table-danger">
-           
-             
-            
-           
-                 
-                <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>작성일자</th>
-                </tr>
-            </thead>
- 
-           
-           
-            <tbody>
-                <tr th:each="post,loop : ${paging}">
-                    <td th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
-                    <td>
-                        <a th:href="@{|/post/detail/${post.postSeq}|}"
-                           th:text="${post.postTitle}"></a>
-                        <span class="text-danger small ms-2"
-                              th:if="${#lists.size(post.knowledgeCommentList) > 0}"
-                              th:text="${#lists.size(post.knowledgeCommentList)}"></span>
-                    </td>
-                    <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-                </tr>
-            </tbody>
-        </table>
-
-        
-        
-        <div th:if="${!paging.isEmpty()}">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{|?boardCode=${boardCode}&page=${paging.number-1}|}">이전</a>
-                </li>
-                <li th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
-                    th:if="${page >= paging.number-5 and page <= paging.number+5}"
-                    th:classappend="${page == paging.number} ? 'active'" class="page-item">
-                    <a th:text="${page}" class="page-link"
-                       th:href="@{|?boardCode=${boardCode}&page=${page}|}"></a>
-                </li>
-                <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{|?boardCode=${boardCode}&page=${paging.number+1}|}">다음</a>
-                </li>
-            </ul>
-        </div>
-
-     
-        <a th:href="@{'/post/create/' + ${currentBoardSeq}}" class="btn btn-warning mb-3">질문 등록</a>
-       
- 
-</div>
-</body>
-</html>
- -->
- 
- 
- 
  <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
@@ -114,14 +7,14 @@
         <div layout:fragment="content">
     <center>
         <!-- 게시판 이름 -->
-        <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${currentBoardName}"></h5>
+        <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${boardName}"></h5>
 
         <!-- 게시판 선택 버튼 -->
         <div class="mb-3">
             <a th:href="@{/post/list/1}" class="btn btn-primary"
-               th:classappend="${currentBoardSeq} == 1 ? ' active' : ''">수의사에게 질문하기</a>
+               th:classappend="${boardSeq} == 1 ? ' active' : ''">수의사에게 질문하기</a>
             <a th:href="@{/post/list/2}" class="btn btn-secondary"
-               th:classappend="${currentBoardSeq} == 2 ? ' active' : ''">냥꿀팁</a>
+               th:classappend="${boardSeq} == 2 ? ' active' : ''">냥꿀팁</a>
         </div>
 
         <!-- 게시글 리스트 -->
@@ -149,9 +42,12 @@
             <tr>
                 <th>번호</th>
                 <th>제목</th>
+                <th>작성자</th>
                 <th>작성일자</th>
             </tr>
             </thead>
+            
+            
             <tbody>
             <tr th:each="post, loop : ${paging.content}">
             
@@ -167,8 +63,14 @@
                 </td>
                 
                 
-                <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+                <!-- 작성자 나타내기 -->
+					 <td><span th:if="${post.user != null}"
+						th:text="${post.user.userName}"></span></td>
                 
+                
+                <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+              
+				
                 
             </tr>
             </tbody>
@@ -195,7 +97,7 @@
         </div>
 
         <!-- 글쓰기 버튼 -->
-        <a th:href="@{'/post/create/' + ${currentBoardSeq}}" class="btn btn-warning mb-3">질문 등록</a>
+        <a th:href="@{|/post/create/${boardCode}|}" class="btn btn-warning mb-3">질문 등록</a>
    </center>
 </div>
 </body>

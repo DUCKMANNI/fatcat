@@ -21,25 +21,28 @@
 
 		<div class="d-flex justify-content-end">
 			<div class="badge bg-light text-dark p-2 text-start">
-
-				<!-- 수정 버튼 
+<!--
+				 수정 버튼 
 				<div class="my-2">
-					<a th:href="@{|/question/modify/${question.id}|}"
+					<a th:href="@{|/post/modify/${post.postSeq}|}"
 						class="btn btn-sm btn-outline-secondary"
 						sec:authorize="isAuthenticated()"
-						th:if="${question.author != null and
+						th:if="${post.user != null and
                         #authentication.getPrincipal().getUsername() 
-                        == question.author.username}"
+                        == post.user.username}"
 						th:text="수정"></a>
 				</div>
                  -->
 
 				<!-- 작성자 이름 나타내기 -->
+				<p>작성자: 
+
 				<div class="mb-2">
 					<span th:if="${post.user != null}"
-						th:text="${post.user.username}"></span>
+						th:text="${post.user.userName}"></span>
 				</div>
-
+				 
+				 
 				<!-- 작성시간 나타내기 -->
 				<div
 					th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
@@ -54,25 +57,39 @@
 		<div class="my-2">
 
 			<!-- 수정 버튼 -->
+			<!-- 
+			<span th:text="${post.user != null ? post.user.username : '익명'}"></span>
+			 -->
+			 
 			<a th:href="@{|/post/modify/${post.postSeq}|}"
-				class="btn btn-sm btn-warning" sec:authorize="isAuthenticated()"
-				th:if="${post.user != null and
-                        #authentication.getPrincipal().getUsername() 
-                        == post.user.username}"
+				class="btn btn-sm btn-warning"
+				th:if="${post.user != null ? post.user.userName : '익명'}"
 				th:text="수정"></a>
-
+				
 
 			<!-- 삭제 버튼 -->
+			
 			<a href="javascript:void(0)"
 				th:data-uri="@{|/post/delete/${post.postSeq}|}"
 				class="delete btn btn-sm btn-primary"
-				sec:authorize="isAuthenticated()"
+				th:if="${post.user != null ? post.user.userName : '익명'}"
+				
+				th:text="삭제"></a>
+				
+				
+				
+				
+				
+				<!-- sec:authorize="isAuthenticated()"
 				th:if="${post.user != null and
                         #authentication.getPrincipal().getUsername() 
-                        == post.user.username}"
-				th:text="삭제"></a>
+                        == post.user.username}" -->
+				
+				
+				
 
 		</div>
+		
 
 
 
@@ -83,12 +100,13 @@
 
 
 	<!-- 답변 갯수-->
+
 	<h5 class="border-bottom my-3 py-3"
 		th:text="|${#lists.size(post.knowledgeCommentList)}개의 답변이 있습니다!!|"></h5>
 
 
-
 	<!-- 답변 목록 -->
+ 
 	<div class="card my-3" th:each=" comment : ${post.knowledgeCommentList}">
 		<div class="card-body">
 			<div class="card-text" style="white-space: pre-line;"
@@ -98,12 +116,13 @@
 
 
 		<!-- 답변 날짜! -->
+		 
 		<div class="d-flex justify-content-end">
 			<div class="badge bg-light text-dark p-2 text-start">
 
 				<div class="mb-2">
 					<span th:if="${comment.user != null}"
-						th:text="${comment.user.username}"></span>
+						th:text="${comment.user.userName}"></span>
 				</div>
 				<div
 					th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
@@ -115,23 +134,44 @@
 		<div class="my-2">
 
 			<!-- 수정 버튼 -->
+			
+			
 			<a th:href="@{|/comment/modify/${comment.commentSeq}|}"
+				class="btn btn-sm btn-warning"
+				th:if="${comment.user != null ? comment.user.userName : '익명'}"
+				th:text="수정"></a>
+				
+			
+			
+			
+			<!-- <a th:href="@{|/comment/modify/${comment.commentSeq}|}"
 				class="btn btn-sm btn-warning" sec:authorize="isAuthenticated()"
 				th:if="${comment.user != null and
                         #authentication.getPrincipal().getUsername() 
                         == comment.user.username}"
 				th:text="수정"></a>
-
+ -->
 
 			<!-- 삭제 버튼 -->
+			
+			
 			<a href="javascript:void(0)"
+				th:data-uri="@{|/comment/delete/${comment.commentSeq}|}"
+				class="delete btn btn-sm btn-primary"
+				th:if="${comment.user != null ? comment.user.userName : '익명'}"
+				th:text="삭제"></a>
+			
+			
+			
+			
+			<!-- <a href="javascript:void(0)"
 				th:data-uri="@{|/comment/delete/${comment.commentSeq}|}"
 				class="delete btn btn-sm btn-primary"
 				sec:authorize="isAuthenticated()"
 				th:if="${comment.user != null and
                         #authentication.getPrincipal().getUsername() 
                         == comment.user.username}"
-				th:text="삭제"></a>
+				th:text="삭제"></a> -->
 
 		</div>
 
@@ -142,18 +182,27 @@
 
 
 	<!-- 답변 등록 -->
+	
 	<form th:action="@{|/comment/create/${post.postSeq}|}"
 		th:object="${commentForm}" method="post">
 
-		<div th:replace="~{form_errors :: formErrorsFragment }"></div>
+ 
+		 <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div> 
 
 		
 		<textarea sec:authorize="isAuthenticated()" class="form-control"
-			rows="10" th:field=*{content}></textarea>
+			rows="10" th:field=*{commentContent}></textarea>
 		<input class="btn btn-warning my-3" type="submit" value="답변 등록하기">
 	</form>
-
-
+	
+	
+<!-- 	
+	<form th:action="@{|/post/list/${boardCode}|}" th:object="${postForm}" method="post">
+	<input value="목록으로 돌아가기" type="submit" class="btn btn-warning my-3" >
+ </form>
+  -->
+ 
+ 
 <!-- delete -->
 <script type='text/javascript' layout:fragment="script">
 

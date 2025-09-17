@@ -1,0 +1,34 @@
+
+
+ <html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
+   
+<body>
+        <div layout:fragment="content">
+    <h5 class="my-3 border-bottom pb-2">질문 수정</h5>
+
+<form th:action="@{|/post/modify/${postSeq}|}" th:object="${postForm}" method="post"> 
+
+         <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div> 
+
+        <div class="mb-3">
+            <label for="postTitle" class="form-label">제목</label>
+            <input type="text" th:field="*{postTitle}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="postContent" class="form-label">내용</label>
+            <textarea class="form-control"  th:field="*{postContent}"  rows="10"></textarea>
+        </div>
+
+
+        <div>
+            <input class="btn btn-warning my-2" type="submit" value="저장하기">
+        </div>
+    </form> 
+</div>
+</body>
+</html>
+ 

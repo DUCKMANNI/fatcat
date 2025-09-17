@@ -48,7 +48,7 @@ public class CommentController {
 
 	@GetMapping("/modify/{commentSeq}")
 //	@PreAuthorize("isAuthenticated()")
-	public String answerModify(CommentForm commentForm, @PathVariable("commentSeq") Integer commentSeq, Principal principal) {
+	public String commentrModify(CommentForm commentForm, @PathVariable("commentSeq") Integer commentSeq, Principal principal) {
 
 		KnowledgeComment comment = this.commentService.getComment(commentSeq);
 
@@ -62,7 +62,7 @@ public class CommentController {
 
 	@PostMapping("/modify/{commentSeq}")
 //	@PreAuthorize("isAuthenticated()")
-	public String answerModify(@Valid CommentForm commentForm, BindingResult bindingResult, Principal principal,
+	public String commentModify(@Valid CommentForm commentForm, BindingResult bindingResult, Principal principal,
 			@PathVariable("commentSeq") Integer commentSeq) {
 
 		if (bindingResult.hasErrors()) {

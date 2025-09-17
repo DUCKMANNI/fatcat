@@ -1,0 +1,117 @@
+ <html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
+   
+<body>
+        <div layout:fragment="content">
+<title>고양이 정보 수정</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group .required::after {
+            content: '*';
+            color: red;
+            margin-left: 4px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+        }
+        .radio-group input {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>고양이 정보 수정</h1>
+
+        <div th:if="${#fields.hasAnyErrors()}" th:each="err : ${#fields.allErrors()}">
+            <span style="color:red;" th:text="${err}"></span>
+        </div>
+
+        <form th:action="@{|/cats/modify/${catSeq}|}" th:object="${catUpdateDTO}" method="post">
+            <div class="form-group">
+                <label for="catName" class="required">이름</label>
+                <input type="text" id="catName" th:field="*{catName}">
+            </div>
+
+            <div class="form-group">
+                <label for="catBirtthday">생일</label>
+                <input type="date" id="catBirtthday" th:field="*{catBirtthday}">
+            </div>
+<!-- 
+            <div class="form-group">
+                <label for="catGender" class="required">성별</label>
+                <div class="radio-group">
+                    <input type="radio" id="male" th:field="*{catGender}" value="수컷">
+                    <label for="male">수컷</label>
+                    <input type="radio" id="female" th:field="*{catGender}" value="암컷">
+                    <label for="female">암컷</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="required">중성화 여부</label>
+                <div class="radio-group">
+                    <input type="radio" id="neutered-yes" th:field="*{isNeutered}" th:value="true">
+                    <label for="neutered-yes">예</label>
+                    <input type="radio" id="neutered-no" th:field="*{isNeutered}" th:value="false">
+                    <label for="neutered-no">아니오</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="catBreed" class="required">고양이 종</label>
+                <input type="text" id="catBreed" th:field="*{catBreed}">
+            </div>
+
+            <div class="form-group">
+                <label for="chronicDisease">지병</label>
+                <input type="text" id="chronicDisease" th:field="*{chronicDisease}">
+            </div>
+
+            <div class="form-group">
+                <label for="allergy">알러지</label>
+                <input type="text" id="allergy" th:field="*{allergy}">
+            </div> -->
+
+         <!--    <div class="form-group">
+                <label for="catImageUrl">사진 URL</label>
+                <input type="url" id="catImageUrl" th:field="*{catImageUrl}">
+            </div> -->
+
+            <div>
+                <button type="submit">수정하기</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -14,6 +14,8 @@ import com.project.fatcat.catBoard.repository.BoardRepository;
 import com.project.fatcat.catBoard.repository.PostRepository;
 import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
+import com.project.fatcat.entity.User;
+import com.project.fatcat.users.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,18 +26,20 @@ public class PostService {
     private final PostRepository postRepository;
     private final BoardService boardService;
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
 
     
     // boardSeq로 글 가져오기
-    public List<KnowledgePost> getPostsByBoardSeq(Integer boardSeq) {
-        return postRepository.findByKnowledgeBoard_BoardSeq(boardSeq);
+    public List<KnowledgePost> getPostsByBoardSeq(String boardCode) {
+        return postRepository.findByKnowledgeBoardBoardCode(boardCode);
     }
     
     
     public Page<KnowledgePost> getPostsByBoardSeq(Integer boardSeq, Pageable pageable) {
-        return postRepository.findByKnowledgeBoard_BoardSeq(boardSeq, pageable);
+        return postRepository.findByKnowledgeBoardBoardSeq(boardSeq, pageable);
     }
 
+    
 	public KnowledgePost getPost(Integer postSeq) {
 
 		Optional<KnowledgePost> qu = this.postRepository.findById(postSeq);
@@ -55,15 +59,15 @@ public class PostService {
 //		return this.postRepository.findAll(pageable);
 //	}
 
-	public void createPost(String postTitle, String postContent) {
-
-		KnowledgePost post = new KnowledgePost();
-		post.setPostContent(postContent);
-		post.setPostTitle(postTitle);
-		post.setCreateDate(LocalDateTime.now());
-//		post.setAuthor(user);
-		this.postRepository.save(post);
-	}
+//	public void createPost(String postTitle, String postContent) {
+//
+//		KnowledgePost post = new KnowledgePost();
+//		post.setPostContent(postContent);
+//		post.setPostTitle(postTitle);
+//		post.setCreateDate(LocalDateTime.now());
+////		post.setAuthor(user);
+//		this.postRepository.save(post);
+//	}
 
 	public void modify(KnowledgePost post, String postTitle, String postContent) {
 		post.setPostTitle(postTitle);
@@ -79,24 +83,31 @@ public class PostService {
 	
 	
 	
-	public Page<KnowledgePost> getListByBoard(Integer boardSeq, int page) {
-	    Pageable pageable = PageRequest.of(page, 5);
-	    return postRepository.findByKnowledgeBoard_BoardSeq(boardSeq, pageable);
-	}
-	
+//	public Page<KnowledgePost> getListByBoard(String boardCode, int page) {
+//	    Pageable pageable = PageRequest.of(page, 5);
+//	    return (Page<KnowledgePost>) postRepository.findByKnowledgeBoardBoardCode(boardCode, pageable);
+//	}
+//	
 	
 	public Page<KnowledgePost> getPostsByBoardCode(String boardCode, Pageable pageable) {
-	    return postRepository.findByKnowledgeBoard_BoardCode(boardCode, pageable);
+	    return (Page<KnowledgePost>) postRepository.findByKnowledgeBoardBoardCode(boardCode, pageable);
 	}
 	
-	public void createPostWithBoardCode(String title, String content, Integer boardSeq) {
+	public void createPostWithBoardCode(String title, String content, String boardCode, User user) {
 		
-	    KnowledgeBoard board = boardRepository.findById(boardSeq)
+	    KnowledgeBoard board = boardRepository.findByBoardCode(boardCode)
 	            .orElseThrow(() -> new IllegalArgumentException("해당 게시판이 없습니다"));
 
+//	    User user = new User();
+	    Optional<User> ou = this.userRepository.findById(2);
+	    if(ou.isPresent());
+	    User u = ou.get();
+	    
+	    
 	    KnowledgePost post = new KnowledgePost();
 	    post.setPostTitle(title);
 	    post.setPostContent(content);
+	    post.setUser(u);
 	    post.setKnowledgeBoard(board);
 	    post.setCreateDate(LocalDateTime.now());
 
@@ -104,65 +115,13 @@ public class PostService {
 	}
 	
 	
-	public KnowledgePost getPostWithComments(Integer postSeq) {
-	    return postRepository.findByIdWithComments(postSeq)
-	        .orElseThrow(() -> new IllegalArgumentException("해당 게시글 없음"));
-	}
+//	public KnowledgePost getPostWithComments(Integer postSeq) {
+//	    return postRepository.findByIdWithComments(postSeq)
+//	        .orElseThrow(() -> new IllegalArgumentException("해당 게시글 없음"));
+//	}
  
 
-//    // Optional 반환
-//    public Optional<KnowledgePost> getPostOptional(Integer seq) {
-//        return postRepository.findById(seq);
-//    }
-//
-//    // 기존 getPost(seq) 유지하고 예외 던지는 용도
-//    public KnowledgePost getPost(Integer seq) {
-//        return postRepository.findById(seq)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 글이 없습니다."));
-//    }
-//
-//    public Page<KnowledgePost> postList(int page) {
-//        Pageable pageable = PageRequest.of(page, 10);
-//        return postRepository.findAll(pageable);
-//    }
-//
-//    public Page<KnowledgePost> getPostsByBoardCode(String boardCode, int page) {
-//        Pageable pageable = PageRequest.of(page, 10);
-//        return postRepository.findPostsByBoardCode(boardCode, pageable);
-//    }
-//
-//    
-//    public void createPost(PostForm postForm) {
-//        // boardSeq로 Board 객체 조회
-//        KnowledgeBoard board = boardRepository.findById(postForm.getBoardSeq())
-//                              .orElseThrow(() -> new IllegalArgumentException("해당 게시판이 없습니다."));
-//        
-//        KnowledgePost post = new KnowledgePost();
-//        post.setPostTitle(postForm.getPostTitle());
-//        post.setPostContent(postForm.getPostContent());
-//        post.setKnowledgeBoard(board);
-//
-//        postRepository.save(post);
-//    }
-//    
-//    public void createPostWithBoardCode(String title, String content, String boardCode) {
-//        KnowledgePost post = new KnowledgePost();
-//        post.setPostTitle(title);
-//        post.setPostContent(content);
-//        // board 설정 필요
-//        // post.setKnowledgeBoard(boardService.getBoard(boardCode));
-//        postRepository.save(post);
-//    }
-//
-//    public void modify(KnowledgePost post, String title, String content) {
-//        post.setPostTitle(title);
-//        post.setPostContent(content);
-//        postRepository.save(post);
-//    }
-//
-//    public void delete(KnowledgePost post) {
-//        postRepository.delete(post);
-//    }
 
+	
  
 }

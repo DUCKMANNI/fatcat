@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
 
 
@@ -38,10 +39,11 @@ public interface PostRepository extends JpaRepository<KnowledgePost, Integer> {
 	List<KnowledgePost> findAllWithCommentsByBoardSeq(@Param("postSeq") Integer boardSeq);
 	
 	Page<KnowledgePost> findAll(Pageable pageable);
-	Page<KnowledgePost> findByKnowledgeBoard_BoardSeq(Integer boardSeq, Pageable pageable);
+	Page<KnowledgePost> findByKnowledgeBoardBoardSeq(Integer boardSeq, Pageable pageable);
 	// boardCode 기준으로 페이징 조회
-    Page<KnowledgePost> findByKnowledgeBoard_BoardCode(String boardCode, Pageable pageable);
-    List<KnowledgePost> findByKnowledgeBoard_BoardSeq(Integer boardSeq);
+    Page<KnowledgePost> findByKnowledgeBoardBoardCode(String boardCode, Pageable pageable);
+    List<KnowledgePost> findByKnowledgeBoardBoardCode(String boardCode);
+    
     
 	 
 }

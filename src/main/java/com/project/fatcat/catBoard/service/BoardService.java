@@ -34,17 +34,7 @@ public class BoardService {
 	        return boardRepository.findById(boardSeq)
 	                .orElseThrow(() -> new IllegalArgumentException("해당 게시판이 없습니다. seq=" + boardSeq));
 	    }
-//
-//	    // 게시판 코드로 게시글 페이징 조회
-//	    public Page<KnowledgePost> getPostsByBoardCode(String boardCode, Pageable pageable) {
-//	        return postRepository.findPostsByBoardCode(boardCode, pageable);
-//	    }
-//
-//		  // Controller에서 직접 Repository 호출하지 않도록
-//	    public KnowledgeBoard findByBoardCode(String boardCode) {
-//	        return boardRepository.findByBoardCode(boardCode)
-//	                .orElseThrow(() -> new IllegalArgumentException("게시판이 없습니다"));
-//	    }
+
 	
 
 	

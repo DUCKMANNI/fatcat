@@ -1,6 +1,8 @@
 package com.project.fatcat.catBoard.repository;
 
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -20,5 +22,7 @@ public interface BoardRepository extends JpaRepository<KnowledgeBoard, Integer> 
 //	Page<KnowledgePost> findPostsByBoardCode(@Param("boardCode") String boardCode, Pageable pageable);
 //	
 //	 Optional<KnowledgeBoard> findByBoardCode(String boardCode);
+	
+	Optional<KnowledgeBoard> findByBoardCode(String boardCode);
 	 
 }
