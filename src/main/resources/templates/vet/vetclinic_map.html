@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-//이번엔 다른수정해볼게여~~~~~
-
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 <head>
 <meta charset="utf-8">
 <title>동물병원 검색</title>
@@ -185,6 +184,7 @@ html, body {
 </style>
 </head>
 <body>
+	<div layout:fragment="content">
 	<script
 		src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
 
