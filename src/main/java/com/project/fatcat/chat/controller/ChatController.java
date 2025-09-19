@@ -12,6 +12,8 @@ public class ChatController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    
+    
 
     @MessageMapping("/private-chat")
     public void sendPrivateMessage(@Payload ChatMessage chatMessage) {

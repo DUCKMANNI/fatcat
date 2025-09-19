@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 <head>
 <title>FatCat 1:1 Chat</title>
 <meta charset="UTF-8">
 <style>
-body {
+/* body {
 	font-family: Arial, sans-serif;
 	background-color: #f0f0f0;
 	padding: 20px;
 }
-
+ */
 #chat-container {
 	max-width: 600px;
 	margin: auto;
 	background-color: white;
 	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	border-radius: 50px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
@@ -71,7 +73,7 @@ h2 {
 
 .input-group button {
 	padding: 10px 15px;
-	background-color: #4CAF50;
+	background-color: #D2B48C;
 	color: white;
 	border: none;
 	border-radius: 4px;
@@ -79,7 +81,7 @@ h2 {
 }
 
 .input-group button:hover {
-	background-color: #45a049;
+	background-color: #CD853F;
 }
 
 #connect-group {
@@ -93,7 +95,7 @@ h2 {
 </style>
 </head>
 <body>
-
+<div layout:fragment="content" class="container mt-5">
 	<div id="chat-container">
 		<h2>FatCat 1:1 Chat</h2>
 		<div id="connect-group">
@@ -150,14 +152,12 @@ h2 {
             alert("ID를 입력해주세요.");
         }
     }
-
+    
+    // **수정된 sendMessage() 함수**
     function sendMessage() {
         const receiver = document.getElementById('receiver').value.trim();
         const message = document.getElementById('message').value.trim();
         
-        console.log("sendMessage() 호출됨");
-        console.log("Receiver:", receiver, "| Message:", message, "| stompClient:", stompClient);
-
         if (message && receiver && stompClient) {
             const chatMessage = {
                 sender: username,
@@ -165,16 +165,21 @@ h2 {
                 content: message,
                 type: 'CHAT'
             };
-            console.log("메시지 전송:", chatMessage);
+            
+            // 1. 서버로 메시지 전송 (수신자에게 전달)
             stompClient.send("/pub/private-chat", {}, JSON.stringify(chatMessage));
             
+            // 2. 보낸 메시지를 자신의 화면에 즉시 표시
+            showMessage(chatMessage, 'sent');
+            
+            // 3. 메시지 입력창 초기화
             document.getElementById('message').value = '';
         } else {
-            console.log("메시지 전송 실패: 필수 정보 누락");
             alert("받는 사람 ID와 메시지를 입력해주세요.");
         }
     }
 
+    // **수정된 showMessage() 함수**
     function showMessage(message, type) {
         const chatWindow = document.getElementById('chat-window');
         const p = document.createElement('p');
@@ -185,16 +190,16 @@ h2 {
         } else {
             if (type === 'sent') {
                 p.classList.add('message-sent');
-                p.innerText = `${message.sender}: ${message.content}`;
+                p.innerText = message.content;
             } else {
                 p.classList.add('message-received');
-                p.innerText = `${message.sender} → 나: ${message.content}`;
+                p.innerText = `${message.sender}: ${message.content}`;
             }
         }
         chatWindow.appendChild(p);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 </script>
-
+</div>
 </body>
 </html>

@@ -4,11 +4,13 @@ import com.project.fatcat.entity.CareServiceBoard;
 import com.project.fatcat.entity.enums.CareBoardStatus;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter
+@ToString
 public class CareServiceBoardDto {
 
     @NotBlank(message = "제목은 필수입니다.")
@@ -28,6 +30,9 @@ public class CareServiceBoardDto {
 
     @NotNull(message = "경도 정보가 누락되었습니다.")
     private Double longitude;
+    
+    
+    private Integer viewCount;
 
     @NotNull(message = "가격은 필수입니다.")
     private Integer price;
@@ -36,7 +41,7 @@ public class CareServiceBoardDto {
     private Integer userSeq;
 
     public CareServiceBoard toEntity() {
-        // ... 기존 로직 ...
+       
         CareServiceBoard board = new CareServiceBoard();
         board.setCareTitle(this.careTitle);
         board.setCareContent(this.careContent);
@@ -44,6 +49,7 @@ public class CareServiceBoardDto {
         board.setAddress2(this.address2);
         board.setLatitude(this.latitude);
         board.setLongitude(this.longitude);
+        board.setViewCount(10); //나중에 viewcount로 바꿔서 넣으삼~~~
         board.setPrice(this.price);
         board.setStatus(CareBoardStatus.OPEN);
         board.setIsDeleted(false);
