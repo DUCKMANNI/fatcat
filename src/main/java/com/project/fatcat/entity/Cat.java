@@ -39,11 +39,12 @@ public class Cat {
     @JoinColumn(name = "user_seq", nullable = true)
     private User user;
     
+    // 이름
     @Column(nullable = false)
     private String catName;
     
-    // 오타 수정: catBirtthday -> catBirthday
-    private LocalDate catBirthday;
+    // 생일
+    private LocalDate catBirtthday;
     
     private String catImageUrl;
     
