@@ -1,4 +1,213 @@
- <html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+   
+<body>
+    <div layout:fragment="content">
+        <style>
+            /* 따뜻한 탄(tan) 색상 팔레트 */
+            :root {
+                --tan-lightest: #F5F5DC;  /* 배경색 (원래 배경색과 조화) */
+                --tan-lighter: #E6D2B5;   /* 보조 배경, 호버 등 */
+                --tan-medium: #C3997A;    /* 주요 요소 (버튼, 구분선) */
+                --tan-darker: #7E5F4D;    /* 텍스트, 아이콘 */
+                --tan-darkest: #4C3C30;   /* 제목, 진한 텍스트 */
+                --white: #FFFFFF;
+                --light-gray: #E0E0E0;
+            }
+
+            body {
+                /* 배경색은 건드리지 않음 */
+                color: var(--tan-darker);
+            }
+
+            /* 컨테이너 추가: 게시판을 중앙에 배치하고 여백 주기 */
+            .board-container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            h5 {
+                color: var(--tan-darkest);
+                font-size: 1.5rem;
+                border-color: var(--light-gray) !important;
+            }
+
+            .btn {
+                background-color: var(--tan-lighter);
+                border-color: var(--tan-lighter);
+                color: var(--tan-darkest);
+                transition: background-color 0.3s, color 0.3s;
+            }
+            
+            .btn:hover {
+                background-color: var(--tan-medium);
+                border-color: var(--tan-medium);
+                color: var(--white);
+            }
+
+            .btn-primary.active {
+                background-color: var(--tan-medium) !important;
+                border-color: var(--tan-medium) !important;
+                color: var(--white) !important;
+            }
+            
+            .btn-secondary {
+                background-color: var(--tan-lighter);
+                border-color: var(--tan-lighter);
+                color: var(--tan-darkest);
+            }
+
+            .btn-secondary.active {
+                background-color: var(--tan-medium) !important;
+                border-color: var(--tan-medium) !important;
+                color: var(--white) !important;
+            }
+            
+            .btn-warning {
+                background-color: var(--tan-medium);
+                border-color: var(--tan-medium);
+                color: var(--white);
+            }
+            
+            .btn-warning:hover {
+                background-color: var(--tan-darker);
+                border-color: var(--tan-darker);
+            }
+
+            .table {
+                --bs-table-bg: none; /* 부트스트랩 배경색 제거 */
+            }
+
+            .table thead {
+                background-color: var(--tan-medium);
+                color: var(--white);
+            }
+
+            .table thead th {
+                border-color: var(--tan-medium);
+            }
+
+            .table tbody tr:hover {
+                background-color: var(--tan-lighter);
+            }
+
+            .page-link {
+                background-color: var(--white);
+                border-color: var(--light-gray);
+                color: var(--tan-darker);
+                transition: background-color 0.3s;
+            }
+            
+            .page-link:hover {
+                background-color: var(--tan-lighter);
+                border-color: var(--tan-medium);
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: var(--tan-medium);
+                border-color: var(--tan-medium);
+                color: var(--white);
+            }
+            
+            .pagination .page-item.disabled .page-link {
+                background-color: var(--tan-lighter);
+                color: var(--tan-darker);
+            }
+
+            a {
+                color: var(--tan-darker);
+                text-decoration: none;
+            }
+            
+            a:hover {
+                color: var(--tan-darkest);
+            }
+
+            td a {
+                color: var(--tan-darker);
+            }
+        </style>
+
+        <div class="board-container">
+            <center>
+                <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${boardName}"></h5>
+
+                <div class="mb-3">
+                    <a th:href="@{/post/list/1}" class="btn"
+                       th:classappend="${boardSeq} == 1 ? ' active' : ''">수의사에게 질문하기</a>
+                    <a th:href="@{/post/list/2}" class="btn btn-secondary"
+                       th:classappend="${boardSeq} == 2 ? ' active' : ''">냥꿀팁</a>
+                </div>
+
+                <th:block th:if="${paging.isEmpty()}">
+                    <p>게시글이 없습니다.</p>
+                </th:block>
+
+                <table class="table mt-3">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일자</th>
+                    </tr>
+                    </thead>
+                    
+                    <tbody>
+                    <tr th:each="post, loop : ${paging.content}">
+                        <td th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
+                        <td>
+                            <a th:href="@{|/post/detail/${post.postSeq}|}" th:text="${post.postTitle}"></a>
+                            <span th:if="${post.knowledgeCommentList != null and #lists.size(post.knowledgeCommentList) > 0}" 
+                                  th:text="${#lists.size(post.knowledgeCommentList)}" style="color: var(--tan-medium); font-weight: bold; margin-left: 5px;"></span>
+                        </td>
+                        <td><span th:if="${post.user != null}" th:text="${post.user.userName}"></span></td>
+                        <td th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div th:if="${!paging.isEmpty()}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{|?boardSeq=${currentBoardSeq}&page=${paging.number-1}|}">이전</a>
+                        </li>
+                        <li th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
+                            th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                            th:classappend="${page == paging.number} ? 'active'" class="page-item">
+                            <a th:text="${page+1}" class="page-link"
+                               th:href="@{|?boardSeq=${currentBoardSeq}&page=${page}|}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{|?boardSeq=${currentBoardSeq}&page=${paging.number+1}|}">다음</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <a th:href="@{|/post/create/${boardCode}|}" class="btn btn-warning mb-3">질문 등록</a>
+            </center>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--  <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
 
@@ -6,10 +215,10 @@
 <body>
         <div layout:fragment="content">
     <center>
-        <!-- 게시판 이름 -->
+        게시판 이름
         <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${boardName}"></h5>
 
-        <!-- 게시판 선택 버튼 -->
+        게시판 선택 버튼
         <div class="mb-3">
             <a th:href="@{/post/list/1}" class="btn btn-primary"
                th:classappend="${boardSeq} == 1 ? ' active' : ''">수의사에게 질문하기</a>
@@ -17,8 +226,8 @@
                th:classappend="${boardSeq} == 2 ? ' active' : ''">냥꿀팁</a>
         </div>
 
-        <!-- 게시글 리스트 -->
-        <!-- 
+        게시글 리스트
+        
         <th:block th:if="${!paging.isEmpty()}">
             <div th:each="post : ${paging.content}" class="card my-2">
                 <div class="card-body text-start">
@@ -27,16 +236,16 @@
                 </div>
             </div>
         </th:block>
- -->
+
  
  
  
-        <!-- 게시글 없을 때 -->
+        게시글 없을 때
         <th:block th:if="${paging.isEmpty()}">
             <p>게시글이 없습니다.</p>
         </th:block>
 
-        <!-- 테이블형 게시글 -->
+        테이블형 게시글
         <table class="table mt-3">
             <thead class="table-danger">
             <tr>
@@ -63,7 +272,7 @@
                 </td>
                 
                 
-                <!-- 작성자 나타내기 -->
+                작성자 나타내기
 					 <td><span th:if="${post.user != null}"
 						th:text="${post.user.userName}"></span></td>
                 
@@ -76,7 +285,7 @@
             </tbody>
         </table>
 
-        <!-- 페이징 -->
+        페이징
         <div th:if="${!paging.isEmpty()}">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
@@ -96,10 +305,10 @@
             </ul>
         </div>
 
-        <!-- 글쓰기 버튼 -->
+        글쓰기 버튼
         <a th:href="@{|/post/create/${boardCode}|}" class="btn btn-warning mb-3">질문 등록</a>
    </center>
 </div>
 </body>
 </html>
- 
+  -->

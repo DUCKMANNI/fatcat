@@ -18,6 +18,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// Enum 타입 사용을 위한 import
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,25 +31,49 @@ import lombok.Setter;
 @Table(name = "cats")
 public class Cat {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer catSeq;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_seq", nullable = true)
-	private User user;
-	
-	@Column( nullable = false)
-	private String catName;
-	
-	private LocalDate catBirtthday;
-	
-	private String catImageUrl;
-	
-	@Column( columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
-	private LocalDateTime createDate;
-	
-	private LocalDateTime updateDate;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer catSeq;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_seq", nullable = true)
+    private User user;
+    
+    @Column(nullable = false)
+    private String catName;
+    
+    // 오타 수정: catBirtthday -> catBirthday
+    private LocalDate catBirthday;
+    
+    private String catImageUrl;
+    
+    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createDate;
+    
+    private LocalDateTime updateDate;
 
+    // --- 추가된 필드 ---
+    
+    // 성별(MALE, FEMALE)을 위한 Enum
+    public enum Gender {
+        MALE, FEMALE
+    }
+    
+    // Enum 값을 문자열로 저장하기 위한 어노테이션
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender catGender;
+    
+    // 종 이름
+    private String catBreed;
+    
+    // 중성화 여부
+    private boolean isNeutered;
+    
+    // 질병 여부
+    private boolean hasDisease;
+    
+    // 알레르기 여부
+    private boolean hasAllergy;
 
 }

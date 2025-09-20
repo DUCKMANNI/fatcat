@@ -1,4 +1,4 @@
-package com.project.fatcat.catBoard.form;
+package com.project.fatcat.catboard.form;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

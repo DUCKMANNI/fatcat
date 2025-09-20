@@ -1,4 +1,4 @@
-package com.project.fatcat.catBoard.service;
+package com.project.fatcat.catboard.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.project.fatcat.DataNotFoundException;
-import com.project.fatcat.catBoard.repository.CommentRepository;
-import com.project.fatcat.catBoard.repository.PostRepository;
+import com.project.fatcat.catboard.repository.CommentRepository;
+import com.project.fatcat.catboard.repository.PostRepository;
 import com.project.fatcat.entity.KnowledgeComment;
 import com.project.fatcat.entity.KnowledgePost;
 

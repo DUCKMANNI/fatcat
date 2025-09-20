@@ -1,4 +1,4 @@
-package com.project.fatcat.catBoard.controller;
+package com.project.fatcat.catboard.controller;
 
 
 
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mysql.cj.log.Log;
-import com.project.fatcat.catBoard.service.BoardService;
-import com.project.fatcat.catBoard.service.PostService;
+import com.project.fatcat.catboard.service.BoardService;
+import com.project.fatcat.catboard.service.PostService;
 import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
 

@@ -1,4 +1,4 @@
-package com.project.fatcat.catBoard.service;
+package com.project.fatcat.catboard.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.project.fatcat.DataNotFoundException;
-import com.project.fatcat.catBoard.repository.BoardRepository;
-import com.project.fatcat.catBoard.repository.PostRepository;
+import com.project.fatcat.catboard.repository.BoardRepository;
+import com.project.fatcat.catboard.repository.PostRepository;
 import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
 import com.project.fatcat.entity.User;
