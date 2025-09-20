@@ -1,4 +1,103 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 
+<body>
+	<div layout:fragment="content">
+		<style>
+			/* 따뜻한 탄(tan) 색상 팔레트 */
+			:root {
+				--tan-medium: #C3997A;      /* 주요 요소 (버튼, 테두리) */
+				--tan-darker: #7E5F4D;      /* 텍스트, 아이콘 */
+				--tan-darkest: #4C3C30;     /* 제목, 진한 텍스트 */
+				--white: #FFFFFF;
+				--form-background: #F8F4EE; /* 폼 배경색 (아주 연한 탄색) */
+			}
+
+            /* 폼을 중앙에 배치하고 여백을 주기 위한 컨테이너 */
+            .form-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: var(--form-background);
+                border: 1px solid var(--tan-medium);
+                border-radius: 10px;
+            }
+
+			h5 {
+				color: var(--tan-darkest);
+				border-color: var(--tan-medium) !important;
+				font-size: 1.5rem;
+			}
+			
+			.form-control {
+				border: 1px solid var(--tan-medium);
+				color: var(--tan-darker);
+				transition: border-color 0.3s, box-shadow 0.3s;
+			}
+			
+			.form-control:focus {
+				border-color: var(--tan-darker);
+				box-shadow: 0 0 5px rgba(126, 95, 77, 0.5);
+				outline: none;
+			}
+			
+			.btn {
+				transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+			}
+
+			.btn-warning {
+				background-color: var(--tan-medium);
+				border: 1px solid var(--tan-medium);
+				color: var(--white);
+			}
+			
+			.btn-warning:hover {
+				background-color: var(--tan-darker);
+				border-color: var(--tan-darker);
+			}
+
+		</style>
+        
+        <div class="form-container">
+            <h5 class="my-3 border-bottom pb-2">질문 등록</h5>
+    
+            <form th:action="@{|/post/create/${boardCode}|}" th:object="${postForm}" method="post"> 
+                <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div> 
+    
+                <div class="mb-3">
+                    <label for="postTitle" class="form-label">제목</label>
+                    <input type="text" th:field="*{postTitle}" class="form-control">
+                </div>
+    
+                <div class="mb-3">
+                    <label for="postContent" class="form-label">내용</label>
+                    <textarea class="form-control"  th:field="*{postContent}"  rows="10"></textarea>
+                </div>
+    
+                <div>
+                    <input class="btn btn-warning my-2" type="submit" value="저장하기">
+                </div>
+            </form>
+        </div>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
 
  <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
@@ -31,4 +130,4 @@
 </div>
 </body>
 </html>
- 
+  -->

@@ -1,4 +1,4 @@
-package com.project.fatcat.catBoard.repository;
+package com.project.fatcat.catboard.repository;
 
 import org.springframework.data.domain.Pageable;
 

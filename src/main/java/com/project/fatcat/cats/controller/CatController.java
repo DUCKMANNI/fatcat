@@ -32,7 +32,7 @@ public class CatController {
         // Cat 엔티티의 정보를 DTO에 담아 HTML 폼에 전달
         CatUpdateDTO catUpdateDTO = new CatUpdateDTO();
         catUpdateDTO.setCatName(cat.getCatName());
-        catUpdateDTO.setCatBirtthday(cat.getCatBirtthday());
+        catUpdateDTO.setCatBirtthday(cat.getCatBirthday());
         catUpdateDTO.setCatImageUrl(cat.getCatImageUrl());
 //        catUpdateDTO.setCatGender(cat.getCatGender());
 //        catUpdateDTO.setIsNeutered(cat.getIsNeutered());
@@ -58,7 +58,7 @@ public class CatController {
 
         // DTO의 정보로 기존 엔티티 업데이트
         cat.setCatName(catUpdateDTO.getCatName());
-        cat.setCatBirtthday(catUpdateDTO.getCatBirtthday());
+        cat.setCatBirthday(catUpdateDTO.getCatBirtthday());
         cat.setCatImageUrl(catUpdateDTO.getCatImageUrl());
 //        cat.setCatGender(catUpdateDTO.getCatGender());
 //        cat.setIsNeutered(catUpdateDTO.getIsNeutered());

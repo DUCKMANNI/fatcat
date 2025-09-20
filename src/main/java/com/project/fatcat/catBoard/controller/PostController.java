@@ -1,6 +1,6 @@
 
 
-package com.project.fatcat.catBoard.controller;
+package com.project.fatcat.catboard.controller;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.project.fatcat.catBoard.form.CommentForm;
-import com.project.fatcat.catBoard.form.PostForm;
-import com.project.fatcat.catBoard.repository.PostRepository;
-import com.project.fatcat.catBoard.service.BoardService;
-import com.project.fatcat.catBoard.service.PostService;
+import com.project.fatcat.catboard.form.CommentForm;
+import com.project.fatcat.catboard.form.PostForm;
+import com.project.fatcat.catboard.repository.PostRepository;
+import com.project.fatcat.catboard.service.BoardService;
+import com.project.fatcat.catboard.service.PostService;
 import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
 import com.project.fatcat.entity.User;

@@ -2,14 +2,177 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
 
+<body>
+	<div layout:fragment="content">
+		<style>
+			/* 따뜻한 탄(tan) 색상 팔레트 */
+			:root {
+				--tan-lighter: #F8F4EE; /* 카드 배경 및 호버 */
+				--tan-medium: #C3997A; /* 주요 요소 (버튼, 구분선) */
+				--tan-darker: #7E5F4D; /* 텍스트, 아이콘 */
+				--tan-darkest: #4C3C30; /* 제목, 진한 텍스트 */
+				--white: #FFFFFF;
+				--light-gray: #E0E0E0;
+			}
+
+			body {
+				color: var(--tan-darker);
+			}
+
+			h2.border-bottom {
+				color: var(--tan-darkest);
+				border-color: var(--tan-medium) !important;
+			}
+
+			.card {
+				border-color: var(--tan-medium);
+				background-color: var(--tan-lighter);
+			}
+			
+			.card-body {
+				background-color: var(--white);
+			}
+
+			.card-text {
+				color: var(--tan-darker);
+			}
+
+			.badge {
+				background-color: var(--tan-lighter) !important;
+				color: var(--tan-darkest) !important;
+			}
+
+			h5.border-bottom {
+				color: var(--tan-darkest);
+				border-color: var(--light-gray) !important;
+			}
+
+			.btn {
+				transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+			}
+
+			.btn-warning {
+				background-color: var(--tan-medium);
+				border-color: var(--tan-medium);
+				color: var(--white);
+			}
+
+			.btn-warning:hover {
+				background-color: var(--tan-darker);
+				border-color: var(--tan-darker);
+			}
+
+			.btn-primary {
+				background-color: var(--tan-lighter);
+				border-color: var(--tan-lighter);
+				color: var(--tan-darkest);
+			}
+
+			.btn-primary:hover {
+				background-color: var(--tan-medium);
+				border-color: var(--tan-medium);
+				color: var(--white);
+			}
+			
+			.form-control {
+				border: 1px solid var(--tan-medium);
+				color: var(--tan-darker);
+			}
+
+			.form-control:focus {
+				border-color: var(--tan-darker);
+				box-shadow: 0 0 5px rgba(126, 95, 77, 0.5);
+			}
+			
+		</style>
+		
+		<h2 class="border-bottom py-2" th:text="${post.postTitle}"></h2>
+		<div class="card my-3">
+			<div class="card-body">
+				<div class="card-text">
+					<div th:text="${post.postContent}"></div>
+				</div>
+			</div>
+			<div class="d-flex justify-content-end">
+				<div class="badge bg-light text-dark p-2 text-start">
+					<p>작성자:</p>
+					<div class="mb-2">
+						<span th:if="${post.user != null}" th:text="${post.user.userName}"></span>
+					</div>
+					<div th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
+			</div>
+			<div class="my-2">
+				<a th:href="@{|/post/modify/${post.postSeq}|}" class="btn btn-sm btn-warning" th:if="${post.user != null ? post.user.userName : '익명'}" th:text="수정"></a>
+				<a href="javascript:void(0)" th:data-uri="@{|/post/delete/${post.postSeq}|}" class="delete btn btn-sm btn-primary" th:if="${post.user != null ? post.user.userName : '익명'}" th:text="삭제"></a>
+			</div>
+		</div>
+
+		<h5 class="border-bottom my-3 py-3" th:text="|${#lists.size(post.knowledgeCommentList)}개의 답변이 있습니다!!|"></h5>
+		
+		<div class="card my-3" th:each=" comment : ${post.knowledgeCommentList}">
+			<div class="card-body">
+				<div class="card-text" style="white-space: pre-line;" th:text="${comment.commentContent}"></div>
+			</div>
+			<div class="d-flex justify-content-end">
+				<div class="badge bg-light text-dark p-2 text-start">
+					<div class="mb-2">
+						<span th:if="${comment.user != null}" th:text="${comment.user.userName}"></span>
+					</div>
+					<div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
+			</div>
+			<div class="my-2">
+				<a th:href="@{|/comment/modify/${comment.commentSeq}|}" class="btn btn-sm btn-warning" th:if="${comment.user != null ? comment.user.userName : '익명'}" th:text="수정"></a>
+				<a href="javascript:void(0)" th:data-uri="@{|/comment/delete/${comment.commentSeq}|}" class="delete btn btn-sm btn-primary" th:if="${comment.user != null ? comment.user.userName : '익명'}" th:text="삭제"></a>
+			</div>
+		</div>
+
+		<form th:action="@{|/comment/create/${post.postSeq}|}" th:object="${commentForm}" method="post">
+			<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+			<textarea sec:authorize="isAuthenticated()" class="form-control" rows="10" th:field="*{commentContent}"></textarea>
+			<input class="btn btn-warning my-3" type="submit" value="답변 등록하기">
+		</form>
+		
+		<script type='text/javascript' layout:fragment="script">
+			const delete_elements = document.getElementsByClassName("delete");
+			Array.from(delete_elements).forEach(function(element) {
+				element.addEventListener('click', function() {
+					if (confirm("정말 삭제하시겠습니까??")) {
+						location.href = this.dataset.uri;
+					}
+				});
+			});
+		</script>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
    
 <body>
         <div layout:fragment="content">
 
-	<!-- 질문 -->
+	질문
 	<h2 class="border-bottom py-2" th:text="${post.postTitle}"></h2>
 
-	<!-- 내용 -->
+	내용
 	<div class="card my-3">
 		<div class="card-body">
 			<div class="card-text">
@@ -21,7 +184,7 @@
 
 		<div class="d-flex justify-content-end">
 			<div class="badge bg-light text-dark p-2 text-start">
-<!--
+
 				 수정 버튼 
 				<div class="my-2">
 					<a th:href="@{|/post/modify/${post.postSeq}|}"
@@ -32,9 +195,9 @@
                         == post.user.username}"
 						th:text="수정"></a>
 				</div>
-                 -->
+                
 
-				<!-- 작성자 이름 나타내기 -->
+				작성자 이름 나타내기
 				<p>작성자: 
 
 				<div class="mb-2">
@@ -43,7 +206,7 @@
 				</div>
 				 
 				 
-				<!-- 작성시간 나타내기 -->
+				작성시간 나타내기
 				<div
 					th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
 
@@ -56,10 +219,10 @@
 
 		<div class="my-2">
 
-			<!-- 수정 버튼 -->
-			<!-- 
+			수정 버튼
+			
 			<span th:text="${post.user != null ? post.user.username : '익명'}"></span>
-			 -->
+			
 			 
 			<a th:href="@{|/post/modify/${post.postSeq}|}"
 				class="btn btn-sm btn-warning"
@@ -67,7 +230,7 @@
 				th:text="수정"></a>
 				
 
-			<!-- 삭제 버튼 -->
+			삭제 버튼
 			
 			<a href="javascript:void(0)"
 				th:data-uri="@{|/post/delete/${post.postSeq}|}"
@@ -80,10 +243,10 @@
 				
 				
 				
-				<!-- sec:authorize="isAuthenticated()"
+				sec:authorize="isAuthenticated()"
 				th:if="${post.user != null and
                         #authentication.getPrincipal().getUsername() 
-                        == post.user.username}" -->
+                        == post.user.username}"
 				
 				
 				
@@ -99,13 +262,13 @@
 
 
 
-	<!-- 답변 갯수-->
+	답변 갯수
 
 	<h5 class="border-bottom my-3 py-3"
 		th:text="|${#lists.size(post.knowledgeCommentList)}개의 답변이 있습니다!!|"></h5>
 
 
-	<!-- 답변 목록 -->
+	답변 목록
  
 	<div class="card my-3" th:each=" comment : ${post.knowledgeCommentList}">
 		<div class="card-body">
@@ -115,7 +278,7 @@
 
 
 
-		<!-- 답변 날짜! -->
+		답변 날짜!
 		 
 		<div class="d-flex justify-content-end">
 			<div class="badge bg-light text-dark p-2 text-start">
@@ -133,7 +296,7 @@
 
 		<div class="my-2">
 
-			<!-- 수정 버튼 -->
+			수정 버튼
 			
 			
 			<a th:href="@{|/comment/modify/${comment.commentSeq}|}"
@@ -144,15 +307,15 @@
 			
 			
 			
-			<!-- <a th:href="@{|/comment/modify/${comment.commentSeq}|}"
+			<a th:href="@{|/comment/modify/${comment.commentSeq}|}"
 				class="btn btn-sm btn-warning" sec:authorize="isAuthenticated()"
 				th:if="${comment.user != null and
                         #authentication.getPrincipal().getUsername() 
                         == comment.user.username}"
 				th:text="수정"></a>
- -->
 
-			<!-- 삭제 버튼 -->
+
+			삭제 버튼
 			
 			
 			<a href="javascript:void(0)"
@@ -164,14 +327,14 @@
 			
 			
 			
-			<!-- <a href="javascript:void(0)"
+			<a href="javascript:void(0)"
 				th:data-uri="@{|/comment/delete/${comment.commentSeq}|}"
 				class="delete btn btn-sm btn-primary"
 				sec:authorize="isAuthenticated()"
 				th:if="${comment.user != null and
                         #authentication.getPrincipal().getUsername() 
                         == comment.user.username}"
-				th:text="삭제"></a> -->
+				th:text="삭제"></a>
 
 		</div>
 
@@ -181,7 +344,7 @@
 	</div>
 
 
-	<!-- 답변 등록 -->
+	답변 등록
 	
 	<form th:action="@{|/comment/create/${post.postSeq}|}"
 		th:object="${commentForm}" method="post">
@@ -196,14 +359,14 @@
 	</form>
 	
 	
-<!-- 	
+	
 	<form th:action="@{|/post/list/${boardCode}|}" th:object="${postForm}" method="post">
 	<input value="목록으로 돌아가기" type="submit" class="btn btn-warning my-3" >
  </form>
-  -->
  
  
-<!-- delete -->
+ 
+delete
 <script type='text/javascript' layout:fragment="script">
 
 const delete_elements = document.getElementsByClassName("delete");
@@ -222,3 +385,4 @@ Array.from(delete_elements).forEach(function(element){
 </div>
 </body>
 </html>
+ -->
