@@ -1,205 +1,182 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>FatCat 1:1 Chat</title>
-<meta charset="UTF-8">
+<meta charset="utf-8">
+<title>1:1 채팅</title>
 <style>
-/* body {
+body {
 	font-family: Arial, sans-serif;
-	background-color: #f0f0f0;
-	padding: 20px;
-}
- */
-#chat-container {
-	max-width: 600px;
-	margin: auto;
-	background-color: white;
-	padding: 20px;
-	border-radius: 50px;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-	text-align: center;
-	color: #333;
-}
-
-#chat-window {
-	height: 400px;
-	border: 1px solid #ddd;
-	overflow-y: auto;
-	padding: 10px;
-	margin-bottom: 10px;
-	border-radius: 4px;
-	background-color: #fafafa;
-}
-
-#chat-window p {
-	margin: 5px 0;
-	padding: 5px;
-	border-radius: 5px;
-}
-
-.message-sent {
-	text-align: right;
-	background-color: #e2f0e2;
-}
-
-.message-received {
-	text-align: left;
-	background-color: #f0e2e2;
-}
-
-.info-message {
-	text-align: center;
-	color: #888;
-	font-style: italic;
-}
-
-.input-group {
+	margin: 0;
+	padding: 0;
 	display: flex;
-	margin-top: 10px;
+	flex-direction: column;
+	height: 100vh;
 }
 
-.input-group input {
+#chat-container {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #ddd;
+	margin: 10px;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+#message-area {
 	flex-grow: 1;
 	padding: 10px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	margin-right: 5px;
+	overflow-y: auto;
+	background-color: #f7f7f7;
 }
 
-.input-group button {
-	padding: 10px 15px;
-	background-color: #D2B48C;
-	color: white;
+.message {
+	margin-bottom: 10px;
+	padding: 8px 12px;
+	border-radius: 18px;
+	max-width: 80%;
+}
+
+.sent {
+	background-color: #dcf8c6;
+	align-self: flex-end;
+	float: right;
+	clear: both;
+}
+
+.received {
+	background-color: #fff;
+	align-self: flex-start;
+	float: left;
+	clear: both;
+}
+
+#input-area {
+	display: flex;
+	padding: 10px;
+	border-top: 1px solid #ddd;
+}
+
+#message-input {
+	flex-grow: 1;
+	padding: 8px;
+	border-radius: 20px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+
+#send-button {
+	margin-left: 10px;
+	padding: 8px 16px;
 	border: none;
-	border-radius: 4px;
+	background-color: #CD853F;
+	color: white;
+	border-radius: 20px;
 	cursor: pointer;
 }
-
-.input-group button:hover {
-	background-color: #CD853F;
-}
-
-#connect-group {
-	margin-bottom: 20px;
-	text-align: center;
-}
-
-#connect-group input, #connect-group button {
-	margin: 5px;
-}
 </style>
+<script
+	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<div layout:fragment="content" class="container mt-5">
 	<div id="chat-container">
-		<h2>FatCat 1:1 Chat</h2>
-		<div id="connect-group">
-			<input type="text" id="username" placeholder="내 ID 입력">
-			<button onclick="connect()">채팅 시작</button>
-		</div>
-
-		<div id="chat-window"></div>
-
-		<div class="input-group">
-			<input type="text" id="receiver" placeholder="상대방 ID 입력"> <input
-				type="text" id="message" placeholder="메시지 입력..."
-				onkeypress="if(event.keyCode==13) sendMessage()">
-			<button onclick="sendMessage()">보내기</button>
+		<div id="message-area"></div>
+		<div id="input-area">
+			<input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+			<button id="send-button">전송</button>
 		</div>
 	</div>
 
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-	<script>
-    let stompClient = null;
-    let username = null;
-
-    function connect() {
-        username = document.getElementById('username').value.trim();
-        if (username) {
-            const socket = new SockJS('/ws-fatcat');
-            stompClient = Stomp.over(socket);
-
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                document.getElementById('connect-group').innerHTML = `<p><strong>${username}</strong>님, 환영합니다! 🥳</p>`;
-
-                stompClient.subscribe(`/user/${username}/private`, function (message) {
-                    console.log("메시지 수신:", message.body);
-                    const receivedMessage = JSON.parse(message.body);
-                    const type = (receivedMessage.sender === username) ? 'sent' : 'received';
-                    showMessage(receivedMessage, type);
-                });
-                
-                stompClient.send("/pub/private-chat", {}, JSON.stringify({
-                    sender: username,
-                    receiver: username,
-                    content: "채팅방에 입장했습니다.",
-                    type: "JOIN"
-                }));
-            }, function(error) {
-                console.error('STOMP error: ' + error);
-                alert('연결 실패: ' + error);
-            });
-        } else {
-            alert("ID를 입력해주세요.");
-        }
-    }
+	<script th:inline="javascript">
+    const chatRoomId = /*[[${chatRoomId}]]*/ 0; /* [[..]] 이거 사용하면 thymeleaf랑 자바스크립트 코드 동시 사용 가능 /0은 문법상 못알아들어서 저렇게 처리하면 가능하다고 하네여.. */
+    const senderId = /*[[${senderId}]]*/ 0;
+    const receiverId = /*[[${receiverId}]]*/ 0;
     
-    // **수정된 sendMessage() 함수**
+    let stompClient = null;
+    const messageArea = document.getElementById('message-area');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+
+    window.onload = function() {
+        fetch(`/api/chat/history?roomId=${chatRoomId}`)
+            .then(response => response.json())
+            .then(messages => {
+                messages.forEach(msg => displayMessage(msg));
+            })
+            .catch(error => console.error('Error fetching chat history:', error));
+
+        connectWebSocket();
+    };
+
+    function connectWebSocket() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, onConnected, onError);
+    }
+
+    function onConnected() {
+        stompClient.subscribe('/user/' + senderId + '/private', onMessageReceived);
+        stompClient.subscribe('/user/' + receiverId + '/private', onMessageReceived);
+    }
+
+    function onError(error) {
+        console.error('WebSocket connection error:', error);
+    }
+
     function sendMessage() {
-        const receiver = document.getElementById('receiver').value.trim();
-        const message = document.getElementById('message').value.trim();
-        
-        if (message && receiver && stompClient) {
-            const chatMessage = {
-                sender: username,
-                receiver: receiver,
-                content: message,
-                type: 'CHAT'
+        const content = messageInput.value.trim();
+        if (content && stompClient) {
+            const chatMessageDto = {
+                chatRoomId: chatRoomId,
+                senderId: senderId,
+                receiverId: receiverId,
+                content: content
             };
-            
-            // 1. 서버로 메시지 전송 (수신자에게 전달)
-            stompClient.send("/pub/private-chat", {}, JSON.stringify(chatMessage));
-            
-            // 2. 보낸 메시지를 자신의 화면에 즉시 표시
-            showMessage(chatMessage, 'sent');
-            
-            // 3. 메시지 입력창 초기화
-            document.getElementById('message').value = '';
-        } else {
-            alert("받는 사람 ID와 메시지를 입력해주세요.");
+
+            // 1. 메시지를 웹소켓으로 전송
+            stompClient.send('/app/private-chat', {}, JSON.stringify(chatMessageDto));
+
+            // 2. 전송과 동시에 내 화면에 메시지를 즉시 표시
+            displayMessage(chatMessageDto);
+
+            // 3. 입력창 비우기
+            messageInput.value = '';
         }
     }
 
-    // **수정된 showMessage() 함수**
-    function showMessage(message, type) {
-        const chatWindow = document.getElementById('chat-window');
-        const p = document.createElement('p');
+    function onMessageReceived(payload) {
+        const message = JSON.parse(payload.body);
         
-        if (message.type === 'JOIN' || message.type === 'LEAVE') {
-            p.classList.add('info-message');
-            p.innerText = message.content;
-        } else {
-            if (type === 'sent') {
-                p.classList.add('message-sent');
-                p.innerText = message.content;
-            } else {
-                p.classList.add('message-received');
-                p.innerText = `${message.sender}: ${message.content}`;
-            }
+     
+        //    받는 메시지(received)만 화면에 표시
+        if (message.senderId !== senderId) {
+            displayMessage(message);
         }
-        chatWindow.appendChild(p);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
     }
+
+    function displayMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        
+        if (message.senderId === senderId) {
+            messageElement.classList.add('sent');
+        } else {
+            messageElement.classList.add('received');
+        }
+        
+        messageElement.innerHTML = `<p>${message.content}</p>`;
+        messageArea.appendChild(messageElement);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
 </script>
-</div>
 </body>
 </html>
