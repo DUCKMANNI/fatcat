@@ -1,0 +1,483 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+   
+<body>
+    <div layout:fragment="content">
+<head>
+   
+    <title>마이페이지</title>
+    <style>
+        :root {
+            --tan-color: #d2b48c; /* 탄색 */
+            --dark-tan-color: #b39b7d; /* 짙은 탄색 */
+            --background-color: #f7f3ed; /* 부드러운 배경색 */
+            --text-color: #333; /* 기본 텍스트 색상 */
+            --border-color: #e0d9cf; /* 경계선 색상 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .mypage-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* 사이드바 메뉴 스타일 */
+        .sidebar {
+            width: 250px;
+            background-color: var(--tan-color);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: block;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: var(--dark-tan-color);
+        }
+
+        /* 메인 콘텐츠 영역 스타일 */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+        }
+
+        .main-content h1 {
+            font-size: 2em;
+            color: var(--dark-tan-color);
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 1.2em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+        }
+
+        .info-item strong {
+            display: inline-block;
+            width: 120px;
+            color: var(--dark-tan-color);
+        }
+
+        .order-list table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .order-list th, .order-list td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-list th {
+            background-color: var(--tan-color);
+            color: #fff;
+        }
+
+        .order-list tbody tr:hover {
+            background-color: #f0e6da;
+        }
+
+        .edit-button {
+            background-color: var(--dark-tan-color);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .edit-button:hover {
+            background-color: #9c846d;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="mypage-container">
+    <div class="sidebar">
+        <h2>마이페이지</h2>
+        <a href="#my-info" class="active">내 정보</a>
+        <a href="#cat-info">고양이 정보</a>
+        <a href="#wishlist">관심상품</a>
+        <a href="#orders">주문내역</a>
+        <a href="#customer-service">고객센터</a>
+    </div>
+
+    <div class="main-content">
+        <div id="my-info" class="section">
+            <h1>내 정보</h1>
+            <ul class="info-list">
+                <li class="info-item"><strong>이름</strong>: 김유정</li>
+                <li class="info-item"><strong>이메일</strong>: yujeong@example.com</li>
+                <li class="info-item"><strong>연락처</strong>: 010-1234-5678</li>
+                <li class="info-item"><strong>회원 등급</strong>: 냥집사</li>
+            </ul>
+            <a href="#" class="edit-button">정보 수정</a>
+        </div>
+
+        <div id="cat-info" class="section">
+            <h1>고양이 정보</h1>
+            <ul class="info-list">
+                <li class="info-item"><strong>이름</strong>: 제리</li>
+                <li class="info-item"><strong>품종</strong>: 코리안 숏헤어</li>
+                <li class="info-item"><strong>나이</strong>: 3살</li>
+                <li class="info-item"><strong>성별</strong>: 암컷</li>
+            </ul>
+            <a href="#" class="edit-button">정보 수정</a>
+        </div>
+        
+        <div id="wishlist" class="section">
+            <h1>관심상품</h1>
+            <ul class="info-list">
+                <li class="info-item"><strong>상품명</strong>: 캣타워</li>
+                <li class="info-item"><strong>상품명</strong>: 고양이 장난감 세트</li>
+                <li class="info-item"><strong>상품명</strong>: 연어맛 사료</li>
+            </ul>
+        </div>
+
+        <div id="orders" class="section">
+            <h1>주문내역</h1>
+            <div class="order-list">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>주문 번호</th>
+                            <th>주문 상품</th>
+                            <th>총 금액</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#20231015-001</td>
+                            <td>고양이 간식 5종 세트</td>
+                            <td>35,000원</td>
+                            <td>배송 완료</td>
+                        </tr>
+                        <tr>
+                            <td>#20230920-002</td>
+                            <td>탄색 캣타워</td>
+                            <td>120,000원</td>
+                            <td>배송 중</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="customer-service" class="section">
+            <h1>고객센터</h1>
+            <p>자주 묻는 질문(FAQ)을 확인하고 싶으시면 아래 링크를 클릭해주세요.</p>
+            <a href="https://www.example.com/faq" target="_blank" class="edit-button">FAQ 보러가기</a>
+            <p style="margin-top: 15px;">기타 문의사항은 고객센터(1588-XXXX)로 연락 바랍니다.</p>
+        </div>
+
+    </div>
+</div>
+</body>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <style>
+        :root {
+            --tan-color: #d2b48c; /* 탄색 */
+            --dark-tan-color: #b39b7d; /* 짙은 탄색 */
+            --background-color: #f7f3ed; /* 부드러운 배경색 */
+            --text-color: #333; /* 기본 텍스트 색상 */
+            --border-color: #e0d9cf; /* 경계선 색상 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .mypage-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* 사이드바 메뉴 스타일 */
+        .sidebar {
+            width: 250px;
+            background-color: var(--tan-color);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: block;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: var(--dark-tan-color);
+        }
+
+        /* 메인 콘텐츠 영역 스타일 */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+        }
+
+        .main-content h1 {
+            font-size: 2em;
+            color: var(--dark-tan-color);
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 1.2em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+        }
+
+        .info-item strong {
+            display: inline-block;
+            width: 100px;
+            color: var(--dark-tan-color);
+        }
+
+        .order-list table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .order-list th, .order-list td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-list th {
+            background-color: var(--tan-color);
+            color: #fff;
+        }
+
+        .order-list tbody tr:hover {
+            background-color: #f0e6da;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="mypage-container">
+    <div class="sidebar">
+        <h2>마이페이지</h2>
+        <a href="#profile" class="active">개인 정보</a>
+        <a href="#orders">주문 내역</a>
+        <a href="#wishlist">위시리스트</a>
+        <a href="#reviews">내 리뷰</a>
+        <a href="#address">배송지 관리</a>
+    </div>
+
+    <div class="main-content">
+        <div id="profile" class="section">
+            <h1>개인 정보</h1>
+            <ul class="info-list">
+                <li class="info-item"><strong>이름</strong>: 김유정</li>
+                <li class="info-item"><strong>이메일</strong>: yujeong00@gmail.com</li>
+                <li class="info-item"><strong>연락처</strong>: 010-1234-5678</li>
+                <li class="info-item"><strong>회원 등급</strong>: 냥집사</li>
+            </ul>
+        </div>
+
+        <div id="orders" class="section">
+            <h1>주문 내역</h1>
+            <div class="order-list">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>주문 번호</th>
+                            <th>주문 상품</th>
+                            <th>수량</th>
+                            <th>총 금액</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#20231015-001</td>
+                            <td>탄색 가죽 지갑</td>
+                            <td>1개</td>
+                            <td>45,000원</td>
+                            <td>배송 완료</td>
+                        </tr>
+                        <tr>
+                            <td>#20230920-002</td>
+                            <td>베이지색 니트</td>
+                            <td>2개</td>
+                            <td>80,000원</td>
+                            <td>배송 중</td>
+                        </tr>
+                        <tr>
+                            <td>#20230805-003</td>
+                            <td>갈색 머그컵 세트</td>
+                            <td>1개</td>
+                            <td>25,000원</td>
+                            <td>주문 취소</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="wishlist" class="section">
+            <h1>위시리스트</h1>
+            <ul class="info-list">
+                <li class="info-item"><strong>상품명</strong>: 탄색 코트</li>
+                <li class="info-item"><strong>상품명</strong>: 베이지색 슬랙스</li>
+                <li class="info-item"><strong>상품명</strong>: 아이보리 캔버스 백</li>
+            </ul>
+        </div>
+
+        </div>
+</div>
+
+</body>
+</html> -->
