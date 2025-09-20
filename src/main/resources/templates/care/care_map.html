@@ -524,11 +524,8 @@
 			        return;
 			    }
 			    
-			    // 타임리프 문법은 서버에서 처리되므로, JavaScript에서는 일반적인 문자열 리터럴을 사용해야 합니다.
-			    // 백엔드에서 채팅방을 처리할 URL을 `/chat/start`로 가정합니다.
 			    const url = `/chat/start?receiverSeq=${authorUserSeq}`;
 			    
-			    // 팝업창 속성 설정
 			    const width = 600;
 			    const height = 800;
 			    const left = (window.innerWidth / 2) - (width / 2);

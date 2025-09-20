@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.project.fatcat.DataNotFoundException;
 import com.project.fatcat.care.dto.CareServiceBoardDto;
