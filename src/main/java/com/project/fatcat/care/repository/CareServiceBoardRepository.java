@@ -12,6 +12,9 @@ public interface CareServiceBoardRepository extends JpaRepository<CareServiceBoa
 
 	List<CareServiceBoard> findByAddress1StartingWith(String region);
 	
+	List<CareServiceBoard> findByAddress1(String address1);
+	
+	
 	
     
 }

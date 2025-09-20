@@ -1,21 +1,11 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
 <head>
 <meta charset="utf-8">
 <title>돌봄서비스</title>
-<!-- <link rel="stylesheet" th:href="@{/bootstrap.min.css}"> -->
 <style>
-/* html, body {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-	font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-	overflow: hidden;
-} */
-
-
-/* ... (기존 CSS 코드는 그대로 유지) ... */
 
 #controls {
 	background: rgba(255, 255, 255, 0.96);
@@ -176,6 +166,23 @@
 	border-color: white;
 	color: #CD853F;
 }
+
+.btn-group .btn {
+    border-radius: 5px;
+    padding: 8px 12px;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+    border: 1px solid #ffc107;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: 1px solid #dc3545;
+}
 </style>
 </head>
 <body>
@@ -215,11 +222,15 @@
 			const $searchBtn = document.getElementById('searchBtn');
 			const $placesList = document.getElementById('placesList');
 			const $pagination = document.getElementById('pagination');
+			
+			const geocoder = new kakao.maps.services.Geocoder();
 
 			const map = new kakao.maps.Map(document.getElementById('map'), {
 				center : new kakao.maps.LatLng(37.566826, 126.9786567),
 				level : 5
 			});
+			
+			const infowindow = new kakao.maps.InfoWindow({zIndex:1});
 
 			window.addEventListener('DOMContentLoaded', () => {
 				fetch('/data/korea_map_info.txt')
@@ -227,10 +238,24 @@
 				    .then(text => {
 					    parseCSV(text);
 					    fillSido();
+					    if (navigator.geolocation) {
+					    	navigator.geolocation.getCurrentPosition(
+					    		(position) => {
+					    			const lat = position.coords.latitude;
+					    			const lon = position.coords.longitude;
+					    			reverseGeocode(lat, lon);
+					    		},
+					    		(error) => {
+					    			console.error("위치 정보를 가져오는 데 실패했습니다.", error);
+					    			fetchCareList();
+					    		}
+					    	);
+					    } else {
+					    	console.error("이 브라우저에서는 Geolocation이 지원되지 않습니다.");
+					    	fetchCareList();
+					    }
 				    })
 				    .catch(err => console.error('CSV 읽기 실패', err));
-				
-				fetchCareList(); // 페이지 로드 시 돌봄서비스 목록 불러오기
 			});
 
 			function parseCSV(csvText) {
@@ -279,11 +304,46 @@
 			function buildRegionText() {
 				return [ $sido.value, $sigungu.value, $dong.value ].filter(Boolean).join(' ');
 			}
+			
+			function reverseGeocode(lat, lon) {
+				const coord = new kakao.maps.LatLng(lat, lon);
+				
+				geocoder.coord2RegionCode(coord.getLng(), coord.getLat(), (result, status) => {
+					if (status === kakao.maps.services.Status.OK) {
+						const regionInfo = result.find(item => item.region_type === 'H');
+						
+						if (regionInfo) {
+							const { region_1depth_name, region_2depth_name, region_3depth_name } = regionInfo;
+							
+							$sido.value = region_1depth_name;
+							fillSigungu();
+							$sigungu.value = region_2depth_name;
+							fillDong(); 
+							
+							const dongList = REGION_DATA[region_1depth_name] ? REGION_DATA[region_1depth_name][region_2depth_name] : null;
+							const matchedDong = dongList ? dongList.find(d => region_3depth_name.includes(d) || d.includes(region_3depth_name)) : null;
 
-			// 서버에서 돌봄서비스 목록 가져오기
+							if (matchedDong) {
+								$dong.value = matchedDong;
+							} else {
+								console.warn(`"${region_3depth_name}"에 해당하는 동이 데이터에 없거나 일치하지 않습니다.`);
+							}
+							
+							fetchCareList();
+						} else {
+							console.warn("행정동 정보를 찾을 수 없습니다. 전체 목록을 불러옵니다.");
+							fetchCareList();
+						}
+					} else {
+						console.error("주소 변환에 실패했습니다.");
+						fetchCareList();
+					}
+				});
+			}
+
 			function fetchCareList() {
 				const region = buildRegionText();
-				const url = `/care/list?region=${encodeURIComponent(region)}`; // 서버 API 엔드포인트
+				const url = `/care/list?region=${encodeURIComponent(region)}`;
 				
 				fetch(url)
 					.then(response => {
@@ -293,7 +353,7 @@
 						return response.json();
 					})
 					.then(data => {
-						allPlaces = data; // 가져온 데이터를 allPlaces에 저장
+						allPlaces = data;
 						currentPage = 1;
 						renderList();
 					})
@@ -326,6 +386,7 @@
 			function renderList() {
 				clearMarkers();
 				clearList();
+				
 				const start = (currentPage - 1) * pageSize, end = start + pageSize;
 				const pagePlaces = allPlaces.slice(start, end);
 
@@ -360,24 +421,29 @@
 					li.addEventListener('click', () => {
 						const detailPanel = document.getElementById('detailPanel');
 						const detailContent = document.getElementById('detailContent');
-						const user = place.user || {userName: '정보 없음'};
-
-						// 상세 페이지 표시
+						
 						detailContent.innerHTML = `
 						<button id="closeDetail" class="btn-close" aria-label="Close"></button>
 						<h4>${place.careTitle}</h4>
-						<p><strong>작성자:</strong> ${user.userName}</p>
+						<p><strong>작성자:</strong> ${place.authorNickname}</p>
 						<p><strong>주소:</strong> ${place.address1} ${place.address2}</p>
 						<p><strong>가격:</strong> ${place.price}원</p>
 						<p><strong>내용:</strong> ${place.careContent}</p>
+						
+						<div style="margin-top: 20px; text-align: right;">
+							<a href="/care/modify/${place.careSeq}" class="btn btn-warning">수정</a>
+							<form action="/care/delete/${place.careSeq}" method="post" style="display:inline;">
+								<button type="submit" class="btn btn-danger mx-1" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
+							</form>
+							<button class="btn btn-warning" onclick="openChatPopup(${place.authorUserSeq})">채팅하기</button>
+						</div>
 						`;
-
+						
 						detailPanel.classList.add('show');
 
 						if (!originalCenter) originalCenter = map.getCenter();
 						map.panBy(-detailPanel.offsetWidth / 2, 0);
 
-						// 닫기 버튼 이벤트 리스너 재등록
 						document.getElementById('closeDetail').onclick = () => {
 							detailPanel.classList.remove('show');
 							map.panTo(originalCenter || map.getCenter());
@@ -449,6 +515,27 @@
 					kakao.maps.event.trigger(map, 'resize');
 					renderList();
 				}
+			}
+			
+		
+			function openChatPopup(authorUserSeq) {
+			    if (!authorUserSeq) {
+			        alert("채팅 상대방 정보가 없습니다.");
+			        return;
+			    }
+			    
+			    // 타임리프 문법은 서버에서 처리되므로, JavaScript에서는 일반적인 문자열 리터럴을 사용해야 합니다.
+			    // 백엔드에서 채팅방을 처리할 URL을 `/chat/start`로 가정합니다.
+			    const url = `/chat/start?receiverSeq=${authorUserSeq}`;
+			    
+			    // 팝업창 속성 설정
+			    const width = 600;
+			    const height = 800;
+			    const left = (window.innerWidth / 2) - (width / 2);
+			    const top = (window.innerHeight / 2) - (height / 2);
+			    const options = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+			    
+			    window.open(url, "chatPopup", options);
 			}
 		</script>
 	</div>

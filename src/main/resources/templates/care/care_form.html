@@ -6,20 +6,26 @@
 <meta charset="UTF-8">
 <title>돌봄서비스 구인등록</title>
 <style>
-/* 기존에 작성하신 CSS 스타일입니다. */
+
+
 #controls {
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid #ddd;
-    border-radius: 14px;
-    padding: 10px 14px;
+	background: rgba(255, 255, 255, 0.96);
+	border: 1px solid #ddd;
+	border-radius: 14px;
+	padding: 15px 20px;
+	gap: 20px;
+	align-items: center;
+	margin: 20px auto;
+	width: 100%; 
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
+}
+
+
+.controls-item {
+    display: flex;
+    gap: 8px; /* 드롭다운 간 간격 조절 */
     align-items: center;
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
 }
 
 #controls select, #controls button {
@@ -30,29 +36,21 @@
     padding: 0 10px;
 }
 
+#controls select {
+    width: 120px; /* 드롭다운 너비 고정 */
+}
+
 #controls button {
     cursor: pointer;
     border: none;
     background: #CD853F;
     color: #fff;
     font-weight: 600;
+    padding: 10px 12px;
 }
 
-#mapListContainer {
-    display: flex;
-    width: calc(100% - 20px);
-    height: 80vh;
-    margin: 20px 15px 0;
-    gap: 16px;
-    box-sizing: border-box;
-}
-
-#mapListContainer>div:first-child {
-    flex: 1;
-}
 
 #map {
-    flex: 1;
     height: 100%;
     border: 1px solid #e5e5e5;
     border-radius: 24px;
@@ -61,6 +59,17 @@
 
 .fixed-element button {
     display: block !important;
+}
+
+/* 폼 컨테이너와 지도 컨테이너의 간격 조절 */
+.row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-md-6 {
+    padding-right: 15px;
+    padding-left: 15px;
 }
 </style>
 </head>
@@ -75,37 +84,42 @@
 
                 <form th:action="@{/care/create}" th:object="${careServiceBoardDto}"
                     method="post" class="needs-validation" novalidate>
-                <input type="hidden" th:field="*{userSeq}" />
+                     <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+                
+                나중에 사용자 정보 로그인하구 히든으로 바꾸세여 지금은 임시로 텍스트 넣는거임 ~~~    
+                <input type="text"  th:field="*{userSeq}" />
                     
-                    <div class="mb-3">
-                        <label for="careTitle" class="form-label">제목</label>
+                    <div class="mb-2">
+                        <label for="careTitle" class="form-label">제목</label> 
                         <input type="text" id="careTitle" th:field="*{careTitle}" class="form-control" required />
                         <div class="invalid-feedback">제목을 입력해주세요.</div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="careContent" class="form-label">내용</label>
                         <textarea id="careContent" th:field="*{careContent}" rows="10" class="form-control" required></textarea>
                         <div class="invalid-feedback">내용을 입력해주세요.</div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label for="price" class="form-label">가격</label>
-                        <input type="number" id="price" th:field="*{price}" class="form-control" required />
+                        <input type="number" id="price" th:field="*{price}" class="form-control" required />원
                         <div class="invalid-feedback">가격을 입력해주세요.</div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">주소 검색</label>
-                        <div class="input-group">
-                            <select id="sido" class="form-select"></select>
-                            <select id="sigungu" class="form-select"></select>
-                            <select id="dong" class="form-select"></select>
-                            <button id="searchBtn" type="button" class="btn btn-warning">검색</button>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">   
+					<div class="mb-3">
+						<label class="form-label">주소 검색</label>
+						<div id="controls" class="d-flex">
+							<div class="controls-item">
+								<label class="mx-2">시/도<select id="sido"></select></label>
+								<label class="mx-2">시/군/구<select id="sigungu"></select></label>
+								<label class="mx-2">동<select id="dong"></select></label>
+							</div>
+							<button id="searchBtn" type="button">검색</button>
+						</div>
+					</div>
+
+					<div class="mb-3">   
                         <input  type= "hidden" id="address1" th:field="*{address1}" class="form-control" required readonly />
                         <div class="invalid-feedback">주소를 검색해주세요.</div>
                     </div>
@@ -159,42 +173,18 @@
                         const lng = pos.coords.longitude;
                         const loc = new kakao.maps.LatLng(lat, lng);
                         
-                        geocoder.coord2Address(lng, lat, (result, status) => {
-                            if (status === kakao.maps.services.Status.OK) {
-                                const addr = result[0].address.address_name.split(' ');
-                                const sido = addr[0];
-                                const sigungu = addr[1];
-                                const dong = addr[2];
-                                
-                                // 드롭다운 자동 선택 (이제 REGION_DATA가 채워져 있음)
-                                $sido.value = sido;
-                                fillSigungu();
-                                $sigungu.value = sigungu;
-                                fillDong();
-                                $dong.value = dong;
-                                
-                                // 주소 입력 필드와 위경도 필드 자동 채움
-                                document.getElementById('address1').value = `${sido} ${sigungu} ${dong}`;
-                                document.getElementById('latitude').value = lat;
-                                document.getElementById('longitude').value = lng;
-                                
-                                // 지도에 마커 및 원 표시
-                                addCenterMarkerAndCircle(loc);
-
-                            } else {
-                                console.error('주소 변환 실패:', status);
-                                // 실패 시 기본 위치로 마커 설정
-                                addCenterMarkerAndCircle(loc);
-                            }
-                        });
+                        // 기존 코드 대신 새로운 reverseGeocode 함수 호출
+                        reverseGeocode(lat, lng, loc);
 
                     }, err => {
                         console.warn("위치 가져오기 실패", err);
-                        // 위치 가져오기 실패 시 기본 지도로 설정
+                        // 실패 시 기본 지도로 설정하고 검색 버튼 클릭 이벤트와 연결
                         addCenterMarkerAndCircle(new kakao.maps.LatLng(37.566826, 126.9786567));
+                        $searchBtn.addEventListener('click', searchLocation);
                     });
                 } else {
                     console.warn("Geolocation API를 지원하지 않는 브라우저입니다.");
+                    $searchBtn.addEventListener('click', searchLocation);
                 }
             })
             .catch(err => console.error('CSV 읽기 실패', err));
@@ -239,6 +229,44 @@
 
     function buildRegionText() {
         return [$sido.value, $sigungu.value, $dong.value].filter(Boolean).join(' ');
+    }
+    
+    // ⭐️ 새로 추가된 함수: 좌표를 주소로 변환하고 드롭다운을 설정합니다.
+    function reverseGeocode(lat, lon, loc) {
+        geocoder.coord2RegionCode(lon, lat, (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                const regionInfo = result.find(item => item.region_type === 'H');
+                
+                if (regionInfo) {
+                    const { region_1depth_name, region_2depth_name, region_3depth_name } = regionInfo;
+                    
+                    // 드롭다운에 시/도와 시/군/구 설정
+                    $sido.value = region_1depth_name;
+                    fillSigungu();
+                    $sigungu.value = region_2depth_name;
+                    fillDong();
+                    
+                    // Geocoder 결과와 비슷한 동(dong) 찾기
+                    const dongList = REGION_DATA[region_1depth_name] ? REGION_DATA[region_1depth_name][region_2depth_name] : null;
+                    const matchedDong = dongList ? dongList.find(d => region_3depth_name.includes(d) || d.includes(region_3depth_name)) : null;
+
+                    if (matchedDong) {
+                        $dong.value = matchedDong;
+                    }
+                    
+                    // 주소와 위경도 필드 자동 채움
+                    const fullAddress = `${region_1depth_name} ${region_2depth_name} ${matchedDong || region_3depth_name}`;
+                    document.getElementById('address1').value = fullAddress;
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lon;
+                    
+                    addCenterMarkerAndCircle(loc);
+                }
+            } else {
+                console.error("주소 변환에 실패했습니다.");
+                addCenterMarkerAndCircle(loc);
+            }
+        });
     }
 
     function addCenterMarkerAndCircle(position) {
@@ -293,6 +321,8 @@
             }
         });
     }
+
+  
     $searchBtn.addEventListener('click', searchLocation);
 
 </script>
