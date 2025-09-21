@@ -1,160 +1,242 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{shared/layout}">
 <head>
-<meta charset="utf-8">
-<title>동물병원 검색</title>
-<style>
-    /* 기존 스타일과 동일 */
-    #controls {
-        background: rgba(255, 255, 255, 0.96);
-        border: 1px solid #ddd;
-        border-radius: 14px;
-        padding: 10px 14px;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        margin: 20px auto;
-        width: fit-content;
-    }
-    #controls select, #controls button {
-        height: 36px;
-        font-size: 14px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        padding: 0 10px;
-    }
-    #controls button {
-        cursor: pointer;
-        border: none;
-        background: #CD853F;
-        color: #fff;
-        font-weight: 600;
-    }
-    #mapListContainer {
-        display: flex;
-        width: calc(100% - 20px);
-        height: 80vh;
-        margin: 20px 15px 0;
-        gap: 16px;
-        box-sizing: border-box;
-    }
-    #map, #menu_wrap, #detailPanel {
-        transition: all 0.3s ease;
-    }
-    #map {
-        flex: 0.9;
-        height: 100%;
-        border: 1px solid #e5e5e5;
-        border-radius: 24px;
-        position: relative;
-    }
-    #menu_wrap {
-        flex: 0.5;
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 24px;
-        padding: 8px;
-        font-size: 14px;
-        overflow-y: auto;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    }
-    #menu_wrap h3 {
-        margin: 6px 8px 10px;
-        font-size: 16px;
-    }
-    #placesList {
-        margin: 0;
-        padding: 0 6px 8px;
-    }
-    #placesList li {
-        list-style: none;
-    }
-    #placesList .item {
-        display: flex;
-        align-items: flex-start;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
-    }
-    #placesList .marker-number {
-        width: 23px;
-        height: 23px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #CD853F;
-        color: white;
-        border-radius: 20%;
-        font-size: 13px;
-        font-weight: bold;
-        margin-right: 10px;
-        flex-shrink: 0;
-    }
-    #placesList .info {
-        flex: 1;
-    }
-    #placesList .info h5 {
-        margin: 0 0 4px;
-        font-size: 15px;
-        font-weight: bold;
-    }
-    #placesList .info p {
-        margin: 2px 0;
-        font-size: 13px;
-        color: #555;
-    }
-    #pagination {
-        text-align: center;
-        padding: 6px 0 10px;
-    }
-    #pagination a {
-        display: inline-block;
-        margin: 0 6px;
-        text-decoration: none;
-        color: #2b74e4;
-    }
-    #pagination .on {
-        font-weight: 700;
-        color: #444;
-        pointer-events: none;
-    }
-    .fixed-element button {
-        display: block !important;
-    }
-    /* 상세창 */
-    #detailPanel {
-        flex: 0;
-        width: 0;
-        padding: 0;
-        overflow: hidden;
-        background: #fff;
-        border-radius: 24px;
-        box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
-    }
-    #detailPanel.show {
-        flex: 0.5;
-        width: 300px;
-        padding: 10px;
-    }
-    #detailPanel #closeDetail {
-        float: right;
-        cursor: pointer;
-        border-radius: 60px;
-        background: white;
-        border-color: white;
-        color: #CD853F;
-    }
-    /* 별점 스타일 */
-    #ratingStars .star {
-        cursor: pointer;
-        color: #ccc;
-        font-size: 24px;
-    }
-    #ratingStars .star.selected {
-        color: #FFD700;
-    }
-</style>
+    <meta charset="utf-8">
+    <title>동물병원 검색</title>
+    <style>
+        /* CSS 스타일 */
+        #controls {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 20px auto;
+            width: fit-content;
+        }
+        #controls select, #controls button {
+            height: 36px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 0 10px;
+        }
+        #controls button {
+            cursor: pointer;
+            border: none;
+            background: #CD853F;
+            color: #fff;
+            font-weight: 600;
+        }
+        #mapListContainer {
+            display: flex;
+            width: calc(100% - 20px);
+            height: 80vh;
+            margin: 20px 15px 0;
+            gap: 16px;
+            box-sizing: border-box;
+        }
+        #map, #menu_wrap, #detailPanel {
+            transition: all 0.3s ease;
+        }
+        #map {
+            flex: 0.9;
+            height: 100%;
+            border: 1px solid #e5e5e5;
+            border-radius: 24px;
+            position: relative;
+        }
+        #menu_wrap {
+            flex: 0.5;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 24px;
+            padding: 8px;
+            font-size: 14px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+        #menu_wrap h3 {
+            margin: 6px 8px 10px;
+            font-size: 16px;
+        }
+        #placesList {
+            margin: 0;
+            padding: 0 6px 8px;
+        }
+        #placesList li {
+            list-style: none;
+        }
+        #placesList .item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        #placesList .marker-number {
+            width: 23px;
+            height: 23px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #CD853F;
+            color: white;
+            border-radius: 20%;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        #placesList .info {
+            flex: 1;
+        }
+        #placesList .info h5 {
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        #placesList .info p {
+            margin: 2px 0;
+            font-size: 13px;
+            color: #555;
+        }
+        #pagination {
+            text-align: center;
+            padding: 6px 0 10px;
+        }
+        #pagination a {
+            display: inline-block;
+            margin: 0 6px;
+            text-decoration: none;
+            color: #2b74e4;
+        }
+        #pagination .on {
+            font-weight: 700;
+            color: #444;
+            pointer-events: none;
+        }
+        .fixed-element button {
+            display: block !important;
+        }
+        #detailPanel {
+            flex: 0;
+            width: 0;
+            padding: 0;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        #detailPanel.show {
+            flex: 0.5;
+            width: 300px;
+            padding: 10px;
+        }
+        #detailPanel #closeDetail {
+            float: right;
+            cursor: pointer;
+            border-radius: 60px;
+            background: white;
+            border-color: white;
+            color: #CD853F;
+        }
+        #reviewForm {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        #reviewForm label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #reviewForm textarea {
+            width: 100%;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        #reviewForm textarea,
+        #reviewForm button {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        #reviewForm button {
+            background-color: #CD853F;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #reviewForm button:hover {
+            background-color: #b87a37;
+        }
+        .star-rating {
+            display: inline-block;
+        }
+        .star-rating .star {
+            cursor: pointer;
+            color: #ccc;
+            font-size: 24px;
+        }
+        .star-rating .star.selected,
+        .star-rating .star.hovered {
+            color: #FFD700;
+        }
+        .review-actions {
+            margin-top: 5px;
+            text-align: right;
+        }
+        .review-actions button {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .update-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .update-form textarea {
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .update-form button {
+            border: none;
+            padding: 6px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .update-form .save-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .update-form .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div layout:fragment="content">
@@ -328,7 +410,7 @@
                 const marker = new kakao.maps.Marker({
                     position: pos,
                     map: map,
-                    image: new kakao.maps.MarkerImage('/images/map_marker.png', new kakao.maps.Size(39, 46))
+                    image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(39, 46))
                 });
                 const overlay = new kakao.maps.CustomOverlay({
                     position: pos,
@@ -385,7 +467,6 @@
                             return;
                         }
                         
-                        // 새로운 병원 정보 표시
                         const detailContent = document.getElementById('detailContent');
                         detailContent.innerHTML = `
                             <div id="clinicInfo">
@@ -405,9 +486,9 @@
                                     <input type="hidden" id="placeNameInput" name="placeName" value="${place.place_name}">
                                     <input type="hidden" id="addressInput" name="address" value="${place.address_name || place.road_address_name}">
                                     
-                                    <div style="margin-bottom: 10px;">
+                                    <div class="form-group">
                                         <label>별점:</label>
-                                        <div id="ratingStars">
+                                        <div id="ratingStars" class="star-rating">
                                             <span class="star" data-rating="1">★</span>
                                             <span class="star" data-rating="2">★</span>
                                             <span class="star" data-rating="3">★</span>
@@ -417,7 +498,7 @@
                                         <input type="hidden" id="ratingInput" name="rating" required>
                                     </div>
                                     
-                                    <div style="margin-bottom: 10px;">
+                                    <div class="form-group">
                                         <label>리뷰:</label>
                                         <textarea id="reviewContentInput" name="reviewContent" rows="3" required></textarea>
                                     </div>
@@ -432,13 +513,8 @@
                             </div>
                         `;
 
-                        // 서버에서 리뷰 정보 가져오기
                         fetchReviews(place.place_name, place.address_name || place.road_address_name);
-
-                        // 별점 선택 기능 활성화
                         setupStarRating();
-
-                        // 리뷰 폼 제출 이벤트 리스너 추가
                         document.getElementById('reviewForm').addEventListener('submit', function(e) {
                             e.preventDefault();
                             const formData = new FormData(this);
@@ -452,7 +528,6 @@
                         });
 
                         detailPanel.classList.add('show');
-
                         if (!originalCenter) originalCenter = map.getCenter();
                         map.panBy(-detailPanel.offsetWidth / 2, 0);
                         openedPlaceId = place.id;
@@ -528,48 +603,81 @@
             }
 
             function setupStarRating() {
-                const stars = document.querySelectorAll('#ratingStars .star');
+                const starsDiv = document.getElementById('ratingStars');
+                starsDiv.innerHTML = '★★★★★'.split('').map((star, i) => `<span class="star" data-rating="${i+1}">${star}</span>`).join('');
+                const stars = starsDiv.querySelectorAll('.star');
                 const ratingInput = document.getElementById('ratingInput');
                 stars.forEach(star => {
                     star.addEventListener('click', function() {
                         const rating = this.dataset.rating;
                         ratingInput.value = rating;
-                        stars.forEach(s => {
-                            if (s.dataset.rating <= rating) {
-                                s.classList.add('selected');
-                            } else {
-                                s.classList.remove('selected');
-                            }
-                        });
+                        stars.forEach(s => s.classList.toggle('selected', s.dataset.rating <= rating));
                     });
                 });
             }
+            
+            async function updateReview(vetReviewSeq, newContent, newRating) {
+                try {
+                    const response = await fetch(`/api/vet-clinics/reviews/${vetReviewSeq}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reviewContent: newContent, rating: parseInt(newRating) })
+                    });
+                    if (response.ok) {
+                        alert('리뷰가 성공적으로 수정되었습니다.');
+                        fetchReviews(document.getElementById('placeNameInput').value, document.getElementById('addressInput').value);
+                    } else { alert('리뷰 수정에 실패했습니다.'); }
+                } catch (error) { alert('네트워크 오류로 리뷰 수정에 실패했습니다.'); }
+            }
 
+            async function deleteReview(vetReviewSeq) {
+                if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) return;
+                try {
+                    const response = await fetch(`/api/vet-clinics/reviews/${vetReviewSeq}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        alert('리뷰가 성공적으로 삭제되었습니다.');
+                        fetchReviews(document.getElementById('placeNameInput').value, document.getElementById('addressInput').value);
+                    } else { alert('리뷰 삭제에 실패했습니다.'); }
+                } catch (error) { alert('네트워크 오류로 리뷰 삭제에 실패했습니다.'); }
+            }
+            
             async function fetchReviews(placeName, address) {
                 try {
-                    const url = `/api/vet-clinics/reviews?placeName=${encodeURIComponent(placeName)}&address=${encodeURIComponent(address)}`;
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('서버 응답 오류');
+                    const params = new URLSearchParams({ placeName, address });
+                    const response = await fetch(`/api/vet-clinics/reviews?${params.toString()}`);
                     const data = await response.json();
-                    
+
                     const avgRatingEl = document.getElementById('avgRating');
                     if (data.ratingAvg !== null) {
                         avgRatingEl.textContent = `${data.ratingAvg.toFixed(2)} (${data.ratingCount}명 참여)`;
                     } else {
                         avgRatingEl.textContent = "아직 평점이 없습니다.";
                     }
+
                     const reviewListEl = document.getElementById('reviewList');
                     reviewListEl.innerHTML = `<h5>등록된 리뷰</h5>`;
+
                     if (data.reviews && data.reviews.length > 0) {
                         data.reviews.forEach(review => {
                             const reviewItem = document.createElement('div');
+                            reviewItem.id = `review-${review.vetReviewSeq}`;
                             reviewItem.innerHTML = `
-                                <p><strong>별점: ${'★'.repeat(review.rating)}</strong></p>
-                                <p>${review.reviewContent}</p>
-                                <small>작성일: ${new Date(review.createDate).toLocaleDateString()}</small>
+                                <p><strong>별점: ${'★'.repeat(review.vetRating)}</strong></p>
+                                <p>${review.vetReview}</p>
+                                <div class="review-actions">
+                                    <button class="edit-btn">수정</button>
+                                    <button class="delete-btn">삭제</button>
+                                </div>
                                 <hr>
                             `;
                             reviewListEl.appendChild(reviewItem);
+
+                            reviewItem.querySelector('.edit-btn').addEventListener('click', () => {
+                                handleUpdateReview(review.vetReviewSeq, review.vetReview, review.vetRating);
+                            });
+                            reviewItem.querySelector('.delete-btn').addEventListener('click', () => {
+                                deleteReview(review.vetReviewSeq);
+                            });
                         });
                     } else {
                         reviewListEl.innerHTML += `<p>등록된 리뷰가 없습니다.</p>`;
@@ -579,28 +687,83 @@
                     document.getElementById('reviewList').innerHTML = `<p>리뷰 정보를 가져올 수 없습니다.</p>`;
                 }
             }
+            
+            function handleUpdateReview(vetReviewSeq, reviewContent, rating) {
+                const reviewItem = document.getElementById(`review-${vetReviewSeq}`);
+                const existingForm = reviewItem.querySelector('.update-form');
+                if (existingForm) {
+                    existingForm.remove();
+                    return;
+                }
 
+                const updateForm = document.createElement('div');
+                updateForm.className = 'update-form';
+                updateForm.innerHTML = `
+                    <div class="form-group">
+                        <label>별점:</label>
+                        <div class="star-rating update-stars">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <input type="hidden" class="update-rating-input" value="${rating}">
+                    </div>
+                    <div class="form-group">
+                        <label>내용:</label>
+                        <textarea class="update-content-input" rows="3">${reviewContent}</textarea>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button class="save-btn">저장</button>
+                        <button class="cancel-btn">취소</button>
+                    </div>
+                `;
+                reviewItem.appendChild(updateForm);
+
+                const updateStars = updateForm.querySelectorAll('.star-rating .star');
+                const updateRatingInput = updateForm.querySelector('.update-rating-input');
+
+                updateStars.forEach(star => {
+                    if (star.dataset.rating <= rating) {
+                        star.classList.add('selected');
+                    }
+                    star.addEventListener('click', function() {
+                        const newRating = this.dataset.rating;
+                        updateRatingInput.value = newRating;
+                        updateStars.forEach(s => {
+                            if (s.dataset.rating <= newRating) {
+                                s.classList.add('selected');
+                            } else {
+                                s.classList.remove('selected');
+                            }
+                        });
+                    });
+                });
+
+                updateForm.querySelector('.save-btn').addEventListener('click', () => {
+                    const newContent = updateForm.querySelector('.update-content-input').value;
+                    const newRating = updateRatingInput.value;
+                    updateReview(vetReviewSeq, newContent, newRating);
+                });
+
+                updateForm.querySelector('.cancel-btn').addEventListener('click', () => {
+                    updateForm.remove();
+                });
+            }
+            
             async function submitReview(reviewData) {
                 try {
                     const response = await fetch('/api/vet-clinics/reviews', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(reviewData)
                     });
                     if (response.ok) {
                         alert('리뷰가 성공적으로 등록되었습니다.');
                         fetchReviews(reviewData.placeName, reviewData.address);
-                        document.getElementById('reviewForm').reset();
-                        document.querySelectorAll('#ratingStars .star').forEach(s => s.classList.remove('selected'));
-                    } else {
-                        alert('리뷰 등록에 실패했습니다.');
-                    }
-                } catch (error) {
-                    console.error('리뷰 제출 중 오류 발생', error);
-                    alert('네트워크 오류로 리뷰 등록에 실패했습니다.');
-                }
+                    } else { alert('리뷰 등록에 실패했습니다.'); }
+                } catch (error) { alert('네트워크 오류로 리뷰 등록에 실패했습니다.'); }
             }
         </script>
     </div>

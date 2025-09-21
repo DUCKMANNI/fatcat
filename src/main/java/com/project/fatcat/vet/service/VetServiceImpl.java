@@ -11,7 +11,6 @@ import com.project.fatcat.vet.repository.VetReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -33,7 +32,11 @@ public class VetServiceImpl implements VetService {
             .orElseGet(() -> {
                 VetClinic newClinic = VetClinic.builder()
                         .clinicName(reviewDto.getPlaceName())
-                        .clinicAddress(reviewDto.getAddress())
+                        .clinicAddress(reviewDto.getAddress()) 
+                        .clinicCity("미지정")
+                        .clinicTown("미지정")
+                        .latitude(0.0)
+                        .longitude(0.0)
                         .createDate(LocalDateTime.now())
                         .build();
                 return vetClinicRepository.save(newClinic);
@@ -54,34 +57,69 @@ public class VetServiceImpl implements VetService {
     @Override
     @Transactional(readOnly = true)
     public VetReviewResponseDto getClinicDetails(String placeName, String address) {
-        VetClinic vetClinic = vetClinicRepository.findByClinicNameAndClinicAddress(placeName, address)
-            .orElse(null);
-
+        VetClinic vetClinic = vetClinicRepository.findByClinicNameAndClinicAddress(placeName, address).orElse(null);
         VetReviewResponseDto responseDto = new VetReviewResponseDto();
-        
         if (vetClinic != null) {
-            VetRatingAvg ratingAvg = vetRatingAvgRepository.findByVetClinicVetSeq(vetClinic.getVetSeq())
-                .orElse(null);
+            VetRatingAvg ratingAvg = vetRatingAvgRepository.findByVetClinicVetSeq(vetClinic.getVetSeq()).orElse(null);
             List<VetReview> reviews = vetReviewRepository.findByVetClinicVetSeq(vetClinic.getVetSeq());
-            
             if (ratingAvg != null) {
                 responseDto.setRatingAvg(ratingAvg.getRatingAvg());
                 responseDto.setRatingCount(ratingAvg.getRatingCount());
             }
-            
             List<VetReviewResponseDto.ReviewDetail> reviewDetails = reviews.stream()
-                .map(review -> new VetReviewResponseDto.ReviewDetail(
-                    review.getVetReview(), 
-                    review.getVetRating(), 
-                    review.getCreateDate(), null))
-                .collect(Collectors.toList());
-            
+                .map(review -> new VetReviewResponseDto.ReviewDetail(review.getVetReviewSeq(), review.getVetReview(), review.getVetRating(), review.getCreateDate(), review.getVisitDate()))
+              	.collect(Collectors.toList());
             responseDto.setReviews(reviewDetails);
         }
-        
         return responseDto;
     }
 
+    @Override
+    @Transactional
+    public void updateReview(Integer vetReviewSeq, VetReviewDto reviewDto) {
+        VetReview vetReview = vetReviewRepository.findById(vetReviewSeq)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid review ID: " + vetReviewSeq));
+        
+        vetReview.setVetReview(reviewDto.getReviewContent());
+        vetReview.setVetRating(reviewDto.getRating());
+        vetReview.setUpdateDate(LocalDateTime.now());
+        vetReviewRepository.save(vetReview);
+        
+        recalculateRating(vetReview.getVetClinic());
+    }
+    
+    @Override
+    @Transactional
+    public void deleteReview(Integer vetReviewSeq) {
+        VetReview vetReview = vetReviewRepository.findById(vetReviewSeq)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid review ID: " + vetReviewSeq));
+            
+        VetClinic vetClinic = vetReview.getVetClinic();
+        vetReviewRepository.delete(vetReview);
+        
+        recalculateRating(vetClinic);
+    }
+    
+    private void recalculateRating(VetClinic vetClinic) {
+        List<VetReview> reviews = vetReviewRepository.findByVetClinicVetSeq(vetClinic.getVetSeq());
+        VetRatingAvg ratingAvg = vetRatingAvgRepository.findByVetClinicVetSeq(vetClinic.getVetSeq())
+            .orElseGet(() -> VetRatingAvg.builder().vetClinic(vetClinic).build());
+        
+        if (reviews.isEmpty()) {
+            ratingAvg.setRatingSum(0);
+            ratingAvg.setRatingCount(0);
+            ratingAvg.setRatingAvg(BigDecimal.ZERO);
+        } else {
+            int sum = reviews.stream().mapToInt(VetReview::getVetRating).sum();
+            int count = reviews.size();
+            ratingAvg.setRatingSum(sum);
+            ratingAvg.setRatingCount(count);
+            ratingAvg.setRatingAvg(new BigDecimal(sum).divide(new BigDecimal(count), 2, RoundingMode.HALF_UP));
+        }
+        ratingAvg.setLastReviewDate(LocalDateTime.now());
+        vetRatingAvgRepository.save(ratingAvg);
+    }
+    
     private void updateRating(VetClinic vetClinic, Integer newRating) {
         VetRatingAvg ratingAvg = vetRatingAvgRepository.findByVetClinicVetSeq(vetClinic.getVetSeq())
             .orElse(VetRatingAvg.builder()
@@ -90,10 +128,16 @@ public class VetServiceImpl implements VetService {
                 .ratingSum(0)
                 .ratingAvg(BigDecimal.ZERO)
                 .build());
-
+        
         ratingAvg.setRatingCount(ratingAvg.getRatingCount() + 1);
         ratingAvg.setRatingSum(ratingAvg.getRatingSum() + newRating);
-        ratingAvg.setRatingAvg(new BigDecimal(ratingAvg.getRatingSum()).divide(new BigDecimal(ratingAvg.getRatingCount()), 2, RoundingMode.HALF_UP));
+        
+        if (ratingAvg.getRatingCount() > 0) {
+            ratingAvg.setRatingAvg(new BigDecimal(ratingAvg.getRatingSum()).divide(new BigDecimal(ratingAvg.getRatingCount()),
+            		2, RoundingMode.HALF_UP));
+        } else {
+            ratingAvg.setRatingAvg(BigDecimal.ZERO);
+        }
         ratingAvg.setLastReviewDate(LocalDateTime.now());
 
         vetRatingAvgRepository.save(ratingAvg);
