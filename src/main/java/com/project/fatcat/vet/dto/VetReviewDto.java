@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class VetReivewDto {
+public class VetReviewDto {
 	
 	private String placeName; //병원 이름 
 	private String address; //병원 주소 

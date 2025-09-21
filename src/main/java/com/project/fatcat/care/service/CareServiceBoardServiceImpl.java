@@ -15,6 +15,7 @@ import com.project.fatcat.entity.CareServiceBoard;
 import com.project.fatcat.entity.User;
 import com.project.fatcat.users.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,6 +26,7 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public void save(CareServiceBoardDto careServiceBoardDto) {
         Optional<User> userOptional = userRepository.findById(careServiceBoardDto.getUserSeq());
 
@@ -108,6 +110,7 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
     }
     
     @Override
+    @Transactional
     public void deleteBoard(Integer careSeq) {
         CareServiceBoard careServiceBoard = getBoard(careSeq);
         this.careServiceBoardRepository.delete(careServiceBoard);
@@ -126,6 +129,7 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
 
   
     @Override
+    @Transactional
     public void modify(Integer careSeq, CareServiceBoardDto careServiceBoardDto) {
        
         CareServiceBoard careBoard = getBoard(careSeq);

@@ -25,6 +25,7 @@ public class CareServiceReviewServiceImpl implements CareServiceReviewService {
  
 
     @Override
+    @Transactional
     public CareReviewResopnseDto createReview(Integer authorUserSeq, Integer targetUserSeq, String careReview, Integer careRating, String targetRole) {
     	
         User authorUser = userRepository.findById(authorUserSeq).orElseThrow(() -> new RuntimeException("작성자를 찾을 수 없습니다."));
