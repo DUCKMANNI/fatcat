@@ -1,46 +1,58 @@
 package com.project.fatcat.vet.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.project.fatcat.vet.dto.VetReviewDto;
 import com.project.fatcat.vet.dto.VetReviewResponseDto;
 import com.project.fatcat.vet.service.VetService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/vet")
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/vet-clinics/reviews")
 @RequiredArgsConstructor
 public class VetController {
 
     private final VetService vetService;
 
-    // 지도 화면을 보여주는 GET 요청
-    @GetMapping("/map")
-    public String showVetMap() {
-        return "vet_map"; // src/main/resources/templates/vet_map.html 렌더링
+
+    // GET: 특정 병원의 리뷰 및 평점 정보 조회
+    @GetMapping
+    public ResponseEntity<VetReviewResponseDto> getClinicReviews(
+            @RequestParam("placeName") String placeName, @RequestParam("address") String address) {
+        VetReviewResponseDto reviews = vetService.getClinicDetails(placeName, address);
+        return ResponseEntity.ok(reviews);
     }
 
-    // ⭐ REST API 처리를 위한 별도 컨트롤러 분리 (내부 클래스로 간소화) ⭐
-    @RestController
-    @RequestMapping("/api/vet-clinics")
-    @RequiredArgsConstructor
-    public class VetApiController {
+    // POST: 리뷰 등록
+    @PostMapping
+    public ResponseEntity<Void> addReview(@RequestBody VetReviewDto reviewDto) {
+        vetService.addReview(reviewDto);
+        return ResponseEntity.ok().build();
+    }
+    
+    // PUT: 리뷰 수정
+    @PutMapping("/{vetReviewSeq}")
+    public ResponseEntity<Void> updateReview(@PathVariable("vetReviewSeq") Integer vetReviewSeq, @RequestBody VetReviewDto reviewDto) {
+        vetService.updateReview(vetReviewSeq, reviewDto);
+        return ResponseEntity.ok().build();
+    }
+    
+    // DELETE: 리뷰 삭제
+    @DeleteMapping("/{vetReviewSeq}")
+    public ResponseEntity<Void> deleteReview(@PathVariable("vetReviewSeq") Integer vetReviewSeq) {
+        vetService.deleteReview(vetReviewSeq);
+        return ResponseEntity.ok().build();
 
-        private final VetService vetService;
 
-        // GET: 특정 병원의 리뷰 및 평점 정보 조회
-        @GetMapping("/reviews")
-        public ResponseEntity<VetReviewResponseDto> getClinicReviews(@RequestParam String placeName, @RequestParam String address) {
-            VetReviewResponseDto reviews = vetService.getClinicDetails(placeName, address);
-            return ResponseEntity.ok(reviews);
-        }
-
-        // POST: 리뷰 등록
-        @PostMapping("/reviews")
-        public ResponseEntity<Void> addReview(@RequestBody VetReviewDto reviewDto) {
-            vetService.addReview(reviewDto);
-            return ResponseEntity.ok().build();
-        }
     }
 }
