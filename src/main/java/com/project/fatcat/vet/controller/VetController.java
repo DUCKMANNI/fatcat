@@ -24,6 +24,7 @@ public class VetController {
 
     private final VetService vetService;
 
+<<<<<<< Updated upstream
     // GET: 특정 병원의 리뷰 및 평점 정보 조회
     @GetMapping
     public ResponseEntity<VetReviewResponseDto> getClinicReviews(
@@ -51,5 +52,28 @@ public class VetController {
     public ResponseEntity<Void> deleteReview(@PathVariable("vetReviewSeq") Integer vetReviewSeq) {
         vetService.deleteReview(vetReviewSeq);
         return ResponseEntity.ok().build();
+=======
+    // ⭐ REST API 처리를 위한 별도 컨트롤러 분리 (내부 클래스로 간소화) ⭐
+    @RestController
+    @RequestMapping("/api/vet-clinics")
+    @RequiredArgsConstructor
+    public class VetApiController {
+
+        private final VetService vetService;
+
+        // GET: 특정 병원의 리뷰 및 평점 정보 조회
+        @GetMapping("/reviews")
+        public ResponseEntity<VetReviewResponseDto> getClinicReviews(@RequestParam String placeName, @RequestParam String address) {
+            VetReviewResponseDto reviews = vetService.getClinicDetails(placeName, address);
+            return ResponseEntity.ok(reviews);
+        }
+
+        // POST: 리뷰 등록
+        @PostMapping("/reviews")
+        public ResponseEntity<Void> addReview(@RequestBody VetReviewDto reviewDto) {
+            vetService.addReview(reviewDto);
+            return ResponseEntity.ok().build();
+        }
+>>>>>>> Stashed changes
     }
 }
