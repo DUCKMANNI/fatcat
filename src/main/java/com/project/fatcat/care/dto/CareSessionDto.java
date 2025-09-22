@@ -1,44 +1,29 @@
 package com.project.fatcat.care.dto;
 
-import com.project.fatcat.entity.CareSession;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CareSessionDto {
+    private Integer id;
+    private Integer ownerUserId;
+    private Integer sitterUserId;
 
-    private Integer sessionSeq;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime startDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime endDate;
-    private String careProviderUserName;
-    private String clientUserName;
-    private String status;
 
-    // 엔티티를 DTO로 변환하는 생성자
-    public CareSessionDto(CareSession session) {
-        this.sessionSeq = session.getSessionSeq();
-        this.startDate = session.getStartDate();
-        this.endDate = session.getEndDate();
-
-        
-        if (session.getStatus() != null) {
-            this.status = session.getStatus().name();
-        }
-
-       
-        if (session.getSitterUser() != null) {
-            this.careProviderUserName = session.getSitterUser().getUserName();
-        }
-
-        if (session.getOwnerUser() != null) {
-            this.clientUserName = session.getOwnerUser().getUserName();
-        }
-    }
+    private String status; // "CONFIRMED", "PENDING", "CANCELLED" 등
 }

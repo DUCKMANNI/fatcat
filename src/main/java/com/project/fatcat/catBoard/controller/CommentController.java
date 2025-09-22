@@ -1,4 +1,4 @@
-package com.project.fatcat.catboard.controller;
+package com.project.fatcat.catBoard.controller;
 
 import java.security.Principal;
 
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.project.fatcat.catboard.form.CommentForm;
-import com.project.fatcat.catboard.service.CommentService;
-import com.project.fatcat.catboard.service.PostService;
+import com.project.fatcat.catBoard.form.CommentForm;
+import com.project.fatcat.catBoard.service.CommentService;
+import com.project.fatcat.catBoard.service.PostService;
 import com.project.fatcat.entity.KnowledgeComment;
 import com.project.fatcat.entity.KnowledgePost;
 

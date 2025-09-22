@@ -1,8 +1,5 @@
 package com.project.fatcat.chat.controller;
 
-import com.project.fatcat.chat.dto.ChatMessageDto;
-import com.project.fatcat.chat.service.ChatService;
-import com.project.fatcat.entity.CareChatRoom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,6 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.project.fatcat.care.dto.CareSessionDto;
+import com.project.fatcat.care.service.CareSessionService;
+import com.project.fatcat.chat.dto.ChatMessageDto;
+import com.project.fatcat.chat.service.ChatService;
 
 @Controller
 public class ChatController {
@@ -21,35 +24,61 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
-    // 임시로 userSeq 1을 현재 로그인한 사용자로 가정합니다.
-    private static final Integer CURRENT_USER_ID = 1;
+    @Autowired
+    private CareSessionService careSessionService;
 
-    @GetMapping("/chat/start")
-    public String startChat(@RequestParam("receiverSeq") Integer receiverSeq, Model model) {
-        CareChatRoom chatRoom = chatService.getOrCreateChatRoom(CURRENT_USER_ID, receiverSeq);
+    // ----------------------------
+    // WebSocket 메시지 처리
+    // ----------------------------
+    @MessageMapping("/private-chat")
+    public void processMessage(@Payload ChatMessageDto chatMessageDto) {
+        // 1️⃣ CARE_CONFIRM 타입 처리 (돌봄 예약)
+        if ("CARE_CONFIRM".equalsIgnoreCase(chatMessageDto.getType())) {
+            CareSessionDto sessionDto = CareSessionDto.builder()
+                    .ownerUserId(chatMessageDto.getReceiverId())
+                    .sitterUserId(chatMessageDto.getSenderId())
+                    .startDate(chatMessageDto.getStartDate())
+                    .endDate(chatMessageDto.getEndDate())
+                    .status("CONFIRMED")
+                    .build();
 
-        model.addAttribute("chatRoomId", chatRoom.getChatSeq());
-        model.addAttribute("senderId", CURRENT_USER_ID);
-        model.addAttribute("receiverId", receiverSeq);
+            CareSessionDto saved = careSessionService.createSession(sessionDto);
+            System.out.println("✅ CareSession saved with ID: " + saved.getId());
+        }
 
-        return "chat/chat_form"; // 👈 이 부분을 chat_form으로 변경합니다.
+        // 2️⃣ 모든 경우에 방 브로드캐스트
+        if (chatMessageDto.getChatRoomId() != null) {
+            messagingTemplate.convertAndSend(
+                    "/topic/chat/" + chatMessageDto.getChatRoomId(),
+                    chatMessageDto
+            );
+        }
     }
 
-    @MessageMapping("/private-chat")
-    public void sendPrivateMessage(@Payload ChatMessageDto chatMessageDto) {
-        ChatMessageDto savedDto = chatService.saveMessage(chatMessageDto);
-        
-        messagingTemplate.convertAndSendToUser(
-            String.valueOf(savedDto.getSenderId()),
-            "/private",
-            savedDto
-        );
-        messagingTemplate.convertAndSendToUser(
-            // 수신자 ID를 메시지 DTO에 추가로 포함시켜 보내는 게 좋습니다.
-            // 여기서는 예시로 receiverId를 사용
-            String.valueOf(chatMessageDto.getRecieverId()), 
-            "/private",
-            savedDto
-        );
+    // ----------------------------
+    // 채팅 페이지 렌더링
+    // ----------------------------
+    @GetMapping("/chat/start")
+    public String startChat(Model model) {
+        return "chat/chat_form";
+    }
+
+    // ----------------------------
+    // REST API: sender/receiver로 chatRoom 조회 또는 생성
+    // ----------------------------
+    @GetMapping("/api/chat/room")
+    @ResponseBody
+    public Object getOrCreateRoom(@RequestParam("sender") Integer senderId,
+                                  @RequestParam("receiver") Integer receiverId) {
+        return chatService.getOrCreateChatRoom(senderId, receiverId);
+    }
+
+    // ----------------------------
+    // REST API: 채팅 기록 가져오기
+    // ----------------------------
+    @GetMapping("/api/chat/history")
+    @ResponseBody
+    public Object getChatHistory(@RequestParam("roomId") Integer chatRoomId) {
+        return chatService.getChatHistory(chatRoomId);
     }
 }
