@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.project.fatcat.catboard.repository.BoardRepository;
-import com.project.fatcat.catboard.repository.PostRepository;
+import com.project.fatcat.catBoard.repository.BoardRepository;
+import com.project.fatcat.catBoard.repository.PostRepository;
 import com.project.fatcat.cats.repository.CatRepository;
 import com.project.fatcat.entity.Cat;
 import com.project.fatcat.entity.KnowledgeBoard;
