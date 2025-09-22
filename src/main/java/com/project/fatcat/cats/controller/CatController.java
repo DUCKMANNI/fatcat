@@ -51,7 +51,7 @@ public class CatController {
     public String modifyCat(@Valid CatUpdateDTO catUpdateDTO, BindingResult bindingResult, @PathVariable("catSeq") Integer catSeq) {
 
         if (bindingResult.hasErrors()) {
-            return "cat_modify";
+            return "cats/cats_modify";
         }
 
         Cat cat = catRepository.findById(catSeq).orElseThrow(() -> new IllegalArgumentException("해당 고양이가 없습니다."));

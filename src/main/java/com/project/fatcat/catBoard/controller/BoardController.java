@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
+
+import com.mysql.cj.log.Log;
+
 import com.project.fatcat.catBoard.service.BoardService;
 import com.project.fatcat.catBoard.service.PostService;
 import com.project.fatcat.entity.KnowledgeBoard;

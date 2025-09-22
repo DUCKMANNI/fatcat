@@ -162,7 +162,7 @@
 
     </style>
 </head>
-<body>
+
 
 <div class="mypage-container">
     <div class="sidebar">
@@ -235,17 +235,23 @@
                 </table>
             </div>
         </div>
+        
+        
+        
+        
+        <!-- target="_blank" -->
+        <!-- 저거 넣으면 페이지가 새로 열림 -->
 
         <div id="customer-service" class="section">
             <h1>고객센터</h1>
             <p>자주 묻는 질문(FAQ)을 확인하고 싶으시면 아래 링크를 클릭해주세요.</p>
-            <a href="https://www.example.com/faq" target="_blank" class="edit-button">FAQ 보러가기</a>
+            <a th:href="@{/faq/list}"  class="edit-button">FAQ 보러가기</a>
             <p style="margin-top: 15px;">기타 문의사항은 고객센터(1588-XXXX)로 연락 바랍니다.</p>
         </div>
 
     </div>
 </div>
-</body>
+
 </div>
 </body>
 </html>
