@@ -8,4 +8,5 @@ public interface ChatService {
     CareChatRoom getOrCreateChatRoom(Integer senderId, Integer receiverId);
     List<ChatMessageDto> getChatHistory(Integer chatRoomId); 
     ChatMessageDto saveMessage(ChatMessageDto chatMessageDto); 
+    
 }

@@ -51,7 +51,6 @@ public class ChatServiceImpl implements ChatService {
         CareChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
         if (chatRoom != null) {
             List<CareChatHistory> history = chatHistoryRepository.findByCareChatRoomOrderByChatDateAsc(chatRoom);
-            // 엔티티 리스트를 DTO 리스트로 변환하여 반환
             return history.stream().map(this::convertToDto).collect(Collectors.toList());
         }
         return List.of();
@@ -59,38 +58,48 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
-        // DTO를 엔티티로 변환
         CareChatHistory chatHistory = convertToEntity(chatMessageDto);
         chatHistory.setChatDate(LocalDateTime.now());
-
-        // 엔티티를 저장하고, 저장된 엔티티를 다시 DTO로 변환하여 반환
         CareChatHistory savedHistory = chatHistoryRepository.save(chatHistory);
         return convertToDto(savedHistory);
     }
-    
-    // --- DTO와 엔티티 간 변환 메서드 ---
-    private ChatMessageDto convertToDto(CareChatHistory entity) {
-        ChatMessageDto dto = new ChatMessageDto();
-        dto.setChatRoomId(entity.getCareChatRoom().getChatSeq());
-        dto.setSenderId(entity.getUser().getUserSeq());
-        dto.setContent(entity.getChatMessage());
-        dto.setTimestamp(entity.getChatDate());
-        return dto;
-    }
+
+    // --- DTO와 엔티티 변환 ---
 
     private CareChatHistory convertToEntity(ChatMessageDto dto) {
         CareChatHistory entity = new CareChatHistory();
-        
-        // DTO에서 받은 ID를 사용하여 엔티티를 조회하여 연결
         CareChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow();
-        User senderUser = userRepository.findById(dto.getSenderId()).orElseThrow();
+        
+        // [수정] Integer 타입의 senderId를 String으로 변환하여 설정
+        entity.setChatSender(String.valueOf(dto.getSenderId())); 
         
         entity.setCareChatRoom(chatRoom);
-        entity.setUser(senderUser);
-        entity.setChatSender(String.valueOf(dto.getSenderId()));
         entity.setChatMessage(dto.getContent());
-        // chatDate는 서비스에서 설정
         
         return entity;
+    }
+
+    private ChatMessageDto convertToDto(CareChatHistory entity) {
+        ChatMessageDto dto = new ChatMessageDto();
+        
+        dto.setChatRoomId(entity.getCareChatRoom().getChatSeq());
+        
+        // [수정] String 타입의 chatsender를 Integer로 변환하여 설정
+        dto.setSenderId(Integer.parseInt(entity.getChatSender()));
+
+        String chatName = entity.getCareChatRoom().getChatName();
+        String[] ids = chatName.split("-");
+        Integer member1 = Integer.parseInt(ids[0]);
+        Integer member2 = Integer.parseInt(ids[1]);
+        
+        if (Integer.parseInt(entity.getChatSender()) == member1) {
+            dto.setReceiverId(member2);
+        } else {
+            dto.setReceiverId(member1);
+        }
+
+        dto.setContent(entity.getChatMessage());
+        dto.setTimestamp(entity.getChatDate());
+        return dto;
     }
 }

@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +16,15 @@ import java.time.LocalDateTime;
 public class ChatMessageDto {
     private Integer chatRoomId;
     private Integer senderId;
-    private Integer recieverId;
-    private String content;
+    private Integer receiverId; 
     private LocalDateTime timestamp;
+	private String content;
+	
+	private String type; //CARE_REQUEST같은 것들 
+	
+	@JsonFormat(pattern = "yyyy-mm-dd'T'HH:mm")
+	private LocalDateTime startDate;
+	
+	@JsonFormat(pattern = "yyyy-mm-dd'T'HH:mm")
+	private LocalDateTime endDate;
 }

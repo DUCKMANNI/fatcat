@@ -1,6 +1,5 @@
 package com.project.fatcat.catBoard.form;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data

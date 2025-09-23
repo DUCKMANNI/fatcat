@@ -2,181 +2,194 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<title>1:1 채팅</title>
+<title>1:1 채팅 + CareSession 테스트</title>
 <style>
-body {
-	font-family: Arial, sans-serif;
-	margin: 0;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-}
-
-#chat-container {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	border: 1px solid #ddd;
-	margin: 10px;
-	border-radius: 8px;
-	overflow: hidden;
-}
-
-#message-area {
-	flex-grow: 1;
-	padding: 10px;
-	overflow-y: auto;
-	background-color: #f7f7f7;
-}
-
-.message {
-	margin-bottom: 10px;
-	padding: 8px 12px;
-	border-radius: 18px;
-	max-width: 80%;
-}
-
-.sent {
-	background-color: #dcf8c6;
-	align-self: flex-end;
-	float: right;
-	clear: both;
-}
-
-.received {
-	background-color: #fff;
-	align-self: flex-start;
-	float: left;
-	clear: both;
-}
-
-#input-area {
-	display: flex;
-	padding: 10px;
-	border-top: 1px solid #ddd;
-}
-
-#message-input {
-	flex-grow: 1;
-	padding: 8px;
-	border-radius: 20px;
-	border: 1px solid #ccc;
-	outline: none;
-}
-
-#send-button {
-	margin-left: 10px;
-	padding: 8px 16px;
-	border: none;
-	background-color: #CD853F;
-	color: white;
-	border-radius: 20px;
-	cursor: pointer;
-}
+body { font-family: Arial; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; }
+#user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; }
+select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid #ccc; }
+#chat-container { flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; margin:10px; border-radius:8px; overflow:hidden; }
+#message-area { flex-grow:1; padding:10px; overflow-y:auto; background:#f7f7f7; display:flex; flex-direction:column; }
+.message { margin-bottom:10px; padding:8px 12px; border-radius:18px; max-width:70%; word-wrap:break-word; }
+.sent { background:#dcf8c6; align-self:flex-end; margin-left:20%; }
+.received { background:#fff; align-self:flex-start; margin-right:20%; }
+#input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
+#message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
+#send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
+#care-form { display:none; flex-direction:column; gap:5px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
+#care-form input, #care-form select, #care-form textarea { width:100%; }
+#confirm-care { background:#8FBC8F; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; }
 </style>
-<script
-	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script
-	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-	<div id="chat-container">
-		<div id="message-area"></div>
-		<div id="input-area">
-			<input type="text" id="message-input" placeholder="메시지를 입력하세요...">
-			<button id="send-button">전송</button>
-		</div>
-	</div>
 
-	<script th:inline="javascript">
-    const chatRoomId = /*[[${chatRoomId}]]*/ 0; /* [[..]] 이거 사용하면 thymeleaf랑 자바스크립트 코드 동시 사용 가능 /0은 문법상 못알아들어서 저렇게 처리하면 가능하다고 하네여.. */
-    const senderId = /*[[${senderId}]]*/ 0;
-    const receiverId = /*[[${receiverId}]]*/ 0;
-    
-    let stompClient = null;
-    const messageArea = document.getElementById('message-area');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
+<div id="user-select">
+    <label>보내는 사람:
+        <select id="sender-select">
+            <option value="">선택하세요</option>
+            <option value="1">User 1</option>
+            <option value="2">User 2</option>
+            <option value="3">User 3</option>
+        </select>
+    </label>
+    <label>받는 사람:
+        <select id="receiver-select">
+            <option value="">선택하세요</option>
+            <option value="1">User 1</option>
+            <option value="2">User 2</option>
+            <option value="3">User 3</option>
+        </select>
+    </label>
+</div>
 
-    window.onload = function() {
-        fetch(`/api/chat/history?roomId=${chatRoomId}`)
-            .then(response => response.json())
-            .then(messages => {
-                messages.forEach(msg => displayMessage(msg));
-            })
-            .catch(error => console.error('Error fetching chat history:', error));
+<div id="chat-container">
+    <div id="message-area"></div>
+    <div id="input-area">
+        <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+        <button id="send-button">전송</button>
+        <button id="care-toggle">돌봄 예약</button>
+    </div>
+    <div id="care-form">
+        시작일: <input type="datetime-local" id="start-date">
+        종료일: <input type="datetime-local" id="end-date">
+        상태:
+        <select id="session-status">
+            <option value="REQUESTED">요청</option>
+            <option value="CONFIRMED">확정</option>
+            <option value="CANCELLED">취소</option>
+        </select>
+        메모: <textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
+        <button id="confirm-care">예약 전송</button>
+    </div>
+</div>
 
-        connectWebSocket();
-    };
+<script>
+let senderId = null;
+let receiverId = null;
+let chatRoomId = null;
+let stompClient = null;
 
-    function connectWebSocket() {
-        const socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-        stompClient.connect({}, onConnected, onError);
-    }
+const messageArea = document.getElementById('message-area');
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
+const careToggle = document.getElementById('care-toggle');
+const careForm = document.getElementById('care-form');
+const startDateInput = document.getElementById('start-date');
+const endDateInput = document.getElementById('end-date');
+const confirmCare = document.getElementById('confirm-care');
 
-    function onConnected() {
-        stompClient.subscribe('/user/' + senderId + '/private', onMessageReceived);
-        stompClient.subscribe('/user/' + receiverId + '/private', onMessageReceived);
-    }
-
-    function onError(error) {
-        console.error('WebSocket connection error:', error);
-    }
-
-    function sendMessage() {
-        const content = messageInput.value.trim();
-        if (content && stompClient) {
-            const chatMessageDto = {
-                chatRoomId: chatRoomId,
-                senderId: senderId,
-                receiverId: receiverId,
-                content: content
-            };
-
-            // 1. 메시지를 웹소켓으로 전송
-            stompClient.send('/app/private-chat', {}, JSON.stringify(chatMessageDto));
-
-            // 2. 전송과 동시에 내 화면에 메시지를 즉시 표시
-            displayMessage(chatMessageDto);
-
-            // 3. 입력창 비우기
-            messageInput.value = '';
-        }
-    }
-
-    function onMessageReceived(payload) {
-        const message = JSON.parse(payload.body);
-        
-     
-        //    받는 메시지(received)만 화면에 표시
-        if (message.senderId !== senderId) {
-            displayMessage(message);
-        }
-    }
-
-    function displayMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        
-        if (message.senderId === senderId) {
-            messageElement.classList.add('sent');
-        } else {
-            messageElement.classList.add('received');
-        }
-        
-        messageElement.innerHTML = `<p>${message.content}</p>`;
-        messageArea.appendChild(messageElement);
-        messageArea.scrollTop = messageArea.scrollHeight;
-    }
+window.onload = function() {
+    document.getElementById('sender-select').addEventListener('change', async (e) => {
+        senderId = parseInt(e.target.value);
+        if (senderId && receiverId) await initChatRoom();
+    });
+    document.getElementById('receiver-select').addEventListener('change', async (e) => {
+        receiverId = parseInt(e.target.value);
+        if (senderId && receiverId) await initChatRoom();
+    });
 
     sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            sendMessage();
-        }
+    messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
     });
+
+    careToggle.addEventListener('click', () => {
+        careForm.style.display = careForm.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    confirmCare.addEventListener('click', () => {
+        const start = startDateInput.value;
+        const end = endDateInput.value;
+        const status = document.getElementById('session-status').value;
+        const note = document.getElementById('session-note').value;
+
+        if (!start || !end) return alert("날짜를 선택하세요.");
+
+        const chatMessage = {
+            chatRoomId: chatRoomId,
+            senderId: senderId,
+            receiverId: receiverId,
+            type: "CARE_CONFIRM",
+            startDate: start,
+            endDate: end,
+            status: status,
+            note: note,
+            content: `돌봄 예약: ${start} ~ ${end}, 상태: ${status}`
+        };
+
+        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+
+        // 초기화
+        careForm.style.display = 'none';
+        startDateInput.value = '';
+        endDateInput.value = '';
+        document.getElementById('session-status').value = 'REQUESTED';
+        document.getElementById('session-note').value = '';
+    });
+};
+
+async function initChatRoom() {
+    if (!senderId || !receiverId) return;
+
+    if (stompClient && stompClient.connected) stompClient.disconnect();
+
+    const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
+    const data = await res.json();
+    chatRoomId = data.chatSeq;
+
+    const histRes = await fetch(`/api/chat/history?roomId=${chatRoomId}`);
+    const history = await histRes.json();
+    displayChatHistory(history);
+
+    connectWebSocket();
+}
+
+function connectWebSocket() {
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, () => {
+        console.log('Connected');
+
+        stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
+            const chatMessage = JSON.parse(message.body);
+            displayMessage(chatMessage);
+        });
+    }, (error) => console.error("Connection error: ", error));
+}
+
+function sendMessage() {
+    if (!stompClient || !stompClient.connected) return;
+    if (!messageInput.value.trim()) return;
+
+    const chatMessage = {
+        chatRoomId: chatRoomId,
+        senderId: senderId,
+        receiverId: receiverId,
+        type: "CHAT",
+        content: messageInput.value.trim()
+    };
+
+    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    messageInput.value = '';
+}
+
+function displayMessage(chatMessage) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    if (chatMessage.senderId === senderId) messageDiv.classList.add('sent');
+    else messageDiv.classList.add('received');
+
+    messageDiv.innerText = chatMessage.content;
+    messageArea.appendChild(messageDiv);
+    messageArea.scrollTop = messageArea.scrollHeight;
+}
+
+function displayChatHistory(history) {
+    messageArea.innerHTML = '';
+    if (history && Array.isArray(history)) history.forEach(displayMessage);
+}
 </script>
 </body>
 </html>

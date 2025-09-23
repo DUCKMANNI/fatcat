@@ -2,9 +2,7 @@
 
 package com.project.fatcat.catBoard.controller;
 
-import java.security.Principal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -22,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.fatcat.catBoard.form.CommentForm;
 import com.project.fatcat.catBoard.form.PostForm;
+
 import com.project.fatcat.catBoard.repository.PostRepository;
+
 import com.project.fatcat.catBoard.service.BoardService;
 import com.project.fatcat.catBoard.service.PostService;
 import com.project.fatcat.entity.KnowledgeBoard;

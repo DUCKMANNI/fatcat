@@ -87,7 +87,8 @@ public class CareServiceBoardController {
         careServiceBoardDto.setLatitude(careBoard.getLatitude());
         careServiceBoardDto.setLongitude(careBoard.getLongitude());
         careServiceBoardDto.setPrice(careBoard.getPrice());
-        
+       
+        model.addAttribute("careSeq", careSeq); 
         model.addAttribute("careServiceBoardDto", careServiceBoardDto);
         return "care/care_form"; // 수정 폼으로 이동
     }
