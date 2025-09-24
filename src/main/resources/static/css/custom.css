@@ -101,11 +101,14 @@ body {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+
+  width: 100%;
+  max-width: 1600px;     /* 👉 여백을 조절하는 핵심 (1200~1600px 사이에서 조정) */
+  margin: 0 auto;        /* 👉 중앙 정렬 */
+  padding: 0 20px;       /* 👉 화면 끝에 딱 붙지 않게 최소 여백 */
+  box-sizing: border-box;
 }
 
 .product-card {
@@ -114,13 +117,12 @@ body {
 }
 
 .product-card img {
-  width: 100%;      /* 칸 크기에 맞게 */
-  aspect-ratio: 1 / 1;
-  height: 280px;    /* 높이 고정 */
-  object-fit: cover;
-  border-radius: 8px;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  display: block;
 }
-
 
 
 

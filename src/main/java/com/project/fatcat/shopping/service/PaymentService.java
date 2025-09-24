@@ -1,10 +1,9 @@
 package com.project.fatcat.shopping.service;
 
-import com.project.fatcat.entity.Order;
-import com.project.fatcat.entity.Payment;
-import com.project.fatcat.entity.User;
+import com.project.fatcat.shopping.dto.PaymentConfirmRequest;
+import com.project.fatcat.shopping.dto.PaymentConfirmResponse;
 
 public interface PaymentService {
 
-	Payment confirmAndSave(String paymentKey, String orderId, int amount, User user, Order order);
+	PaymentConfirmResponse confirmPayment(PaymentConfirmRequest request);
 }

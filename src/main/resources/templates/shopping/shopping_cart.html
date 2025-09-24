@@ -78,7 +78,10 @@
 								th:text="${cartSummary.finalPrice + '원'}"></span>
 						</p>
 					</div>
-					<button class="btn btn-danger w-100 py-2 fs-6">주문하기</button>
+					<form th:action="@{/orders/form}" method="get">
+						<input type="hidden" name="cartSeq" th:value="${cartSeq}">
+						<button type="submit" class="btn btn-danger w-100 py-2 fs-6">주문하기</button>
+					</form>
 				</div>
 			</div>
 

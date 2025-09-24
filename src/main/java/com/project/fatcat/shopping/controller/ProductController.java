@@ -1,55 +1,64 @@
 package com.project.fatcat.shopping.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.project.fatcat.entity.Product;
+import com.project.fatcat.shopping.service.ProductServiceImpl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
 @Controller
 @RequestMapping("/products")
+@RequiredArgsConstructor
+@Log4j2
 public class ProductController {
 
+	private final ProductServiceImpl productServiceImpl;
+	
 	@GetMapping("")
-	public String listProducts(@RequestParam(name = "category",defaultValue="all") String category,
-	                           @RequestParam(name = "sub",required = false) String sub,
-	                           @RequestParam(name = "detail", required = false) String detail,
-	                           @RequestParam(name = "page", required = false) Integer page,
-	                           Model model){
+	public String listProducts(
+            @RequestParam(name = "category", defaultValue = "all") String main,
+            @RequestParam(name = "sub", required = false) String sub,
+            @RequestParam(name = "detail", required = false) String detail,
+            @RequestParam(name = "page", defaultValue = "0") int page,   // 0-base
+            @RequestParam(name = "size", defaultValue = "12") int size,
+            Model model) {
 
-		if (page == null) page = 0;
-		
-		List<Map<String, Object>> dummyProducts = new ArrayList<>();
-		for (int i = 1; i <= 20; i++) {
-			Map<String, Object> p = new HashMap<>();
-			p.put("productCode", category + sub + "00" + i);
-			p.put("name", "상품 " + i);
-			p.put("price", i * 1000);
-			dummyProducts.add(p);
-		}
+        // ✅ 파라미터 정규화 (빈 문자열 → 기본값/NULL)
+        String m = (main == null || main.isBlank()) ? "all" : main.trim();   // main 필수
+        String s = (sub == null || sub.isBlank()) ? null : sub.trim();
+        String d = (detail == null || detail.isBlank()) ? null : detail.trim();
 
-		model.addAttribute("products", dummyProducts);
-		model.addAttribute("currentPage", page);
-	    model.addAttribute("totalPages", 5); // 예시로 5페이지 있다고 가정
-		return "shopping/shopping_product";
-	}
+        int p = Math.max(0, page);
+        int sz = Math.max(1, size);
+
+        Pageable pageable = PageRequest.of(p, sz, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<Product> productPage = productServiceImpl.getProducts(m, s, d, pageable);
+
+        // 뷰로 전달
+        model.addAttribute("productPage", productPage);           // 페이지 정보
+        model.addAttribute("products", productPage.getContent()); // 실제 데이터
+        model.addAttribute("main", m);
+        model.addAttribute("sub", s);       // null이면 Thymeleaf URL에서 자동 제거
+        model.addAttribute("detail", d);    // null이면 Thymeleaf URL에서 자동 제거
+
+        return "shopping/shopping_product"; // 뷰 이름
+    }
+
 	
 	@GetMapping("/detail")
 	public String productDetail(@RequestParam("productCode") String productCode, Model model) {
-	    // 실제로는 DB 조회
-	    Map<String, Object> product = new HashMap<>();
-	    product.put("productCode", productCode);
-	    product.put("name", "상품 " + productCode);
-	    product.put("price",  10000);
-	    product.put("description", "상품 상세 설명 " + productCode);
-	    product.put("reviewCount", 100);
-	    product.put("mainImage", "/images/no_image.jpg");
-	    product.put("detailImage", "/images/no_image.jpg");
+	    
+	    Product product = productServiceImpl.getProductDetail(productCode);
 
 	    model.addAttribute("product", product);
 

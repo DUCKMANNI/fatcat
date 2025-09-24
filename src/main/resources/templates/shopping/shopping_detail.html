@@ -7,46 +7,72 @@
 <title>쇼핑몰 상품 상세보기</title>
 </head>
 <body>
+	<!-- ✅ 폭/높이 한 번에 조정: max-width와 --box-h 숫자만 바꾸면 됨 -->
 	<div layout:fragment="shopContent"
-		class="container my-3 d-flex flex-column align-items-center mt-5">
-		<div class="row">
-			<!-- 상품 대표 이미지 -->
-			<div class="col-md-6 text-center">
-				<img
-					th:src="${product.mainImage != null ? product.mainImage : '/images/no_image.jpg'}"
-					th:alt="${product.name}" class="img-fluid border rounded">
+		class="container my-3 d-flex flex-column align-items-center mt-5"
+		style="max-width: 1200px; --box-h: 520px;">
+
+		<!-- ===== 상단: 대표이미지 / 상품정보 (같은 높이, 가운데 정렬) ===== -->
+		<div class="row g-4 align-items-stretch w-100">
+
+			<!-- 대표 이미지 -->
+			<div class="col-md-6 d-flex">
+				<!-- 기존 product-img-box 스타일이 겹침 원인이었을 수 있으니 인라인로 완전 제어 -->
+				<div
+					class="flex-fill d-flex align-items-center justify-content-center"
+					style="height: var(--box-h); position: static !important; overflow: hidden;">
+					<img
+						th:src="${product.productImageList.^[imageTypeCode == 'm']?.fileName}"
+						th:alt="${product.productName}" class="w-100 h-100"
+						style="object-fit: contain;">
+				</div>
 			</div>
 
 			<!-- 상품 정보 -->
-			<div class="col-md-6 d-flex flex-column">
-				<h3 th:text="${product.name}">상품명</h3>
-				<p>
-					★★★★★ <span class="text-muted"
-						th:text="'(' + ${product.reviewCount} + ' 리뷰)'">리뷰수</span>
-				</p>
+			<div class="col-md-6 d-flex">
+				<div class="flex-fill p-4 d-flex flex-column"
+					style="min-height: var(--box-h);">
+					<h3 th:text="${product.productName}">상품명</h3>
 
-				<!-- 수량 & 가격 -->
-				<div class="mt-auto">
-					<div class="d-flex align-items-center mb-4">
-						<button class="btn btn-outline-secondary">-</button>
-						<input type="text" class="form-control text-center mx-2"
-							style="width: 70px;" value="1">
-						<button class="btn btn-outline-secondary">+</button>
-						<p class="ms-3 h5 mb-0"
-							th:text="'₩ ' + ${#numbers.formatInteger(product.price, 3, 'COMMA')}"></p>
-					</div>
+					<p class="mb-2">
+						★★★★★ <span class="text-muted">(0개)</span>
+					</p>
 
-					<!-- 장바구니 & 바로구매 버튼 -->
-					<div class="d-flex gap-2 mt-3">
-						<button class="btn btn-outline-dark flex-fill" style="font-size:20px; border-radius: 999px;">장바구니</button>
-						<button class="btn btn-primary flex-fill" style="font-size:20px; border-radius: 999px;">바로구매</button>
-					</div>
+					<form th:action="@{/shopping/cart/add}" method="post"
+						class="mt-auto">
+						<input type="hidden" name="productCode"
+							th:value="${product.productCode}">
+						<div id="orderBox"
+							class="d-flex align-items-center mb-4 qty-group"
+							th:attr="data-unit-price=${product.productPrice}, data-min=1, data-max=99">
+
+							<button class="btn btn-outline-secondary btn-qty" type="button"
+								data-op="minus">-</button>
+							<input type="number"  name="qty"
+								class="form-control text-center mx-2 qty-input"
+								style="width: 70px;" value="1" min="1" max="99">
+							<button class="btn btn-outline-secondary btn-qty" type="button"
+								data-op="plus">+</button>
+
+							<p class="ms-3 h5 mb-0 price-text"
+								th:text="'₩ ' + ${#numbers.formatInteger(product.productPrice, 3, 'COMMA')}">
+							</p>
+						</div>
+
+						<div class="d-flex gap-2 mt-3">
+							<button class="btn btn-outline-dark flex-fill" type="submit"
+								style="font-size: 20px; border-radius: 999px;">장바구니</button>
+							<button class="btn btn-primary flex-fill" type="button"
+								style="font-size: 20px; border-radius: 999px;">바로구매</button>
+						</div>
+					</form>
+
 				</div>
 			</div>
 		</div>
 
-		<!-- 상세보기 & 리뷰 탭 -->
-		<div class="container mt-5">
+
+		<div class="mt-5 w-100">
 			<!-- 탭 메뉴 -->
 			<ul class="nav nav-tabs" id="productTab" role="tablist">
 				<li class="nav-item" role="presentation">
@@ -63,15 +89,18 @@
 			<!-- 탭 내용 -->
 			<div class="tab-content p-4 border border-top-0"
 				id="productTabContent">
-				<!-- 상세보기 -->
-				<div class="tab-pane fade show active" id="detail" role="tabpanel">
-					<div class="text-center">
-						<img th:src="@{/images/no_image.jpg}" alt="상세 이미지"
-							class="img-fluid detail-image">
+				<!-- ✅ 중복 tab-pane 제거 & id 중복 제거 -->
+				<div class="tab-pane fade show active text-center" id="detail"
+					role="tabpanel">
+					<div class="border rounded d-inline-block"
+						style="max-width: 100%; width: 100%; position: static !important; overflow: hidden;">
+						<img
+							th:src="${product.productImageList.^[imageTypeCode == 'd']?.fileName}"
+							th:alt="${product.productName}"
+							style="max-width: 100%; height: auto; object-fit: contain;">
 					</div>
 				</div>
 
-				<!-- 리뷰 -->
 				<div class="tab-pane fade" id="review" role="tabpanel">
 					<h5 class="mb-4">상품 리뷰</h5>
 					<p>아직 등록된 리뷰가 없습니다.</p>
@@ -79,8 +108,43 @@
 			</div>
 		</div>
 
+		<script>
+		(function () {
+			  const box = document.querySelector('#orderBox');
+			  if (!box) return;
 
+			  const unitPrice = parseInt(box.dataset.unitPrice || '0', 10);
+			  const min = parseInt(box.dataset.min || '1', 10);
+			  const max = parseInt(box.dataset.max || '99', 10);
 
+			  const input = box.querySelector('.qty-input');
+			  const priceEl = box.querySelector('.price-text');
+			  const minusBtn = box.querySelector('.btn-qty[data-op="minus"]');
+			  const plusBtn  = box.querySelector('.btn-qty[data-op="plus"]');
+
+			  const clamp = v => Math.max(min, Math.min(max, v));
+			  const parseQty = v => {
+			    const n = parseInt(v, 10);
+			    return clamp(isNaN(n) ? min : n);
+			  };
+
+			  function update(qty) {
+			    input.value = qty;
+			    minusBtn.disabled = qty <= min;
+			    plusBtn.disabled  = qty >= max;
+			    const total = unitPrice * qty;
+			    priceEl.textContent = '₩ ' + total.toLocaleString('ko-KR');
+			  }
+
+			  minusBtn.addEventListener('click', () => update(parseQty(input.value) - 1));
+			  plusBtn .addEventListener('click', () => update(parseQty(input.value) + 1));
+			  input.addEventListener('input', () => update(parseQty(input.value)));
+
+			  update(parseQty(input.value));
+			})();
+
+</script>
 	</div>
 </body>
+
 </html>

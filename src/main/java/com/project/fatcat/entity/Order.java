@@ -75,5 +75,9 @@ public class Order {
 	@Builder.Default
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
 	private List<Payment> paymentList = new ArrayList<>();
+	
+	@Builder.Default
+	@OneToMany(mappedBy = "orderInfo", cascade = CascadeType.ALL)
+	private List<OrderItem> orderItemList = new ArrayList<>();
 
 }

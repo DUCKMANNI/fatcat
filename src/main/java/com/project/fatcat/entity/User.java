@@ -51,6 +51,9 @@ public class User {
 	@Column(length = 200)
 	private String address2;
 	
+	@Column(length = 20)
+	private String zipCode;
+	
 	@Column(nullable = false)
 	private Double latitude;
 	
