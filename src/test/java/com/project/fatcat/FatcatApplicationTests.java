@@ -18,44 +18,73 @@ import com.project.fatcat.users.UserRepository;
 
 @SpringBootTest
 class FatcatApplicationTests {
-	
-	
-	
+
 	@Autowired
 	private BoardRepository boardRepository;
-	
+
 	@Autowired
 	private PostRepository postRepository;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private CatRepository catRepository;
-	
-	
 
 	@Test
 	void contextLoads() {
+
 		
 		
-//		//고양이 정보 등록
+		
 //		
-//		  // 1. 테스트를 위한 유저 정보 가져오기 (user_seq=1)
-//        User user = userRepository.findById(1).orElseThrow();
+//		
+//		// 1. 테스트를 위한 유저 정보 가져오기 (user_seq=2)
+//		User user = userRepository.findById(2).orElseThrow();
 //
-//        // 2. 새로운 고양이 정보 저장 (INSERT)
-//       
-//        Cat newCat = Cat.builder()
-//                .user(user)
-//                .catName("제리")
-//                .catBirtthday(LocalDate.of(2022, 7, 7))
-//                .build();
-//        
-//        Cat savedCat = catRepository.save(newCat);
-//        
-        
-       
+//		// 2. 새로운 고양이 정보 저장 (INSERT)
+//		// "수컷" 대신 Enum 타입인 Cat.Gender.MALE 사용
+//		Cat newCat = Cat.builder()
+//		.user(user) // 유저 정보는 이제 ID 2번을 사용합니다.
+//		.catName("설이")
+//		.catBirtthday(LocalDate.of(2021, 7, 7)) // catBirtthday 오타를 수정했습니다.
+//		.catGender(Cat.Gender.FEMALE) // 'cat_gender' 필드를 올바른 Enum 값으로 설정
+//		.catBreed("코리안 숏헤어") // 필수 필드인 종 이름도 추가
+//		.isNeutered(true) // 필수 필드인 중성화 여부도 추가
+//		.build();
+//
+//		Cat savedCat = catRepository.save(newCat);
+//
+//		//*** MALE (수컷)**과 **FEMALE (암컷) **//
+//		
+//		
+//		
+//		
+//		
+//		
+		
+		
+		
+		
+		
+		
+
+//		// 고양이 정보 등록
+//
+		/*
+		 * // 1. 테스트를 위한 유저 정보 가져오기 (user_seq=1) User user =
+		 * userRepository.findById(1).orElseThrow();
+		 * 
+		 * // 2. 새로운 고양이 정보 저장 (INSERT) // String "수컷" 대신 Enum 타입인 Cat.Gender.MALE 사용
+		 * Cat newCat = Cat.builder() .user(user) .catName("톰")
+		 * .catBirtthday(LocalDate.of(2022, 7, 7)) .catGender(Cat.Gender.FEMALE) //
+		 * 'cat_gender' 필드를 올바른 Enum 값으로 설정 .build();
+		 * 
+		 * Cat savedCat = catRepository.save(newCat);
+		 * 
+		 *//*** MALE (수컷)**과 **FEMALE (암컷) ***//*
+												*/
+
 //        // 저장된 고양이의 ID로 다시 조회
 //        Cat foundCat = catRepository.findById(savedCat.getCatSeq()).orElseThrow();
 //        
@@ -68,9 +97,7 @@ class FatcatApplicationTests {
 //        System.out.println("수정된 고양이의 catSeq: " + updatedCat.getCatSeq());
 //        System.out.println("수정된 고양이 이름: " + updatedCat.getCatName());
 //    }
-		
-		
-		
+
 //		// post
 //		// 1. User와 Board 가져오기 (이미 테스트용으로 넣어둔 데이터)
 //        User user = userRepository.findById(1).orElseThrow(); // user_seq = 1
@@ -119,13 +146,7 @@ class FatcatApplicationTests {
 //
 //	    User saved = userRepository.save(user);
 //	    System.out.println("저장된 userSeq = " + saved.getUserSeq());
-		
-		
-	
 
-		
-		
-		
 	}
 
 }
