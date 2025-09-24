@@ -9,23 +9,60 @@
 
 
 	<div layout:fragment="shopContent"
-		class="container my-3 d-flex flex-column align-items-center">
+		class="container-fluid my-3 d-flex flex-column align-items-center">
 
 		<!-- 상품목록 시작 -->
-
 		<div class="product-grid">
 			<div class="product-card me-5" th:each="product : ${products}">
-				<a th:href="@{/products/detail(productCode=${product['productCode']})}"
-					class="text-decoration-none text-dark"> 
-					<img
-					th:src="@{'https://picsum.photos/200/200?random=' + ${product['productCode']}}"
-					th:alt="${product['name']}">
-					<span th:text="${product['name']}"></span>
+				<a th:href="@{/products/detail(productCode=${product.productCode})}"
+					class="text-decoration-none text-dark"> <img
+					th:src="${product.productImageList.^[imageTypeCode == 'm']?.fileName}"
+					th:alt="${product.productName}" class="border rounded"> <span
+					th:text="${product.productName}"></span>
 				</a>
-				<p th:text="'가격 : ' + ${product['price']} + '원'"></p>
+				<p
+					th:text="'가격 : ' + ${#numbers.formatInteger(product.productPrice, 3, 'COMMA')} + '원'"></p>
 			</div>
 		</div>
 		<!-- 상품목록 종료 -->
+
+		<!-- 페이지네이션 (초간단) -->
+		<nav th:if="${productPage.totalPages > 1}" class="mt-4">
+			<ul class="pagination justify-content-center">
+
+				<!-- 이전 -->
+				<li class="page-item"
+					th:classappend="${productPage.first} ? 'disabled'"><a
+					class="page-link"
+					th:href="@{/products(page=${productPage.number - 1}, size=${productPage.size},
+                              category=${#strings.isEmpty(main)?'all':main},
+                              sub=${#strings.isEmpty(sub)?null:sub},
+                              detail=${#strings.isEmpty(detail)?null:detail})}">
+						이전 </a></li>
+
+				<!-- 번호 -->
+				<li class="page-item"
+					th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+					th:classappend="${i == productPage.number} ? 'active'"><a
+					class="page-link" th:text="${i + 1}"
+					th:href="@{/products(page=${i}, size=${productPage.size},
+                              category=${#strings.isEmpty(main)?'all':main},
+                              sub=${#strings.isEmpty(sub)?null:sub},
+                              detail=${#strings.isEmpty(detail)?null:detail})}">
+				</a></li>
+
+				<!-- 다음 -->
+				<li class="page-item"
+					th:classappend="${productPage.last} ? 'disabled'"><a
+					class="page-link"
+					th:href="@{/products(page=${productPage.number + 1}, size=${productPage.size},
+                              category=${#strings.isEmpty(main)?'all':main},
+                              sub=${#strings.isEmpty(sub)?null:sub},
+                              detail=${#strings.isEmpty(detail)?null:detail})}">
+						다음 </a></li>
+
+			</ul>
+		</nav>
 
 	</div>
 </body>
