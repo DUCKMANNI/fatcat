@@ -14,23 +14,20 @@ import com.project.fatcat.chat.repository.CareChatHistoryRepository;
 import com.project.fatcat.chat.repository.ChatRoomRepository;
 import com.project.fatcat.entity.CareChatHistory;
 import com.project.fatcat.entity.CareChatRoom;
-import com.project.fatcat.entity.User;
 import com.project.fatcat.users.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final CareChatHistoryRepository chatHistoryRepository;
     private final UserRepository userRepository;
 
-    @Autowired
-    public ChatServiceImpl(ChatRoomRepository chatRoomRepository, CareChatHistoryRepository chatHistoryRepository, UserRepository userRepository) {
-        this.chatRoomRepository = chatRoomRepository;
-        this.chatHistoryRepository = chatHistoryRepository;
-        this.userRepository = userRepository;
-    }
+
 
     @Override
     public CareChatRoom getOrCreateChatRoom(Integer senderId, Integer receiverId) {
@@ -83,23 +80,23 @@ public class ChatServiceImpl implements ChatService {
         ChatMessageDto dto = new ChatMessageDto();
         
         dto.setChatRoomId(entity.getCareChatRoom().getChatSeq());
-        
-        // [수정] String 타입의 chatsender를 Integer로 변환하여 설정
         dto.setSenderId(Integer.parseInt(entity.getChatSender()));
 
         String chatName = entity.getCareChatRoom().getChatName();
         String[] ids = chatName.split("-");
+        
         Integer member1 = Integer.parseInt(ids[0]);
         Integer member2 = Integer.parseInt(ids[1]);
         
         if (Integer.parseInt(entity.getChatSender()) == member1) {
             dto.setReceiverId(member2);
         } else {
-            dto.setReceiverId(member1);
+            dto.setReceiverId(member2);
         }
 
-        dto.setContent(entity.getChatMessage());
+        dto.setContent(entity.getChatMessage());  
         dto.setTimestamp(entity.getChatDate());
+        
         return dto;
     }
 }

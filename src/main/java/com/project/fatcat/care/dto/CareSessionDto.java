@@ -18,6 +18,7 @@ public class CareSessionDto {
     private Integer id;
     private Integer ownerUserId;
     private Integer sitterUserId;
+    private String note;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime startDate;
@@ -26,4 +27,6 @@ public class CareSessionDto {
     private LocalDateTime endDate;
 
     private String status; // "CONFIRMED", "PENDING", "CANCELLED" 등
+    
+    
 }

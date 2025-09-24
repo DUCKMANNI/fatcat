@@ -12,6 +12,8 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 .message { margin-bottom:10px; padding:8px 12px; border-radius:18px; max-width:70%; word-wrap:break-word; }
 .sent { background:#dcf8c6; align-self:flex-end; margin-left:20%; }
 .received { background:#fff; align-self:flex-start; margin-right:20%; }
+.care-request { background:#FFFACD; padding:6px 10px; border-radius:12px; margin-top:4px; }
+.care-confirmed { background:#8FBC8F; padding:6px 10px; border-radius:12px; margin-top:4px; }
 #input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
 #message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
 #send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
@@ -98,40 +100,55 @@ window.onload = function() {
         careForm.style.display = careForm.style.display === 'none' ? 'flex' : 'none';
     });
 
-    confirmCare.addEventListener('click', () => {
-        const start = startDateInput.value;
-        const end = endDateInput.value;
-        const status = document.getElementById('session-status').value;
-        const note = document.getElementById('session-note').value;
-
-        if (!start || !end) return alert("날짜를 선택하세요.");
-
-        const chatMessage = {
-            chatRoomId: chatRoomId,
-            senderId: senderId,
-            receiverId: receiverId,
-            type: "CARE_CONFIRM",
-            startDate: start,
-            endDate: end,
-            status: status,
-            note: note,
-            content: `돌봄 예약: ${start} ~ ${end}, 상태: ${status}`
-        };
-
-        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-
-        // 초기화
-        careForm.style.display = 'none';
-        startDateInput.value = '';
-        endDateInput.value = '';
-        document.getElementById('session-status').value = 'REQUESTED';
-        document.getElementById('session-note').value = '';
-    });
+    confirmCare.addEventListener('click', sendCareRequest);
 };
+
+function sendCareRequest() {
+    const start = startDateInput.value;
+    const end = endDateInput.value;
+   
+
+    if (!start || !end) return alert("날짜를 선택하세요.");
+    
+    const startWithSeconds = start + ':00';
+    const endWithSeconds = end + ':00'
+
+    const chatMessage = {
+        chatRoomId: chatRoomId,
+        senderId: senderId,
+        receiverId: receiverId,
+        type: "CARE_REQUEST",
+        startDate: startWithSeconds,
+        endDate: endWithSeconds,
+        status: document.getElementById('session-status').value,
+        note: document.getElementById('session-note').value,
+        content: `돌봄 요청: ${start} ~ ${end}, 상태: ${status}`
+    };
+
+    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+
+    careForm.style.display = 'none';
+    startDateInput.value = '';
+    endDateInput.value = '';
+    document.getElementById('session-status').value = 'REQUESTED';
+    document.getElementById('session-note').value = '';
+}
+
+function confirmCareRequest(sessionId, senderIdFromMsg) {
+    const chatMessage = {
+        chatRoomId: chatRoomId,
+        senderId: senderId,
+        receiverId: senderIdFromMsg,
+        type: "CARE_CONFIRM",
+        sessionId: sessionId,
+        content: `✅ 돌봄 예약이 확정되었습니다.`
+    };
+    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+}
+
 
 async function initChatRoom() {
     if (!senderId || !receiverId) return;
-
     if (stompClient && stompClient.connected) stompClient.disconnect();
 
     const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
@@ -151,7 +168,6 @@ function connectWebSocket() {
 
     stompClient.connect({}, () => {
         console.log('Connected');
-
         stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
             const chatMessage = JSON.parse(message.body);
             displayMessage(chatMessage);
@@ -178,17 +194,55 @@ function sendMessage() {
 function displayMessage(chatMessage) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
-    if (chatMessage.senderId === senderId) messageDiv.classList.add('sent');
-    else messageDiv.classList.add('received');
+    if (chatMessage.senderId === senderId) {
+        messageDiv.classList.add('sent');
+    } else {
+        messageDiv.classList.add('received');
+    }
 
+    // 모든 메시지의 내용을 표시하는 기본 로직
     messageDiv.innerText = chatMessage.content;
+
+    // 만약 돌봄 요청 메시지라면, 추가 정보를 담은 요소를 생성하여 추가
+    if (chatMessage.type === "CARE_REQUEST") {
+        const careDiv = document.createElement('div');
+        careDiv.classList.add('care-request');
+        
+        let confirmButtonHtml = '';
+        // 메시지를 받는 사람에게만 '확정' 버튼을 표시
+        if (chatMessage.receiverId === senderId) {
+            confirmButtonHtml = `<button class="confirm-btn">확정</button>`;
+        }
+        
+        careDiv.innerHTML = `
+            <div>돌봄 요청: ${chatMessage.startDate} ~ ${chatMessage.endDate}</div>
+            <div>메모: ${chatMessage.note || ''}</div>
+            ${confirmButtonHtml}
+        `;
+        
+        messageDiv.appendChild(careDiv);
+
+        if (confirmButtonHtml) {
+            const confirmButton = careDiv.querySelector('.confirm-btn');
+            confirmButton.addEventListener('click', () => {
+                confirmCareRequest(chatMessage.sessionId, chatMessage.senderId);
+            });
+        }
+    } else if (chatMessage.type === "CARE_CONFIRM") {
+        // CARE_CONFIRM 메시지는 특별한 스타일로 표시
+        messageDiv.classList.add('care-confirmed');
+        messageDiv.innerText = chatMessage.content;
+    }
+
     messageArea.appendChild(messageDiv);
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 
 function displayChatHistory(history) {
     messageArea.innerHTML = '';
-    if (history && Array.isArray(history)) history.forEach(displayMessage);
+    if (history && Array.isArray(history)) {
+        history.forEach(msg => displayMessage(msg));
+    }
 }
 </script>
 </body>
