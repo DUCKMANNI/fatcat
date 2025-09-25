@@ -2,101 +2,414 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1:1 채팅 + CareSession 테스트 (카톡 스타일)</title>
+<title>1:1 채팅 + CareSession 테스트</title>
 <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; background-color: #e5ddd5; }
-    #user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    select, input, textarea { padding:8px 12px; border-radius:8px; border:1px solid #ccc; outline:none; font-size: 14px; }
-    #chat-container { flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; margin:10px; border-radius:12px; overflow:hidden; background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-    #message-area { flex-grow:1; padding:15px; overflow-y:auto; background-color: #e5ddd5; display:flex; flex-direction:column; gap: 10px; }
-    .message-bubble { display: flex; align-items: flex-end; max-width: 80%; }
-    .profile-pic { width: 40px; height: 40px; border-radius: 50%; background-color: #ccc; border: 1px solid #aaa; flex-shrink: 0; }
-    .message-info-content { display: flex; flex-direction: column; }
-    .message-info { font-size: 11px; color: #666; margin-top: 4px; }
-    .message-content { padding: 10px 14px; border-radius: 18px; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
-    
-    .sent { align-self: flex-end; }
-    .sent .profile-pic { display: none; }
-    .sent .message-info-content { align-items: flex-end; }
-    .sent .message-content { background: #dcf8c6; }
-    
-    .received { align-self: flex-start; }
-    .received .message-info-content { align-items: flex-start; }
-    .received .message-content { background: #fff; margin-left: 8px; }
-    .received .message-info { margin-left: 8px; }
-    .received .sender-name { font-size: 12px; font-weight: bold; color: #444; margin-bottom: 2px; }
+/* ---------------------------------------------------------------------------------- */
+/* 1. 기본 채팅 UI 스타일 */
+/* ---------------------------------------------------------------------------------- */
+body {
+	font-family: Arial;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
 
-    .care-request .message-content { background:#FFFACD; }
-    .care-confirmed .message-content { background:#8FBC8F; color: white; }
-    #input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; background-color: #fff; align-items: center; }
-    #message-input { flex-grow:1; padding:10px; border-radius:24px; border:1px solid #ddd; outline:none; }
-    #send-button, #care-toggle { padding:10px 18px; border:none; background:#CD853F; color:white; border-radius:24px; cursor:pointer; font-weight: bold; transition: background-color 0.2s; }
-    #send-button:hover, #care-toggle:hover { background-color: #A96C33; }
-    #care-form { display:none; flex-direction:column; gap:8px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
-    #care-form input, #care-form select, #care-form textarea { width:calc(100% - 20px); }
-    #confirm-care { background:#8FBC8F; color:white; border:none; padding:10px 18px; border-radius:24px; cursor:pointer; font-weight: bold; transition: background-color 0.2s; }
-    #confirm-care:hover { background-color: #729672; }
-    .confirm-btn { padding: 5px 10px; border-radius: 12px; border: 1px solid #729672; background: #8FBC8F; color: white; cursor: pointer; font-size: 12px; }
-    .confirm-btn:disabled { background: #ccc; cursor: not-allowed; }
-    #temp-message { padding: 10px; text-align: center; color: #D32F2F; font-size: 14px; display: none; }
-    #status-message { text-align: center; color: #666; font-style: italic; margin: 10px 0; }
+#user-select {
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+	background: #fafafa;
+}
+
+select, input, textarea {
+	padding: 5px 10px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+}
+
+#chat-container {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #ddd;
+	margin: 10px;
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative; /* 팝업을 위해 필수 */
+}
+
+#message-area {
+	flex-grow: 1;
+	padding: 10px;
+	overflow-y: auto;
+	background: #f7f7f7;
+	display: flex;
+	flex-direction: column;
+}
+
+.message-row {
+	display: flex;
+	margin-bottom: 10px;
+	align-items: flex-end;
+}
+
+.message-row.sent {
+	justify-content: flex-end;
+}
+
+.message-row.received {
+	justify-content: flex-start;
+}
+
+/* 프로필 이미지 (빈 동그라미) 스타일 및 클릭 가능 설정 */
+.profile-placeholder {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: #ccc;
+	margin-right: 10px;
+	align-self: flex-start;
+	flex-shrink: 0;
+	cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+/* 메시지 내용 및 시간 포함하는 컨텐츠 랩퍼 */
+.message-content-wrapper {
+	display: flex;
+	flex-direction: column;
+	max-width: 70%;
+}
+
+.message-row.sent .message-content-wrapper {
+	align-items: flex-end;
+}
+
+.message-row.received .message-content-wrapper {
+	align-items: flex-start;
+}
+
+/* 닉네임 -> User Name 스타일 및 클릭 가능 설정 */
+.user-nickname {
+	font-size: 12px;
+	color: #555;
+	margin-bottom: 4px;
+	cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+.message-row.sent .user-nickname {
+	display: none;
+}
+
+/* 기존 메시지 박스 스타일 */
+.message {
+	padding: 8px 12px;
+	border-radius: 18px;
+	max-width: 100%;
+	word-wrap: break-word;
+	position: relative;
+}
+
+.sent .message {
+	background: #dcf8c6;
+}
+
+.received .message {
+	background: #fff;
+}
+
+/* 시간 스타일 */
+.message-time {
+	font-size: 10px;
+	color: #555;
+	margin-top: 2px;
+	align-self: flex-end;
+	white-space: nowrap;
+}
+
+.message-row.received .message-time {
+	align-self: flex-start;
+}
+
+.care-request {
+	background: #FFFACD;
+	padding: 6px 10px;
+	border-radius: 12px;
+	margin-top: 4px;
+}
+
+.care-confirmed {
+	background: #8FBC8F;
+	padding: 6px 10px;
+	border-radius: 12px;
+	margin-top: 4px;
+}
+
+/* 입력 영역 스타일 */
+#input-area {
+	display: flex;
+	padding: 10px;
+	border-top: 1px solid #ddd;
+	gap: 10px;
+}
+
+#message-input {
+	flex-grow: 1;
+	padding: 8px;
+	border-radius: 20px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+
+#send-button, #care-toggle {
+	padding: 8px 16px;
+	border: none;
+	background: #CD853F;
+	color: white;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+#care-form {
+	display: none;
+	flex-direction: column;
+	gap: 5px;
+	padding: 10px;
+	background: #fafafa;
+	border-top: 1px solid #ddd;
+}
+
+#care-form input, #care-form select, #care-form textarea {
+	width: 100%;
+}
+
+#confirm-care {
+	background: #8FBC8F;
+	color: white;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------------- */
+/* 2. 리뷰 팝업 스타일 */
+/* ---------------------------------------------------------------------------------- */
+#review-popup {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 350px;
+	height: 100%;
+	background: white;
+	box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+	z-index: 100;
+	transform: translateX(100%);
+	transition: transform 0.3s ease-in-out;
+	display: flex;
+	flex-direction: column;
+	padding: 15px;
+	box-sizing: border-box;
+	border-left: 1px solid #ddd;
+	overflow-y: auto;
+}
+
+#review-popup.show {
+	transform: translateX(0);
+}
+
+.popup-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+}
+
+.popup-header button {
+	background: none;
+	border: none;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+#review-rating-summary {
+	text-align: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #eee;
+	margin-bottom: 15px;
+}
+
+#review-rating-summary h3 {
+	margin: 0;
+	font-size: 1.5em;
+}
+
+#review-rating-summary p {
+	margin: 5px 0 0;
+	color: #666;
+}
+
+.star-rating {
+	color: gold;
+	font-size: 1.2em;
+}
+
+/* 리뷰 목록 스타일 */
+#review-list {
+	flex-grow: 1;
+	overflow-y: auto;
+	padding-right: 5px; /* 스크롤바 공간 */
+}
+
+.review-item {
+	padding: 10px 0;
+	border-bottom: 1px dotted #ddd;
+}
+
+.review-item:last-child {
+	border-bottom: none;
+}
+
+.review-header {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.9em;
+	color: #444;
+	margin-bottom: 5px;
+}
+
+.review-body {
+	font-size: 0.95em;
+	color: #333;
+}
+
+.review-date {
+	font-size: 0.8em;
+	color: #999;
+}
+
+/* 리뷰 등록 폼 스타일 */
+#review-form-area {
+	padding-top: 15px;
+	border-top: 1px solid #eee;
+}
+
+#review-form-area h4 {
+	margin-top: 0;
+}
+
+#review-form-area textarea {
+	width: 100%;
+	margin-bottom: 10px;
+	box-sizing: border-box;
+}
+
+.rating-input {
+	margin-bottom: 10px;
+}
+
+.rating-input span {
+	font-size: 1.5em;
+	cursor: pointer;
+	color: #ccc; /* 비활성 별 색상 */
+}
+
+.rating-input span.active {
+	color: gold; /* 활성 별 색상 */
+}
+
+#submit-review-btn {
+	width: 100%;
+	padding: 8px;
+	background: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
 
-<div id="user-select">
-    <label>보내는 사람:
-        <select id="sender-select">
-            <option value="">선택하세요</option>
-            <option value="1">User 1</option>
-            <option value="2">User 2</option>
-            <option value="3">User 3</option>
-        </select>
-    </label>
-    <label>받는 사람:
-        <select id="receiver-select">
-            <option value="">선택하세요</option>
-            <option value="1">User 1</option>
-            <option value="2">User 2</option>
-            <option value="3">User 3</option>
-        </select>
-    </label>
-</div>
+	<div id="user-select">
+		<label>보내는 사람: <select id="sender-select">
+				<option value="">선택하세요</option>
+				<option value="1" data-username="김유정">User 1</option>
+				<option value="2" data-username="유정">User 2</option>
+				<option value="3" data-username="관리왕">User 3</option>
+		</select>
+		</label> <label>받는 사람: <select id="receiver-select">
+				<option value="">선택하세요</option>
+				<option value="1" data-username="김유정">User 1</option>
+				<option value="2" data-username="유정">User 2</option>
+				<option value="3" data-username="관리왕">User 3</option>
+		</select>
+		</label>
+	</div>
 
-<div id="chat-container">
-    <div id="status-message"></div>
-    <div id="message-area"></div>
-    <div id="temp-message"></div>
-    <div id="input-area">
-        <input type="text" id="message-input" placeholder="메시지를 입력하세요..." disabled>
-        <button id="send-button" disabled>전송</button>
-        <button id="care-toggle">돌봄 예약</button>
-    </div>
-    <div id="care-form">
-        시작일: <input type="datetime-local" id="start-date">
-        종료일: <input type="datetime-local" id="end-date">
-        상태:
-        <select id="session-status">
-            <option value="REQUESTED">요청</option>
-            <option value="CONFIRMED">확정</option>
-            <option value="CANCELLED">취소</option>
-        </select>
-        메모: <textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
-        <button id="confirm-care">예약 전송</button>
-    </div>
-</div>
+	<div id="chat-container">
+		<div id="message-area"></div>
+		<div id="input-area">
+			<input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+			<button id="send-button">전송</button>
+			<button id="care-toggle">돌봄 예약</button>
+		</div>
+		<div id="care-form">
+			시작일: <input type="datetime-local" id="start-date"> 종료일: <input
+				type="datetime-local" id="end-date"> 상태: <select
+				id="session-status">
+				<option value="REQUESTED">요청</option>
+				<option value="CONFIRMED">확정</option>
+				<option value="CANCELLED">취소</option>
+			</select> 메모:
+			<textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
+			<button id="confirm-care">예약 전송</button>
+		</div>
 
-<script>
+		<div id="review-popup">
+			<div class="popup-header">
+				<h2 id="review-target-name"></h2>
+				<button onclick="closeReviewPopup()">×</button>
+			</div>
+
+			<div id="review-rating-summary">
+				<h3 id="avg-rating"></h3>
+				<p id="total-reviews"></p>
+			</div>
+
+			<div id="review-form-area">
+				<h4>리뷰 등록</h4>
+				<div class="rating-input" id="new-rating">
+					<span data-rating="1">★</span> <span data-rating="2">★</span> <span
+						data-rating="3">★</span> <span data-rating="4">★</span> <span
+						data-rating="5">★</span>
+				</div>
+				<textarea id="new-review-text" rows="3" placeholder="리뷰 내용을 입력하세요."></textarea>
+				<button id="submit-review-btn">리뷰 작성</button>
+			</div>
+
+			<h4>리뷰 목록</h4>
+			<div id="review-list"></div>
+		</div>
+	</div>
+
+	<script>
 let senderId = null;
 let receiverId = null;
 let chatRoomId = null;
 let stompClient = null;
+let targetUserSeqForReview = null; // 현재 리뷰 대상 사용자 ID
+let currentRating = 0; // 리뷰 등록 시 선택된 별점
 
-const senderSelect = document.getElementById('sender-select');
-const receiverSelect = document.getElementById('receiver-select');
+let userNames = {}; // User Name 매핑 객체
+
 const messageArea = document.getElementById('message-area');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
@@ -105,37 +418,48 @@ const careForm = document.getElementById('care-form');
 const startDateInput = document.getElementById('start-date');
 const endDateInput = document.getElementById('end-date');
 const confirmCare = document.getElementById('confirm-care');
-const tempMessageDiv = document.getElementById('temp-message');
-const statusMessageDiv = document.getElementById('status-message');
 
-// 경고 메시지를 표시하는 함수
-function showMessage(message) {
-    tempMessageDiv.innerText = message;
-    tempMessageDiv.style.display = 'block';
-    setTimeout(() => {
-        tempMessageDiv.style.display = 'none';
-    }, 3000);
+// --------------------------------------------------------
+// LocalStorage 헬퍼 함수
+// --------------------------------------------------------
+
+function getConfirmedSessions() {
+    const json = localStorage.getItem('confirmedSessions');
+    return new Set(json ? JSON.parse(json) : []);
 }
 
-// UI 상태를 설정하는 함수
-function setChatUIState(enabled) {
-    messageInput.disabled = !enabled;
-    sendButton.disabled = !enabled;
-    if (enabled) {
-        statusMessageDiv.innerText = "연결되었습니다.";
-        messageInput.focus();
-    } else {
-        statusMessageDiv.innerText = "채팅방 연결 중...";
-    }
+function addConfirmedSession(sessionId) {
+    const sessions = getConfirmedSessions();
+    sessions.add(sessionId);
+    localStorage.setItem('confirmedSessions', JSON.stringify(Array.from(sessions)));
 }
+
+// --------------------------------------------------------
+// 초기화 및 이벤트 리스너 (User Name 저장 로직 반영)
+// --------------------------------------------------------
 
 window.onload = function() {
-    setChatUIState(false);
-    
+    const senderSelect = document.getElementById('sender-select');
+    const receiverSelect = document.getElementById('receiver-select');
+
+    // 드롭다운에서 user_name 정보를 추출하여 userNames에 저장
+    function extractUserNames(selectElement) {
+        Array.from(selectElement.options).forEach(option => {
+            if (option.value) {
+                // data-username 속성 사용
+                userNames[option.value] = option.dataset.username || `User ${option.value}`;
+            }
+        });
+    }
+    extractUserNames(senderSelect);
+    extractUserNames(receiverSelect);
+
+
     senderSelect.addEventListener('change', async (e) => {
         senderId = parseInt(e.target.value);
         if (senderId && receiverId) await initChatRoom();
     });
+    
     receiverSelect.addEventListener('change', async (e) => {
         receiverId = parseInt(e.target.value);
         if (senderId && receiverId) await initChatRoom();
@@ -151,23 +475,27 @@ window.onload = function() {
     });
 
     confirmCare.addEventListener('click', sendCareRequest);
+
+    // 리뷰 별점 선택 이벤트 리스너 설정
+    document.querySelectorAll('#new-rating span').forEach(star => {
+        star.addEventListener('click', () => {
+            currentRating = parseInt(star.dataset.rating);
+            updateStarRating(currentRating);
+        });
+    });
+
+    // 리뷰 등록 버튼 이벤트 리스너 설정
+    document.getElementById('submit-review-btn').addEventListener('click', submitReview);
 };
 
-function getSenderName() {
-    return senderSelect.options[senderSelect.selectedIndex].text;
-}
+// --------------------------------------------------------
+// 돌봄 요청/확정 로직 (이전과 동일)
+// --------------------------------------------------------
 
 function sendCareRequest() {
-    if (!stompClient || !stompClient.connected) {
-        showMessage("먼저 보내는 사람과 받는 사람을 선택하여 채팅방에 연결해주세요.");
-        return;
-    }
-
     const start = startDateInput.value;
     const end = endDateInput.value;
-    if (!start || !end) {
-        return showMessage("날짜를 선택하세요.");
-    }
+    if (!start || !end) return alert("날짜를 선택하세요.");
 
     const startWithSeconds = start + ':00';
     const endWithSeconds = end + ':00';
@@ -176,23 +504,15 @@ function sendCareRequest() {
         chatRoomId: chatRoomId,
         senderId: senderId,
         receiverId: receiverId,
-        senderName: getSenderName(),
         type: "CARE_REQUEST",
         startDate: startWithSeconds,
         endDate: endWithSeconds,
         status: 'REQUESTED',
         note: document.getElementById('session-note').value,
-        content: `돌봄 요청: ${start} ~ ${end}`,
-        timestamp: new Date().toISOString()
+        content: `돌봄 요청: ${start} ~ ${end}`
     };
-    
-    console.log("SENDING CARE REQUEST: ", chatMessage);
-    try {
-        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-    } catch (e) {
-        console.error("Failed to send care request:", e);
-        showMessage("돌봄 요청 전송에 실패했습니다. 연결을 확인해주세요.");
-    }
+
+    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
 
     careForm.style.display = 'none';
     startDateInput.value = '';
@@ -202,37 +522,26 @@ function sendCareRequest() {
 }
 
 function confirmCareRequest(sessionId, senderIdFromMsg) {
-    if (!stompClient || !stompClient.connected) {
-        showMessage("먼저 보내는 사람과 받는 사람을 선택하여 채팅방에 연결해주세요.");
-        return;
-    }
-
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
         receiverId: senderIdFromMsg,
         type: "CARE_CONFIRM",
         sessionId: sessionId,
-        content: `✅ 돌봄 예약이 확정되었습니다.`,
-        timestamp: new Date().toISOString()
+        content: `✅ 돌봄 예약이 확정되었습니다.`
     };
-    console.log("SENDING CARE CONFIRMATION: ", chatMessage);
-    try {
-        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-    } catch (e) {
-        console.error("Failed to send confirmation:", e);
-        showMessage("확정 메시지 전송에 실패했습니다. 연결을 확인해주세요.");
-    }
+    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+
+    addConfirmedSession(sessionId);
 }
+
+// --------------------------------------------------------
+// 채팅방 및 웹소켓 연결 (이전과 동일)
+// --------------------------------------------------------
 
 async function initChatRoom() {
     if (!senderId || !receiverId) return;
-    
-    setChatUIState(false);
-    
     if (stompClient && stompClient.connected) stompClient.disconnect();
-    
-    console.log(`Connecting to chat room for Sender: ${senderId}, Receiver: ${receiverId}`);
 
     const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
     const data = await res.json();
@@ -250,144 +559,323 @@ function connectWebSocket() {
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, () => {
-        console.log('WebSocket connection established.');
-        setChatUIState(true);
         stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
-            console.log("RECEIVED MESSAGE: ", message.body);
             const chatMessage = JSON.parse(message.body);
             displayMessage(chatMessage);
         });
-        console.log(`Subscribed to /topic/chat/${chatRoomId}`);
-    }, (error) => {
-        console.error("Connection error: ", error);
-        setChatUIState(false);
-        statusMessageDiv.innerText = "연결에 실패했습니다. 다시 시도해주세요.";
-    });
+    }, (error) => console.error("Connection error: ", error));
 }
 
 function sendMessage() {
-    if (!stompClient || !stompClient.connected) {
-        showMessage("먼저 보내는 사람과 받는 사람을 선택하여 채팅방에 연결해주세요.");
-        return;
-    }
-
+    if (!stompClient || !stompClient.connected) return;
     if (!messageInput.value.trim()) return;
 
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
         receiverId: receiverId,
-        senderName: getSenderName(),
         type: "CHAT",
-        content: messageInput.value.trim(),
-        timestamp: new Date().toISOString()
+        content: messageInput.value.trim()
     };
 
-    // 낙관적 UI 업데이트: 메시지를 보내기 전에 즉시 화면에 표시합니다.
-    displayMessage(chatMessage);
-    
-    console.log("SENDING MESSAGE: ", chatMessage);
-    try {
-        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-    } catch (e) {
-        console.error("Failed to send message:", e);
-        showMessage("메시지 전송에 실패했습니다. 연결을 확인해주세요.");
-    }
+    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
     messageInput.value = '';
 }
 
-function displayMessage(chatMessage) {
-    console.log("DISPLAYING RECEIVED MESSAGE: ", chatMessage);
-    const messageBubbleDiv = document.createElement('div');
-    messageBubbleDiv.classList.add('message-bubble');
+// --------------------------------------------------------
+// 리뷰 팝업 관련 함수
+// --------------------------------------------------------
 
-    const profilePicDiv = document.createElement('div');
-    profilePicDiv.classList.add('profile-pic');
-    
-    const messageInfoContentDiv = document.createElement('div');
-    messageInfoContentDiv.classList.add('message-info-content');
-
-    const messageContentDiv = document.createElement('div');
-    messageContentDiv.classList.add('message-content');
-    
-    const messageInfoDiv = document.createElement('div');
-    messageInfoDiv.classList.add('message-info');
-
-    const timestamp = chatMessage.timestamp ? new Date(chatMessage.timestamp) : new Date();
-    const currentTime = timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-    
-    if (chatMessage.senderId === senderId) {
-        messageBubbleDiv.classList.add('sent');
-        messageInfoDiv.innerText = `${currentTime}`;
-    } else {
-        messageBubbleDiv.classList.add('received');
-        messageInfoContentDiv.innerHTML = `<div class="sender-name">${chatMessage.senderName || '알 수 없음'}</div>`;
-        messageInfoDiv.innerText = `${currentTime}`;
+/**
+ * 프로필이나 닉네임 클릭 시 리뷰 팝업을 엽니다.
+ * @param {number} targetSeq 리뷰 대상 사용자 ID
+ */
+function openReviewPopup(targetSeq) {
+    if (!targetSeq || targetSeq === senderId) {
+        alert("본인에 대한 리뷰는 등록하거나 확인할 수 없습니다.");
+        return;
     }
 
+    targetUserSeqForReview = targetSeq;
+    const targetName = userNames[targetSeq] || `User ${targetSeq}`;
+
+    document.getElementById('review-target-name').innerText = `${targetName} 님 리뷰`;
+    document.getElementById('review-popup').classList.add('show');
+
+    // 리뷰 목록 및 평점 가져오기
+    fetchReviews(targetSeq);
+}
+
+function closeReviewPopup() {
+    document.getElementById('review-popup').classList.remove('show');
+    targetUserSeqForReview = null;
+    currentRating = 0;
+    document.getElementById('new-review-text').value = '';
+    updateStarRating(0);
+}
+
+/**
+ * 서버에서 리뷰 목록을 가져와 화면에 표시합니다.
+ */
+async function fetchReviews(targetSeq) {
+    const listArea = document.getElementById('review-list');
+    const avgRatingElem = document.getElementById('avg-rating');
+    const totalReviewsElem = document.getElementById('total-reviews');
+    listArea.innerHTML = '불러오는 중...';
+
+    try {
+        const response = await fetch(`/api/care-reviews?targetUserSeq=${targetSeq}`);
+        if (!response.ok) throw new Error('Failed to fetch reviews');
+        
+        const reviews = await response.json();
+        listArea.innerHTML = '';
+        
+        let totalRating = 0;
+        
+        if (reviews.length === 0) {
+            listArea.innerHTML = '<p style="text-align: center; color: #999;">등록된 리뷰가 없습니다.</p>';
+            avgRatingElem.innerHTML = '평점: <span class="star-rating">0.0</span>';
+            totalReviewsElem.innerText = '총 0개의 리뷰';
+            return;
+        }
+
+        reviews.forEach(review => {
+            totalRating += review.careRating;
+            listArea.appendChild(createReviewItem(review));
+        });
+
+        // 평점 요약 계산 및 표시
+        const average = (totalRating / reviews.length).toFixed(1);
+        const starHtml = '★'.repeat(Math.round(average)) + '☆'.repeat(5 - Math.round(average));
+        
+        avgRatingElem.innerHTML = `평점: <span class="star-rating">${average}</span> (${starHtml})`;
+        totalReviewsElem.innerText = `총 ${reviews.length}개의 리뷰`;
+
+    } catch (error) {
+        console.error("리뷰 로드 오류:", error);
+        listArea.innerHTML = '<p style="color: red;">리뷰를 불러오는 중 오류가 발생했습니다.</p>';
+        avgRatingElem.innerHTML = '평점: <span class="star-rating">--</span>';
+        totalReviewsElem.innerText = '총 --개의 리뷰';
+    }
+}
+
+/**
+ * 리뷰 아이템 DOM 요소를 생성합니다.
+ */
+function createReviewItem(review) {
+    const item = document.createElement('div');
+    item.classList.add('review-item');
+    
+    const starHtml = '★'.repeat(review.careRating) + '☆'.repeat(5 - review.careRating);
+    const date = new Date(review.createDate);
+    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+
+    item.innerHTML = `
+        <div class="review-header">
+            <span>${review.authorNickname}</span>
+            <span class="star-rating">${starHtml}</span>
+        </div>
+        <div class="review-body">${review.careReview}</div>
+        <div class="review-date">${dateString}</div>
+    `;
+    return item;
+}
+
+/**
+ * 별점 아이콘의 활성화 상태를 업데이트합니다.
+ */
+function updateStarRating(rating) {
+    document.querySelectorAll('#new-rating span').forEach(star => {
+        if (parseInt(star.dataset.rating) <= rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * 새로운 리뷰를 등록합니다.
+ * 백엔드 DTO에 맞게 senderId를 authorUserSeq로 전송합니다.
+ */
+async function submitReview() {
+    const reviewText = document.getElementById('new-review-text').value.trim();
+
+    if (currentRating === 0) {
+        return alert("별점을 선택해주세요.");
+    }
+    if (reviewText.length < 5) {
+        return alert("리뷰 내용을 5자 이상 입력해주세요.");
+    }
+    if (!targetUserSeqForReview || targetUserSeqForReview === senderId) {
+        return alert("리뷰 대상을 확인할 수 없습니다.");
+    }
+    if (!senderId) {
+        return alert("리뷰를 작성할 '보내는 사람'을 선택해주세요.");
+    }
+
+    const requestBody = {
+        // 백엔드 DTO에 맞게 senderId를 작성자로 설정
+        authorUserSeq: senderId, 
+        targetUserSeq: targetUserSeqForReview,
+        careReview: reviewText,
+        careRating: currentRating,
+        targetRole: "provider" 
+    };
+
+    try {
+        const response = await fetch('/api/care-reviews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error('리뷰 등록에 실패했습니다. (HTTP Error)');
+        }
+
+        alert("리뷰가 성공적으로 등록되었습니다!");
+        
+        // 폼 초기화
+        document.getElementById('new-review-text').value = '';
+        currentRating = 0;
+        updateStarRating(0);
+
+        // 리뷰 목록 새로고침
+        fetchReviews(targetUserSeqForReview);
+
+    } catch (error) {
+        console.error("리뷰 등록 오류:", error);
+        alert("리뷰 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+}
+
+// --------------------------------------------------------
+// 메시지 표시 (클릭 이벤트 추가)
+// --------------------------------------------------------
+
+function displayMessage(chatMessage) {
+    const isSent = chatMessage.senderId === senderId;
+    const senderIdForPopup = chatMessage.senderId; // 리뷰 대상은 메시지 보낸 사람
+
+    const senderName = userNames[chatMessage.senderId] || `User ${chatMessage.senderId}`;
+    
+    const messageRow = document.createElement('div');
+    messageRow.classList.add('message-row');
+    messageRow.classList.add(isSent ? 'sent' : 'received');
+
+    // 시간 포맷팅
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2,'0');
+    const ampm = hours >= 12 ? '오후' : '오전';
+    const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+    const timeString = `${ampm} ${hour12}:${minutes}`;
+    
+    // 2. 받은 메시지인 경우에만 프로필 플레이스홀더 추가
+    if (!isSent) {
+        const profilePlaceholder = document.createElement('div');
+        profilePlaceholder.classList.add('profile-placeholder');
+        // 프로필 클릭 이벤트 리스너 추가
+        profilePlaceholder.addEventListener('click', () => openReviewPopup(senderIdForPopup));
+        messageRow.appendChild(profilePlaceholder);
+    }
+
+    // 3. User Name, 메시지 본문, 시간을 담는 content wrapper 생성
+    const contentWrapper = document.createElement('div');
+    contentWrapper.classList.add('message-content-wrapper');
+
+    // User Name 추가 (받은 메시지에만 표시)
+    if (!isSent) {
+        const nameDiv = document.createElement('div');
+        nameDiv.classList.add('user-nickname'); 
+        nameDiv.innerText = senderName; 
+        // User Name 클릭 이벤트 리스너 추가
+        nameDiv.addEventListener('click', () => openReviewPopup(senderIdForPopup));
+        contentWrapper.appendChild(nameDiv);
+    }
+
+    // 메시지 본문
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+
     if (chatMessage.type === "CARE_REQUEST") {
-        messageContentDiv.classList.add('care-request');
+        const careDiv = document.createElement('div');
+        careDiv.classList.add('care-request');
+
         const status = chatMessage.status || 'REQUESTED';
         const sessionId = chatMessage.sessionId || -1;
         
-        let statusText = '';
-        if (status === 'CONFIRMED') {
-            statusText = `<span style="color: green; font-weight: bold;">[✅ 확정됨]</span>`;
-        } else if (status === 'CANCELLED') {
-            statusText = `<span style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
-        }
+        const confirmedSessions = getConfirmedSessions(); 
+        const isConfirmedLocally = confirmedSessions.has(sessionId); 
 
         let confirmButtonHtml = '';
-        if (status === 'REQUESTED' && chatMessage.senderId !== senderId) {
-             confirmButtonHtml = `<button class="confirm-btn" data-session-id="${sessionId}" data-sender-id="${chatMessage.senderId}">확정</button>`;
+        const isReceiver = chatMessage.senderId !== senderId;
+
+        if (status === 'REQUESTED' && isReceiver && !isConfirmedLocally) {
+            confirmButtonHtml = `<button class="confirm-btn" data-session-id="${sessionId}" data-sender-id="${chatMessage.senderId}">확정</button>`;
+        } else if (status === 'CONFIRMED' || isConfirmedLocally) {
+            confirmButtonHtml = `<span style="color: green; font-weight: bold;">[✅ 확정됨]</span>`;
+        } else if (status === 'CANCELLED') {
+            confirmButtonHtml = `<span style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
         }
-        
-        messageContentDiv.innerHTML = `
+
+        careDiv.innerHTML = `
             <div>돌봄 요청: ${chatMessage.startDate} ~ ${chatMessage.endDate}</div>
             <div>메모: ${chatMessage.note || ''}</div>
-            ${statusText ? statusText : confirmButtonHtml}
+            ${confirmButtonHtml}
         `;
+        messageDiv.appendChild(careDiv);
 
-        if (status === 'REQUESTED') {
-            const confirmButton = messageContentDiv.querySelector('.confirm-btn');
+        if (status === 'REQUESTED' && isReceiver && !isConfirmedLocally) {
+            const confirmButton = careDiv.querySelector('.confirm-btn');
             if (confirmButton) {
                 confirmButton.addEventListener('click', (event) => {
                     const session_Id = parseInt(event.target.dataset.sessionId);
                     const sender_Id = parseInt(event.target.dataset.senderId);
                     if (session_Id !== -1) {
                         confirmCareRequest(session_Id, sender_Id);
-                        confirmButton.disabled = true;
-                        confirmButton.innerText = "확정됨";
-                    } else {
-                        showMessage("세션 ID가 없어 확정할 수 없습니다. 서버 응답 확인 필요.");
+
+                        confirmButton.remove();
+                        const confirmedSpan = document.createElement('span');
+                        confirmedSpan.style.color = 'green';
+                        confirmedSpan.style.fontWeight = 'bold';
+                        confirmedSpan.innerText = `[✅ 확정됨]`;
+                        careDiv.appendChild(confirmedSpan);
                     }
                 });
             }
         }
-    } else if (chatMessage.type === "CARE_CONFIRM") {
-        messageContentDiv.classList.add('care-confirmed');
-        messageContentDiv.innerText = chatMessage.content;
-    } else {
-        messageContentDiv.innerText = chatMessage.content;
-    }
 
-    if (chatMessage.senderId !== senderId) {
-        messageBubbleDiv.appendChild(profilePicDiv);
+    } else if (chatMessage.type === "CARE_CONFIRM") {
+        messageDiv.classList.add('care-confirmed');
+        messageDiv.innerText = chatMessage.content;
+    } else {
+        messageDiv.innerText = chatMessage.content;
     }
     
-    messageInfoContentDiv.appendChild(messageContentDiv);
-    messageInfoContentDiv.appendChild(messageInfoDiv);
-    messageBubbleDiv.appendChild(messageInfoContentDiv);
-    messageArea.appendChild(messageBubbleDiv);
+    contentWrapper.appendChild(messageDiv);
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.classList.add('message-time');
+    timeDiv.innerText = timeString;
+    contentWrapper.appendChild(timeDiv);
+
+    messageRow.appendChild(contentWrapper);
+
+    messageArea.appendChild(messageRow);
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 
 function displayChatHistory(history) {
     messageArea.innerHTML = '';
     if (history && Array.isArray(history)) {
-        history.forEach(msg => displayMessage(msg));
+        history.forEach(msg => displayMessage(msg)); 
     }
 }
 </script>
+
 </body>
 </html>
