@@ -2,24 +2,45 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<title>1:1 채팅 + CareSession 테스트</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1:1 채팅 + CareSession 테스트 (카톡 스타일)</title>
 <style>
-body { font-family: Arial; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; }
-#user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; }
-select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid #ccc; }
-#chat-container { flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; margin:10px; border-radius:8px; overflow:hidden; }
-#message-area { flex-grow:1; padding:10px; overflow-y:auto; background:#f7f7f7; display:flex; flex-direction:column; }
-.message { margin-bottom:10px; padding:8px 12px; border-radius:18px; max-width:70%; word-wrap:break-word; }
-.sent { background:#dcf8c6; align-self:flex-end; margin-left:20%; }
-.received { background:#fff; align-self:flex-start; margin-right:20%; }
-.care-request { background:#FFFACD; padding:6px 10px; border-radius:12px; margin-top:4px; }
-.care-confirmed { background:#8FBC8F; padding:6px 10px; border-radius:12px; margin-top:4px; }
-#input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
-#message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
-#send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
-#care-form { display:none; flex-direction:column; gap:5px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
-#care-form input, #care-form select, #care-form textarea { width:100%; }
-#confirm-care { background:#8FBC8F; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; background-color: #e5ddd5; }
+    #user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    select, input, textarea { padding:8px 12px; border-radius:8px; border:1px solid #ccc; outline:none; font-size: 14px; }
+    #chat-container { flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; margin:10px; border-radius:12px; overflow:hidden; background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    #message-area { flex-grow:1; padding:15px; overflow-y:auto; background-color: #e5ddd5; display:flex; flex-direction:column; gap: 10px; }
+    .message-bubble { display: flex; align-items: flex-end; max-width: 80%; }
+    .profile-pic { width: 40px; height: 40px; border-radius: 50%; background-color: #ccc; border: 1px solid #aaa; flex-shrink: 0; }
+    .message-info-content { display: flex; flex-direction: column; }
+    .message-info { font-size: 11px; color: #666; margin-top: 4px; }
+    .message-content { padding: 10px 14px; border-radius: 18px; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+    
+    .sent { align-self: flex-end; }
+    .sent .profile-pic { display: none; }
+    .sent .message-info-content { align-items: flex-end; }
+    .sent .message-content { background: #dcf8c6; }
+    
+    .received { align-self: flex-start; }
+    .received .message-info-content { align-items: flex-start; }
+    .received .message-content { background: #fff; margin-left: 8px; }
+    .received .message-info { margin-left: 8px; }
+    .received .sender-name { font-size: 12px; font-weight: bold; color: #444; margin-bottom: 2px; }
+
+    .care-request .message-content { background:#FFFACD; }
+    .care-confirmed .message-content { background:#8FBC8F; color: white; }
+    #input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; background-color: #fff; align-items: center; }
+    #message-input { flex-grow:1; padding:10px; border-radius:24px; border:1px solid #ddd; outline:none; }
+    #send-button, #care-toggle { padding:10px 18px; border:none; background:#CD853F; color:white; border-radius:24px; cursor:pointer; font-weight: bold; transition: background-color 0.2s; }
+    #send-button:hover, #care-toggle:hover { background-color: #A96C33; }
+    #care-form { display:none; flex-direction:column; gap:8px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
+    #care-form input, #care-form select, #care-form textarea { width:calc(100% - 20px); }
+    #confirm-care { background:#8FBC8F; color:white; border:none; padding:10px 18px; border-radius:24px; cursor:pointer; font-weight: bold; transition: background-color 0.2s; }
+    #confirm-care:hover { background-color: #729672; }
+    .confirm-btn { padding: 5px 10px; border-radius: 12px; border: 1px solid #729672; background: #8FBC8F; color: white; cursor: pointer; font-size: 12px; }
+    .confirm-btn:disabled { background: #ccc; cursor: not-allowed; }
+    #temp-message { padding: 10px; text-align: center; color: #D32F2F; font-size: 14px; display: none; }
+    #status-message { text-align: center; color: #666; font-style: italic; margin: 10px 0; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -46,10 +67,12 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 </div>
 
 <div id="chat-container">
+    <div id="status-message"></div>
     <div id="message-area"></div>
+    <div id="temp-message"></div>
     <div id="input-area">
-        <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
-        <button id="send-button">전송</button>
+        <input type="text" id="message-input" placeholder="메시지를 입력하세요..." disabled>
+        <button id="send-button" disabled>전송</button>
         <button id="care-toggle">돌봄 예약</button>
     </div>
     <div id="care-form">
@@ -72,6 +95,8 @@ let receiverId = null;
 let chatRoomId = null;
 let stompClient = null;
 
+const senderSelect = document.getElementById('sender-select');
+const receiverSelect = document.getElementById('receiver-select');
 const messageArea = document.getElementById('message-area');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
@@ -80,13 +105,38 @@ const careForm = document.getElementById('care-form');
 const startDateInput = document.getElementById('start-date');
 const endDateInput = document.getElementById('end-date');
 const confirmCare = document.getElementById('confirm-care');
+const tempMessageDiv = document.getElementById('temp-message');
+const statusMessageDiv = document.getElementById('status-message');
+
+// 경고 메시지를 표시하는 함수
+function showMessage(message) {
+    tempMessageDiv.innerText = message;
+    tempMessageDiv.style.display = 'block';
+    setTimeout(() => {
+        tempMessageDiv.style.display = 'none';
+    }, 3000);
+}
+
+// UI 상태를 설정하는 함수
+function setChatUIState(enabled) {
+    messageInput.disabled = !enabled;
+    sendButton.disabled = !enabled;
+    if (enabled) {
+        statusMessageDiv.innerText = "연결되었습니다.";
+        messageInput.focus();
+    } else {
+        statusMessageDiv.innerText = "채팅방 연결 중...";
+    }
+}
 
 window.onload = function() {
-    document.getElementById('sender-select').addEventListener('change', async (e) => {
+    setChatUIState(false);
+    
+    senderSelect.addEventListener('change', async (e) => {
         senderId = parseInt(e.target.value);
         if (senderId && receiverId) await initChatRoom();
     });
-    document.getElementById('receiver-select').addEventListener('change', async (e) => {
+    receiverSelect.addEventListener('change', async (e) => {
         receiverId = parseInt(e.target.value);
         if (senderId && receiverId) await initChatRoom();
     });
@@ -103,29 +153,46 @@ window.onload = function() {
     confirmCare.addEventListener('click', sendCareRequest);
 };
 
+function getSenderName() {
+    return senderSelect.options[senderSelect.selectedIndex].text;
+}
+
 function sendCareRequest() {
+    if (!stompClient || !stompClient.connected) {
+        showMessage("먼저 보내는 사람과 받는 사람을 선택하여 채팅방에 연결해주세요.");
+        return;
+    }
+
     const start = startDateInput.value;
     const end = endDateInput.value;
-   
+    if (!start || !end) {
+        return showMessage("날짜를 선택하세요.");
+    }
 
-    if (!start || !end) return alert("날짜를 선택하세요.");
-    
     const startWithSeconds = start + ':00';
-    const endWithSeconds = end + ':00'
+    const endWithSeconds = end + ':00';
 
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
         receiverId: receiverId,
+        senderName: getSenderName(),
         type: "CARE_REQUEST",
         startDate: startWithSeconds,
         endDate: endWithSeconds,
-        status: document.getElementById('session-status').value,
+        status: 'REQUESTED',
         note: document.getElementById('session-note').value,
-        content: `돌봄 요청: ${start} ~ ${end}, 상태: ${status}`
+        content: `돌봄 요청: ${start} ~ ${end}`,
+        timestamp: new Date().toISOString()
     };
-
-    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    
+    console.log("SENDING CARE REQUEST: ", chatMessage);
+    try {
+        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    } catch (e) {
+        console.error("Failed to send care request:", e);
+        showMessage("돌봄 요청 전송에 실패했습니다. 연결을 확인해주세요.");
+    }
 
     careForm.style.display = 'none';
     startDateInput.value = '';
@@ -135,21 +202,37 @@ function sendCareRequest() {
 }
 
 function confirmCareRequest(sessionId, senderIdFromMsg) {
+    if (!stompClient || !stompClient.connected) {
+        showMessage("먼저 보내는 사람과 받는 사람을 선택하여 채팅방에 연결해주세요.");
+        return;
+    }
+
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
         receiverId: senderIdFromMsg,
         type: "CARE_CONFIRM",
         sessionId: sessionId,
-        content: `✅ 돌봄 예약이 확정되었습니다.`
+        content: `✅ 돌봄 예약이 확정되었습니다.`,
+        timestamp: new Date().toISOString()
     };
-    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    console.log("SENDING CARE CONFIRMATION: ", chatMessage);
+    try {
+        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    } catch (e) {
+        console.error("Failed to send confirmation:", e);
+        showMessage("확정 메시지 전송에 실패했습니다. 연결을 확인해주세요.");
+    }
 }
-
 
 async function initChatRoom() {
     if (!senderId || !receiverId) return;
+    
+    setChatUIState(false);
+    
     if (stompClient && stompClient.connected) stompClient.disconnect();
+    
+    console.log(`Connecting to chat room for Sender: ${senderId}, Receiver: ${receiverId}`);
 
     const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
     const data = await res.json();
@@ -167,74 +250,135 @@ function connectWebSocket() {
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, () => {
-        console.log('Connected');
+        console.log('WebSocket connection established.');
+        setChatUIState(true);
         stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
+            console.log("RECEIVED MESSAGE: ", message.body);
             const chatMessage = JSON.parse(message.body);
             displayMessage(chatMessage);
         });
-    }, (error) => console.error("Connection error: ", error));
+        console.log(`Subscribed to /topic/chat/${chatRoomId}`);
+    }, (error) => {
+        console.error("Connection error: ", error);
+        setChatUIState(false);
+        statusMessageDiv.innerText = "연결에 실패했습니다. 다시 시도해주세요.";
+    });
 }
 
 function sendMessage() {
-    if (!stompClient || !stompClient.connected) return;
+    if (!stompClient || !stompClient.connected) {
+        showMessage("먼저 보내는 사람과 받는 사람을 선택하여 채팅방에 연결해주세요.");
+        return;
+    }
+
     if (!messageInput.value.trim()) return;
 
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
         receiverId: receiverId,
+        senderName: getSenderName(),
         type: "CHAT",
-        content: messageInput.value.trim()
+        content: messageInput.value.trim(),
+        timestamp: new Date().toISOString()
     };
 
-    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    // 낙관적 UI 업데이트: 메시지를 보내기 전에 즉시 화면에 표시합니다.
+    displayMessage(chatMessage);
+    
+    console.log("SENDING MESSAGE: ", chatMessage);
+    try {
+        stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+    } catch (e) {
+        console.error("Failed to send message:", e);
+        showMessage("메시지 전송에 실패했습니다. 연결을 확인해주세요.");
+    }
     messageInput.value = '';
 }
 
 function displayMessage(chatMessage) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message');
+    console.log("DISPLAYING RECEIVED MESSAGE: ", chatMessage);
+    const messageBubbleDiv = document.createElement('div');
+    messageBubbleDiv.classList.add('message-bubble');
+
+    const profilePicDiv = document.createElement('div');
+    profilePicDiv.classList.add('profile-pic');
+    
+    const messageInfoContentDiv = document.createElement('div');
+    messageInfoContentDiv.classList.add('message-info-content');
+
+    const messageContentDiv = document.createElement('div');
+    messageContentDiv.classList.add('message-content');
+    
+    const messageInfoDiv = document.createElement('div');
+    messageInfoDiv.classList.add('message-info');
+
+    const timestamp = chatMessage.timestamp ? new Date(chatMessage.timestamp) : new Date();
+    const currentTime = timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    
     if (chatMessage.senderId === senderId) {
-        messageDiv.classList.add('sent');
+        messageBubbleDiv.classList.add('sent');
+        messageInfoDiv.innerText = `${currentTime}`;
     } else {
-        messageDiv.classList.add('received');
+        messageBubbleDiv.classList.add('received');
+        messageInfoContentDiv.innerHTML = `<div class="sender-name">${chatMessage.senderName || '알 수 없음'}</div>`;
+        messageInfoDiv.innerText = `${currentTime}`;
     }
 
-    // 모든 메시지의 내용을 표시하는 기본 로직
-    messageDiv.innerText = chatMessage.content;
-
-    // 만약 돌봄 요청 메시지라면, 추가 정보를 담은 요소를 생성하여 추가
     if (chatMessage.type === "CARE_REQUEST") {
-        const careDiv = document.createElement('div');
-        careDiv.classList.add('care-request');
+        messageContentDiv.classList.add('care-request');
+        const status = chatMessage.status || 'REQUESTED';
+        const sessionId = chatMessage.sessionId || -1;
         
+        let statusText = '';
+        if (status === 'CONFIRMED') {
+            statusText = `<span style="color: green; font-weight: bold;">[✅ 확정됨]</span>`;
+        } else if (status === 'CANCELLED') {
+            statusText = `<span style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
+        }
+
         let confirmButtonHtml = '';
-        // 메시지를 받는 사람에게만 '확정' 버튼을 표시
-        if (chatMessage.receiverId === senderId) {
-            confirmButtonHtml = `<button class="confirm-btn">확정</button>`;
+        if (status === 'REQUESTED' && chatMessage.senderId !== senderId) {
+             confirmButtonHtml = `<button class="confirm-btn" data-session-id="${sessionId}" data-sender-id="${chatMessage.senderId}">확정</button>`;
         }
         
-        careDiv.innerHTML = `
+        messageContentDiv.innerHTML = `
             <div>돌봄 요청: ${chatMessage.startDate} ~ ${chatMessage.endDate}</div>
             <div>메모: ${chatMessage.note || ''}</div>
-            ${confirmButtonHtml}
+            ${statusText ? statusText : confirmButtonHtml}
         `;
-        
-        messageDiv.appendChild(careDiv);
 
-        if (confirmButtonHtml) {
-            const confirmButton = careDiv.querySelector('.confirm-btn');
-            confirmButton.addEventListener('click', () => {
-                confirmCareRequest(chatMessage.sessionId, chatMessage.senderId);
-            });
+        if (status === 'REQUESTED') {
+            const confirmButton = messageContentDiv.querySelector('.confirm-btn');
+            if (confirmButton) {
+                confirmButton.addEventListener('click', (event) => {
+                    const session_Id = parseInt(event.target.dataset.sessionId);
+                    const sender_Id = parseInt(event.target.dataset.senderId);
+                    if (session_Id !== -1) {
+                        confirmCareRequest(session_Id, sender_Id);
+                        confirmButton.disabled = true;
+                        confirmButton.innerText = "확정됨";
+                    } else {
+                        showMessage("세션 ID가 없어 확정할 수 없습니다. 서버 응답 확인 필요.");
+                    }
+                });
+            }
         }
     } else if (chatMessage.type === "CARE_CONFIRM") {
-        // CARE_CONFIRM 메시지는 특별한 스타일로 표시
-        messageDiv.classList.add('care-confirmed');
-        messageDiv.innerText = chatMessage.content;
+        messageContentDiv.classList.add('care-confirmed');
+        messageContentDiv.innerText = chatMessage.content;
+    } else {
+        messageContentDiv.innerText = chatMessage.content;
     }
 
-    messageArea.appendChild(messageDiv);
+    if (chatMessage.senderId !== senderId) {
+        messageBubbleDiv.appendChild(profilePicDiv);
+    }
+    
+    messageInfoContentDiv.appendChild(messageContentDiv);
+    messageInfoContentDiv.appendChild(messageInfoDiv);
+    messageBubbleDiv.appendChild(messageInfoContentDiv);
+    messageArea.appendChild(messageBubbleDiv);
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 

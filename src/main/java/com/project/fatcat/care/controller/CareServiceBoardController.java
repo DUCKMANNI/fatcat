@@ -79,6 +79,7 @@ public class CareServiceBoardController {
     public String modifyCareForm(@PathVariable("careSeq") Integer careSeq, Model model) {
         // 기존 게시글 정보를 가져와서 DTO에 담아 뷰에 전달
         CareServiceBoard careBoard = this.careServiceBoardService.getBoard(careSeq);
+        
         CareServiceBoardDto careServiceBoardDto = new CareServiceBoardDto();
         careServiceBoardDto.setCareTitle(careBoard.getCareTitle());
         careServiceBoardDto.setCareContent(careBoard.getCareContent());
