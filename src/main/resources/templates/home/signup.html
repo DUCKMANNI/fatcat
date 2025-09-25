@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+</head>
+<body>
+
+	<div layout:fragment="content"
+		class="container my-3 d-flex flex-column align-items-center">
+
+		<!-- 제목 -->
+		<label class="mb-5"
+			style="font-family: 'BagelFat', sans-serif; font-size: 80px; color: #CD853F;">회원가입</label>
+
+		<!-- 아이디 입력 -->
+		<input type="text" class="login-input mb-3" placeholder="아이디">
+
+		<!-- 비밀번호 입력 -->
+		<input type="password" class="login-input mb-4" placeholder="비밀번호">
+
+		<!-- 로그인 버튼 -->
+		<button class="login-btn mb-4">로그인</button>
+
+
+	</div>
+</body>
+</html>

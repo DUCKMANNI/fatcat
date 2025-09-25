@@ -8,6 +8,6 @@ import com.project.fatcat.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer>{
 
-	Optional<Order> findByOrderNumber(String orderNumber);
+	Optional<Order> findByOrderNumber(String orderNum);
 	
 }

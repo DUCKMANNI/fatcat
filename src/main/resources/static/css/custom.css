@@ -184,3 +184,8 @@ body {
   background-color: #fff; /* 선택된 탭 배경 흰색 유지 */
   border-color: #dee2e6 #dee2e6 #fff; /* 아래쪽 경계선 지우기 */
 }
+
+.btn.primary {
+background-color: #3282f6;
+color: #f9fcff;
+}

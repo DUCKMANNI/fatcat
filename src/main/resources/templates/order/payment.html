@@ -4,43 +4,51 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>토스페이먼츠 결제</title>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
 </head>
 <body>
-    <div class="wrapper">
+<!--     <div class="wrapper">
         <h2>결제하기</h2>
         <div id="payment-method"></div>
         <div id="agreement"></div>
         <div class="btn-wrapper">
-            <button id="payment-request-button" class="btn">결제하기</button>
+            <button id="payment-request-button" class="btn primary w-100">결제하기</button>
+        </div>
+    </div> -->
+    
+<div style="max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+        <h2 style="text-align: center;">결제하기</h2>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="pay-button" style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">결제하기</button>
         </div>
     </div>
     
-    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
-    
-    <script>
-        // DOMContentLoaded 이벤트 리스너를 추가하여 문서가 완전히 로드된 후에 실행되도록 합니다.
-        window.addEventListener('DOMContentLoaded', function() {
-            const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
-            const orderId = '[[${orderForm.orderNumber}]]';
-            const amount = '[[${cartSummary.finalPrice}]]';
-            const customerName = '[[${orderForm.receiverName}]]';
-            const cartSeq = '[[${orderForm.cartSeq}]]';
+    <script th:inline="javascript">
+    window.onload = function() {
+        // 💡 친구분이 사용하시는 clientKey
+        const clientKey = 'test_ck_DpexMgkW36zJ6oDb6Nk43GbR5ozO';
+        const orderNumber = /*[[${orderForm.orderNumber}]]*/ '';
+        const amount = /*[[${cartSummary.finalPrice}]]*/ 0;
+        const customerName = /*[[${orderForm.receiverName}]]*/ '';
+        const cartSeq = /*[[${orderForm.cartSeq}]]*/ 0;
+        
+        console.log("현재 orderNumber:", orderNumber);
+        console.log("현재 ClientKey:", clientKey);
+        
+        // 💡 TossPayments 객체 생성
+        const tossPayments = TossPayments(clientKey);
 
-            const paymentWidget = PaymentWidget(clientKey, PaymentWidget.ANONYMOUS);
-            
-            paymentWidget.renderPaymentMethods('#payment-method', { value: amount });
-            paymentWidget.renderAgreement('#agreement');
-
-            document.getElementById('payment-request-button').addEventListener('click', () => {
-                paymentWidget.requestPayment({
-                    orderId: orderId,
-                    orderName: "상품 결제",
-                    customerName: customerName,
-                    successUrl: "http://localhost:8080/orders/success?cartSeq=${cartSeq}",
-                    failUrl: "http://localhost:8080/orders/fail"
-                });
+        document.getElementById('pay-button').addEventListener('click', () => {
+            tossPayments.requestPayment({
+                amount: amount,
+                orderId: orderNumber,
+                orderName: "상품 결제",
+                customerName: customerName,
+                successUrl: window.location.origin + `/orders/success?cartSeq=${cartSeq}`,
+                failUrl: window.location.origin + `/orders/fail`
             });
         });
+    };
     </script>
 </body>
 </html>
