@@ -1,10 +1,13 @@
 package com.project.fatcat.cats.service;
 
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.project.fatcat.DataNotFoundException;
+import com.project.fatcat.cats.dto.CatAddDTO;
 import com.project.fatcat.cats.dto.CatUpdateDTO;
 import com.project.fatcat.cats.repository.CatRepository;
 import com.project.fatcat.entity.Cat;
@@ -23,8 +26,17 @@ public class CatService {
         return catRepository.findAll();
     }
 
-    public Optional<Cat> findById(Integer catSeq) {
-        return catRepository.findById(catSeq);
+    public Cat findById(Integer catSeq) {
+    	
+    	Optional<Cat> c = this.catRepository.findById(catSeq);
+    	
+    	if(c.isPresent()) {
+    		return c.get();
+    	}else {
+    		
+    		throw new DataNotFoundException("객체를 찾을 수 없습니다.");
+    	}
+    	
     }
 
     public Cat save(Cat cat) {
@@ -35,6 +47,24 @@ public class CatService {
         catRepository.deleteById(catSeq);
     }
 
+    
+    public Cat addCat(CatAddDTO catAddDTO) {
+        Cat cat = Cat.builder()
+                .catName(catAddDTO.getCatName())
+                .catBirtthday(catAddDTO.getCatBirtthday())
+                .catGender(catAddDTO.getCatGender())
+                .catBreed(catAddDTO.getCatBreed())
+                .isNeutered(catAddDTO.getIsNeutered())
+                .hasDisease(catAddDTO.getHasDisease())
+                .hasAllergy(catAddDTO.getHasAllergy())
+                .catImageUrl(catAddDTO.getCatImageUrl())
+                .build();
+
+        return catRepository.save(cat);
+    }
+
+    
+    
     /**
      * 고양이 정보를 업데이트하는 메소드
      * @param catSeq 업데이트할 고양이의 고유 번호
@@ -43,9 +73,8 @@ public class CatService {
     @Transactional // 트랜잭션 처리를 통해 데이터 변경 작업을 안전하게 실행
     public void updateCat(Integer catSeq, CatUpdateDTO catUpdateDTO) {
         // 1. catSeq를 사용하여 기존 Cat 엔티티를 찾습니다.
-        //    만약 찾지 못하면 IllegalArgumentException을 발생시킵니다.
-        Cat cat = findById(catSeq)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid catSeq:" + catSeq));
+        Cat cat = findById(catSeq);
+           
 
         // 2. DTO의 정보로 엔티티의 필드를 업데이트합니다.
         cat.setCatName(catUpdateDTO.getCatName());
@@ -56,6 +85,9 @@ public class CatService {
         cat.setNeutered(catUpdateDTO.getIsNeutered());
         cat.setHasDisease(catUpdateDTO.getHasDisease());
         cat.setHasAllergy(catUpdateDTO.getHasAllergy());
+        
+        // 3. 명시적으로 save() 메서드를 호출하여 변경사항을 DB에 저장합니다.
+        this.catRepository.save(cat);
     }
 
     /**
@@ -64,8 +96,6 @@ public class CatService {
      * @return 해당 사용자가 키우는 고양이들의 리스트
      */
     public List<Cat> findAllByUserId(Integer userId) {
-        // 1. userSeq를 기반으로 CatRepository에 고양이 리스트 조회를 요청합니다.
-        //    CatRepository에 findByUserId(Integer userId) 메소드를 추가해야 합니다.
         return catRepository.findByUserUserSeq(userId);
     }
 }

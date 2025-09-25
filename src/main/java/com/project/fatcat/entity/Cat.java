@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+// Enum 타입 사용을 위한 import
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,10 +21,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-// Enum 타입 사용을 위한 import
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 
 @Getter
 @Setter
@@ -66,9 +65,7 @@ public class Cat {
     @Column(nullable = false)
     private Gender catGender;
     
-    // 종 이름 (필수, 빈 값이나 공백만 있는 값도 허용하지 않음)
-    @NotBlank
-    @Column(nullable = false)
+   
     private String catBreed;
     
     // 중성화 여부 (필수)
@@ -76,9 +73,9 @@ public class Cat {
     private boolean isNeutered;
     
     // 질병 여부
-    private boolean hasDisease;
+    private String hasDisease;
     
     // 알레르기 여부
-    private boolean hasAllergy;
+    private String hasAllergy;
 
 }

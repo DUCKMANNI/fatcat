@@ -1,290 +1,156 @@
-<html xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{shared/layout}">
+    <html xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{shared/layout}">
 
-<head>
-    <title>고양이 정보 수정</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #fcf8f3; /* 아주 연한 베이지색 배경 */
-            margin: 20px;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #e0c9a7; /* 옅은 탄색 테두리 */
-            border-radius: 8px;
-            background-color: #fff9f0; /* 배경보다 약간 밝은 색 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #8b4513; /* 새들브라운 색상 */
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #5c3b1e; /* 어두운 갈색 텍스트 */
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d4b494; /* 중간 탄색 테두리 */
-            border-radius: 4px;
-            box-sizing: border-box;
-            background-color: #fff;
-            color: #333;
-        }
-        .form-group input:focus, .form-group select:focus {
-            border-color: #a0522d; /* 시에나 색상으로 포커스 효과 */
-            outline: none;
-            box-shadow: 0 0 5px rgba(160, 82, 45, 0.5);
-        }
-        .form-group .required::after {
-            content: '*';
-            color: #a0522d; /* 시에나 색상으로 강조 */
-            margin-left: 4px;
-        }
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .radio-group label {
-            font-weight: normal;
-        }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #d2b48c; /* 탄색 버튼 */
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #b8860b; /* 다크 골든로드 색상으로 호버 효과 */
-        }
-        .error-message {
-            color: #a0522d;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div layout:fragment="content">
-        <div class="form-container">
-            <h1>고양이 정보 수정</h1>
-    
-            <div th:if="${#fields.hasAnyErrors()}" th:each="err : ${#fields.allErrors()}">
-                <span class="error-message" th:text="${err}"></span>
-            </div>
-    
-            <form th:action="@{|/cats/modify/${catSeq}|}" th:object="${catUpdateDTO}" method="post">
-                <div class="form-group">
-                    <label for="catName" class="required">이름</label>
-                    <input type="text" id="catName" th:field="*{catName}">
-                    <div class="error-message" th:if="${#fields.hasErrors('catName')}" th:errors="*{catName}"></div>
-                </div>
-    
-                <div class="form-group">
-                    <label for="catBirtthday">생일</label>
-                    <input type="date" id="catBirtthday" th:field="*{catBirtthday}">
-                </div>
-    
-                <div class="form-group">
-                    <label for="catGender" class="required">성별</label>
-                    <div class="radio-group">
-                        <input type="radio" id="male" th:field="*{catGender}" th:value="MALE">
-                        <label for="male">수컷</label>
-                        <input type="radio" id="female" th:field="*{catGender}" th:value="FEMALE">
-                        <label for="female">암컷</label>
-                    </div>
-                </div>
-    
-                <div class="form-group">
-                    <label class="required">중성화 여부</label>
-                    <div class="radio-group">
-                        <input type="radio" id="neutered-yes" th:field="*{isNeutered}" th:value="true">
-                        <label for="neutered-yes">예</label>
-                        <input type="radio" id="neutered-no" th:field="*{isNeutered}" th:value="false">
-                        <label for="neutered-no">아니오</label>
-                    </div>
-                </div>
-    
-                <div class="form-group">
-                    <label for="catBreed">고양이 종</label>
-                    <input type="text" id="catBreed" th:field="*{catBreed}">
-                </div>
-    
-                <div class="form-group">
-                    <label for="hasDisease">질병</label>
-                    <input type="text" id="hasDisease" th:field="*{hasDisease}">
-                </div>
-    
-                <div class="form-group">
-                    <label for="hasAllergy">알러지</label>
-                    <input type="text" id="hasAllergy" th:field="*{hasAllergy}">
-                </div>
-    
-                <div class="form-group">
-                    <label for="catImageUrl">사진 URL</label>
-                    <input type="url" id="catImageUrl" th:field="*{catImageUrl}">
-                </div>
-    
-                <div>
-                    <button type="submit">수정하기</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--  <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
-
-   
-<body>
+    <head>
+        <title>고양이 정보 수정</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #fcf8f3; /* 아주 연한 베이지색 배경 */
+                margin: 20px;
+            }
+            .form-container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid #e0c9a7; /* 옅은 탄색 테두리 */
+                border-radius: 8px;
+                background-color: #fff9f0; /* 배경보다 약간 밝은 색 */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #8b4513; /* 새들브라운 색상 */
+                text-align: center;
+            }
+            .form-group {
+                margin-bottom: 20px;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: bold;
+                color: #5c3b1e; /* 어두운 갈색 텍스트 */
+            }
+            .form-group input, .form-group select {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #d4b494; /* 중간 탄색 테두리 */
+                border-radius: 4px;
+                box-sizing: border-box;
+                background-color: #fff;
+                color: #333;
+            }
+            .form-group input:focus, .form-group select:focus {
+                border-color: #a0522d; /* 시에나 색상으로 포커스 효과 */
+                outline: none;
+                box-shadow: 0 0 5px rgba(160, 82, 45, 0.5);
+            }
+            .form-group .required::after {
+                content: '*';
+                color: #a0522d; /* 시에나 색상으로 강조 */
+                margin-left: 4px;
+            }
+            .radio-group {
+                display: flex;
+                gap: 20px;
+                align-items: center;
+            }
+            .radio-group label {
+                font-weight: normal;
+            }
+            button {
+                width: 100%;
+                padding: 15px;
+                background-color: #d2b48c; /* 탄색 버튼 */
+                border: none;
+                border-radius: 4px;
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+            button:hover {
+                background-color: #b8860b; /* 다크 골든로드 색상으로 호버 효과 */
+            }
+            .error-message {
+                color: #a0522d;
+                font-size: 14px;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
         <div layout:fragment="content">
-<title>고양이 정보 수정</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .form-group .required::after {
-            content: '*';
-            color: red;
-            margin-left: 4px;
-        }
-        .radio-group {
-            display: flex;
-            gap: 20px;
-        }
-        .radio-group input {
-            width: auto;
-        }
-    </style>
-</head>
-<body>
-    <div class="form-container">
-        <h1>고양이 정보 수정</h1>
-
-        <div th:if="${#fields.hasAnyErrors()}" th:each="err : ${#fields.allErrors()}">
-            <span style="color:red;" th:text="${err}"></span>
+            <div class="form-container">
+                <h1>고양이 정보 수정</h1>
+        
+        
+                <form th:action="@{|/cats/modify/${catSeq}|}" th:object="${catUpdateDTO}" method="post">
+                
+                
+            <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+                
+                    <div class="form-group">
+                        <label for="catName" class="required">이름</label>
+                        <input type="text" id="catName" th:field="*{catName}">
+                    <!--  <div class="error-message" th:if="${#fields.hasErrors('catName')}" th:errors="*{catName}"></div> -->
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="catBirtthday">생일</label>
+                        <input type="date" id="catBirtthday" th:field="*{catBirtthday}">
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="catGender" class="required">성별</label>
+                        <div class="radio-group">
+                            <input type="radio" id="male" th:field="*{catGender}" th:value="MALE">
+                            <label for="male">남아</label>
+                            <input type="radio" id="female" th:field="*{catGender}" th:value="FEMALE">
+                            <label for="female">여아</label>
+                        </div>
+                    </div>
+        
+                    <div class="form-group">
+                        <label class="required">중성화 여부</label>
+                        <div class="radio-group">
+                            <input type="radio" id="neutered-yes" th:field="*{isNeutered}" th:value="true">
+                            <label for="neutered-yes">예</label>
+                            <input type="radio" id="neutered-no" th:field="*{isNeutered}" th:value="false">
+                            <label for="neutered-no">아니오</label>
+                        </div>
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="catBreed">고양이 종</label>
+                        <input type="text" id="catBreed" th:field="*{catBreed}">
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="hasDisease">질병</label>
+                        <input type="text" id="hasDisease" th:field="*{hasDisease}">
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="hasAllergy">알러지</label>
+                        <input type="text" id="hasAllergy" th:field="*{hasAllergy}">
+                    </div>
+        
+                    <div class="form-group">
+                        <label for="catImageUrl">사진 URL</label>
+                        <input type="url" id="catImageUrl" th:field="*{catImageUrl}">
+                    </div>
+        
+        <center>
+                    <div>
+                        <button type="submit" class="btn btn-fatcat">수정하기</button>
+                    </div>
+                    </center>
+                    
+                </form>
+            </div>
         </div>
-
-        <form th:action="@{|/cats/modify/${catSeq}|}" th:object="${catUpdateDTO}" method="post">
-            <div class="form-group">
-                <label for="catName" class="required">이름</label>
-                <input type="text" id="catName" th:field="*{catName}">
-            </div>
-
-            <div class="form-group">
-                <label for="catBirtthday">생일</label>
-                <input type="date" id="catBirtthday" th:field="*{catBirtthday}">
-            </div>
-
-            <div class="form-group">
-                <label for="catGender" class="required">성별</label>
-                <div class="radio-group">
-                    <input type="radio" id="male" th:field="*{catGender}" value="수컷">
-                    <label for="male">수컷</label>
-                    <input type="radio" id="female" th:field="*{catGender}" value="암컷">
-                    <label for="female">암컷</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="required">중성화 여부</label>
-                <div class="radio-group">
-                    <input type="radio" id="neutered-yes" th:field="*{isNeutered}" th:value="true">
-                    <label for="neutered-yes">예</label>
-                    <input type="radio" id="neutered-no" th:field="*{isNeutered}" th:value="false">
-                    <label for="neutered-no">아니오</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="catBreed" class="required">고양이 종</label>
-                <input type="text" id="catBreed" th:field="*{catBreed}">
-            </div>
-
-            <div class="form-group">
-                <label for="chronicDisease">지병</label>
-                <input type="text" id="chronicDisease" th:field="*{chronicDisease}">
-            </div>
-
-            <div class="form-group">
-                <label for="allergy">알러지</label>
-                <input type="text" id="allergy" th:field="*{allergy}">
-            </div>
-
-            <div class="form-group">
-                <label for="catImageUrl">사진 URL</label>
-                <input type="url" id="catImageUrl" th:field="*{catImageUrl}">
-            </div>
-
-            <div>
-                <button type="submit">수정하기</button>
-            </div>
-        </form>
-    </div>
-
-</body>
-</html> -->
+    </body>
+    </html>
