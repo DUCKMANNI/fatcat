@@ -19,6 +19,7 @@ import com.project.fatcat.shopping.dto.OrderFormDTO;
 import com.project.fatcat.shopping.dto.PaymentConfirmResponse;
 import com.project.fatcat.shopping.service.CartServiceImpl;
 import com.project.fatcat.shopping.service.OrderService;
+import com.project.fatcat.shopping.service.TossPaymentServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +30,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final CartServiceImpl cartServiceImpl; 
+    private final TossPaymentServiceImpl tossPaymentServiceImpl;
 
     /** 주문서 작성 화면 */
     @GetMapping("/form")
@@ -116,6 +118,10 @@ public class OrderController {
 
         // DB에 저장된 orderNumber 사용
         orderForm.setOrderNumber(order.getOrderNumber());
+        
+        System.out.println("getReceiverName222"+orderForm.getReceiverName());
+        System.out.println("orderForm"+orderForm.getCartSeq());
+        
 
         model.addAttribute("orderForm", orderForm);
         model.addAttribute("cartSummary", summary);
@@ -127,27 +133,21 @@ public class OrderController {
     
    
     @GetMapping("/success")
-    public String paymentSuccess(@RequestParam String paymentKey,
-                                 @RequestParam String orderId,
-                                 @RequestParam int amount,
-                                 @RequestParam Integer cartSeq, // @ModelAttribute("orderForm") 대신 이렇게 변경
+    public String paymentSuccess(@RequestParam("paymentKey") String paymentKey,
+                                 @RequestParam("orderId") String orderNumber,
+                                 @RequestParam("amount") int amount,
+                                 @RequestParam("cartSeq") Integer cartSeq,
                                  Model model) {
-        
-        // 1. OrderService의 메서드를 호출하여 토스페이먼츠 결제 승인 및 DB 업데이트를 한 번에 처리
-        // 결제 성공 후 주문 상태를 "PAID"로 변경하는 로직이 OrderService.handlePaymentSuccess()에 포함되어 있음.
-        PaymentConfirmResponse response = orderService.handlePaymentSuccess(paymentKey, orderId, amount);
 
-        // 2. 결제 완료된 장바구니 비우기 (is_completed 상태를 true로 변경)
-        // OrderService에 새로운 메서드(clearCart) 추가 필요
-        orderService.clearCart(cartSeq);
-
+        PaymentConfirmResponse response = tossPaymentServiceImpl.confirmPayment(paymentKey, orderNumber, amount, cartSeq);
         model.addAttribute("payment", response);
+
         return "order/success";
     }
 
     @GetMapping("/fail")
-    public String paymentFail(@RequestParam String code,
-                              @RequestParam String message,
+    public String paymentFail(@RequestParam("code") String code,
+                              @RequestParam("message") String message,
                               Model model) {
         model.addAttribute("errorCode", code);
         model.addAttribute("errorMessage", message);
