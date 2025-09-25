@@ -1,266 +1,333 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
 <head>
-<meta charset="utf-8">
-<title>1:1 채팅 + CareSession 테스트</title>
+<meta charset="UTF-8">
+<title>돌봄서비스 구인등록</title>
 <style>
-body { font-family: Arial; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; }
-#user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; }
-select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid #ccc; }
-#chat-container { flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; margin:10px; border-radius:8px; overflow:hidden; }
-#message-area { flex-grow:1; padding:10px; overflow-y:auto; background:#f7f7f7; display:flex; flex-direction:column; }
-.message { margin-bottom:10px; padding:8px 12px; border-radius:18px; max-width:70%; word-wrap:break-word; }
-.sent { background:#dcf8c6; align-self:flex-end; margin-left:20%; }
-.received { background:#fff; align-self:flex-start; margin-right:20%; }
-.care-request { background:#FFFACD; padding:6px 10px; border-radius:12px; margin-top:4px; }
-.care-confirmed { background:#8FBC8F; padding:6px 10px; border-radius:12px; margin-top:4px; }
-#input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
-#message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
-#send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
-#care-form { display:none; flex-direction:column; gap:5px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
-#care-form input, #care-form select, #care-form textarea { width:100%; }
-#confirm-care { background:#8FBC8F; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; }
+#controls {
+	background: rgba(255, 255, 255, 0.96);
+	border: 1px solid #ddd;
+	border-radius: 14px;
+	padding: 15px 20px;
+	gap: 20px;
+	align-items: center;
+	margin: 20px auto;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.controls-item {
+	display: flex;
+	gap: 8px; /* 드롭다운 간 간격 조절 */
+	align-items: center;
+}
+
+#controls select, #controls button {
+	height: 36px;
+	font-size: 14px;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	padding: 0 10px;
+}
+
+#controls select {
+	width: 120px; /* 드롭다운 너비 고정 */
+}
+
+#controls button {
+	cursor: pointer;
+	border: none;
+	background: #CD853F;
+	color: #fff;
+	font-weight: 600;
+	padding: 10px 12px;
+}
+
+#map {
+	height: 100%;
+	border: 1px solid #e5e5e5;
+	border-radius: 24px;
+	position: relative;
+}
+
+.fixed-element button {
+	display: block !important;
+}
+
+/* 폼 컨테이너와 지도 컨테이너의 간격 조절 */
+.row {
+	margin-right: -15px;
+	margin-left: -15px;
+}
+
+.col-md-6 {
+	padding-right: 15px;
+	padding-left: 15px;
+}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
+	<div layout:fragment="content" class="container mt-5">
+		<script
+			src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
 
-<div id="user-select">
-    <label>보내는 사람:
-        <select id="sender-select">
-            <option value="">선택하세요</option>
-            <option value="1">User 1</option>
-            <option value="2">User 2</option>
-            <option value="3">User 3</option>
-        </select>
-    </label>
-    <label>받는 사람:
-        <select id="receiver-select">
-            <option value="">선택하세요</option>
-            <option value="1">User 1</option>
-            <option value="2">User 2</option>
-            <option value="3">User 3</option>
-        </select>
-    </label>
-</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h2 class="my-3 border-bottom pb-2 text-center">돌봄서비스 구인등록</h2>
 
-<div id="chat-container">
-    <div id="message-area"></div>
-    <div id="input-area">
-        <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
-        <button id="send-button">전송</button>
-        <button id="care-toggle">돌봄 예약</button>
-    </div>
-    <div id="care-form">
-        시작일: <input type="datetime-local" id="start-date">
-        종료일: <input type="datetime-local" id="end-date">
-        상태:
-        <select id="session-status">
-            <option value="REQUESTED">요청</option>
-            <option value="CONFIRMED">확정</option>
-            <option value="CANCELLED">취소</option>
-        </select>
-        메모: <textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
-        <button id="confirm-care">예약 전송</button>
-    </div>
-</div>
+				<form method="post" th:object="${careServiceBoardDto}"
+					th:action="@{${careSeq != null} ? '/care/modify/' + ${careSeq} : '/care/create'}">
+					
+					<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
 
-<script>
-let senderId = null;
-let receiverId = null;
-let chatRoomId = null;
-let stompClient = null;
+					나중에 사용자 정보 로그인하구 히든으로 바꾸세여 지금은 임시로 텍스트 넣는거임 ~~~ <input type="text"
+						th:field="*{userSeq}" />
 
-const messageArea = document.getElementById('message-area');
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-const careToggle = document.getElementById('care-toggle');
-const careForm = document.getElementById('care-form');
-const startDateInput = document.getElementById('start-date');
-const endDateInput = document.getElementById('end-date');
-const confirmCare = document.getElementById('confirm-care');
+					<div class="mb-2">
+						<label for="careTitle" class="form-label">제목</label> <input
+							type="text" id="careTitle" th:field="*{careTitle}"
+							class="form-control" required />
+						<div class="invalid-feedback">제목을 입력해주세요.</div>
+					</div>
 
-window.onload = function() {
-    document.getElementById('sender-select').addEventListener('change', async (e) => {
-        senderId = parseInt(e.target.value);
-        if (senderId && receiverId) await initChatRoom();
+					<div class="mb-2">
+						<label for="careContent" class="form-label">내용</label>
+						<textarea id="careContent" th:field="*{careContent}" rows="10"
+							class="form-control" required></textarea>
+						<div class="invalid-feedback">내용을 입력해주세요.</div>
+					</div>
+
+					<div class="mb-2">
+						<label for="price" class="form-label">가격</label> <input
+							type="number" id="price" th:field="*{price}" class="form-control"
+							required />원
+						<div class="invalid-feedback">가격을 입력해주세요.</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">주소 검색</label>
+						<div id="controls" class="d-flex">
+							<div class="controls-item">
+								<label class="mx-2">시/도<select id="sido"></select></label> <label
+									class="mx-2">시/군/구<select id="sigungu"></select></label> <label
+									class="mx-2">동<select id="dong"></select></label>
+							</div>
+							<button id="searchBtn" type="button">검색</button>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<input type="hidden" id="address1" th:field="*{address1}"
+							class="form-control" required readonly />
+						<div class="invalid-feedback">주소를 검색해주세요.</div>
+					</div>
+
+					<div class="mb-3">
+						<label for="address2" class="form-label">상세주소</label> <input
+							type="text" id="address2" th:field="*{address2}"
+							class="form-control" required />
+						<div class="invalid-feedback">상세주소를 입력해주세요.</div>
+					</div>
+
+					<input type="hidden" id="latitude" th:field="*{latitude}" /> <input
+						type="hidden" id="longitude" th:field="*{longitude}" />
+
+					<div class="d-grid gap-2">
+						<button type="submit" class="btn btn-warning btn-lg">등록하기</button>
+					</div>
+				</form>
+			</div>
+
+			<div class="col-md-6">
+				<div id="map"></div>
+			</div>
+		</div>
+		<script>
+    let REGION_DATA={}, circle = null;
+
+    const markers = [];
+    const $sido = document.getElementById('sido');
+    const $sigungu = document.getElementById('sigungu');
+    const $dong = document.getElementById('dong');
+    const $searchBtn = document.getElementById('searchBtn');
+
+    const map = new kakao.maps.Map(document.getElementById('map'), {
+        center: new kakao.maps.LatLng(37.566826, 126.9786567),
+        level: 5
     });
-    document.getElementById('receiver-select').addEventListener('change', async (e) => {
-        receiverId = parseInt(e.target.value);
-        if (senderId && receiverId) await initChatRoom();
+    const geocoder = new kakao.maps.services.Geocoder();
+
+    window.addEventListener('DOMContentLoaded', () => {
+        // CSV 파일 로드 및 데이터 파싱을 먼저 완료
+        fetch('/data/korea_map_info.txt')
+            .then(res => res.text())
+            .then(text => {
+                parseCSV(text);
+                fillSido();
+
+                // CSV 데이터 로드 완료 후 위치 정보 가져오기 시작
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const loc = new kakao.maps.LatLng(lat, lng);
+                        
+                        // 기존 코드 대신 새로운 reverseGeocode 함수 호출
+                        reverseGeocode(lat, lng, loc);
+
+                    }, err => {
+                        console.warn("위치 가져오기 실패", err);
+                        // 실패 시 기본 지도로 설정하고 검색 버튼 클릭 이벤트와 연결
+                        addCenterMarkerAndCircle(new kakao.maps.LatLng(37.566826, 126.9786567));
+                        $searchBtn.addEventListener('click', searchLocation);
+                    });
+                } else {
+                    console.warn("Geolocation API를 지원하지 않는 브라우저입니다.");
+                    $searchBtn.addEventListener('click', searchLocation);
+                }
+            })
+            .catch(err => console.error('CSV 읽기 실패', err));
     });
 
-    sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    careToggle.addEventListener('click', () => {
-        careForm.style.display = careForm.style.display === 'none' ? 'flex' : 'none';
-    });
-
-    confirmCare.addEventListener('click', sendCareRequest);
-};
-
-function sendCareRequest() {
-    const start = startDateInput.value;
-    const end = endDateInput.value;
-   
-
-    if (!start || !end) return alert("날짜를 선택하세요.");
-    
-    const startWithSeconds = start + ':00';
-    const endWithSeconds = end + ':00'
-
-    const chatMessage = {
-        chatRoomId: chatRoomId,
-        senderId: senderId,
-        receiverId: receiverId,
-        type: "CARE_REQUEST",
-        startDate: startWithSeconds,
-        endDate: endWithSeconds,
-        // 명확하게 REQUESTED 상태로 보냄
-        status: 'REQUESTED', 
-        note: document.getElementById('session-note').value,
-        content: `돌봄 요청: ${start} ~ ${end}`
-    };
-
-    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-
-    careForm.style.display = 'none';
-    startDateInput.value = '';
-    endDateInput.value = '';
-    document.getElementById('session-status').value = 'REQUESTED';
-    document.getElementById('session-note').value = '';
-}
-
-function confirmCareRequest(sessionId, senderIdFromMsg) {
-    const chatMessage = {
-        chatRoomId: chatRoomId,
-        senderId: senderId,
-        receiverId: senderIdFromMsg,
-        type: "CARE_CONFIRM",
-        sessionId: sessionId,
-        content: `✅ 돌봄 예약이 확정되었습니다.`
-    };
-    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-}
-
-
-async function initChatRoom() {
-    if (!senderId || !receiverId) return;
-    if (stompClient && stompClient.connected) stompClient.disconnect();
-
-    const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
-    const data = await res.json();
-    chatRoomId = data.chatSeq;
-
-    const histRes = await fetch(`/api/chat/history?roomId=${chatRoomId}`);
-    const history = await histRes.json();
-    displayChatHistory(history);
-
-    connectWebSocket();
-}
-
-function connectWebSocket() {
-    const socket = new SockJS('/ws');
-    stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, () => {
-        console.log('Connected');
-        stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
-            const chatMessage = JSON.parse(message.body);
-            displayMessage(chatMessage);
+    function parseCSV(csvText) {
+        REGION_DATA = {};
+        csvText.split('\n').slice(1).forEach(line => {
+            const [sido, sigungu, dong] = line.split(',').map(s => s.trim());
+            if (!sido || !sigungu || !dong) return;
+            REGION_DATA[sido] = REGION_DATA[sido] || {};
+            REGION_DATA[sido][sigungu] = REGION_DATA[sido][sigungu] || [];
+            REGION_DATA[sido][sigungu].push(dong);
         });
-    }, (error) => console.error("Connection error: ", error));
-}
-
-function sendMessage() {
-    if (!stompClient || !stompClient.connected) return;
-    if (!messageInput.value.trim()) return;
-
-    const chatMessage = {
-        chatRoomId: chatRoomId,
-        senderId: senderId,
-        receiverId: receiverId,
-        type: "CHAT",
-        content: messageInput.value.trim()
-    };
-
-    stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
-    messageInput.value = '';
-}
-
-function displayMessage(chatMessage) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message');
-    if (chatMessage.senderId === senderId) {
-        messageDiv.classList.add('sent');
-    } else {
-        messageDiv.classList.add('received');
     }
 
-    if (chatMessage.type === "CARE_REQUEST") {
-        const careDiv = document.createElement('div');
-        careDiv.classList.add('care-request');
-        
-        let confirmButtonHtml = '';
-        
-        // --- ★★★ 핵심 수정 로직: status 필드가 없거나 'REQUESTED'일 경우 버튼 표시 ★★★
-        const status = chatMessage.status || 'REQUESTED'; // status가 없으면 요청 상태로 간주
-        const sessionId = chatMessage.sessionId || -1; // sessionId가 없으면 임시값(-1) 사용
+    function fillSido() {
+        $sido.innerHTML = '<option value="">시/도 선택</option>';
+        Object.keys(REGION_DATA).forEach(sd => $sido.innerHTML += `<option value="${sd}">${sd}</option>`);
+        $sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
+        $dong.innerHTML = '<option value="">동 선택</option>';
+    }
 
-        if (status === 'REQUESTED') {
-            confirmButtonHtml = `<button class="confirm-btn" data-session-id="${sessionId}" data-sender-id="${chatMessage.senderId}">확정</button>`;
-        } else if (status === 'CONFIRMED') {
-            confirmButtonHtml = `<span style="color: green; font-weight: bold;">[✅ 확정됨]</span>`;
-        }
-        // --- ★★★ 여기까지 ★★★ ---
-        
-        // 보내는 사람과 받는 사람 모두에게 돌봄 요청 내용과 상태를 표시
-        careDiv.innerHTML = `
-            <div>돌봄 요청: ${chatMessage.startDate} ~ ${chatMessage.endDate}</div>
-            <div>메모: ${chatMessage.note || ''}</div>
-            ${confirmButtonHtml}
-        `;
-        
-        messageDiv.appendChild(careDiv);
+    function fillSigungu() {
+        const sd = $sido.value;
+        $sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
+        $dong.innerHTML = '<option value="">동 선택</option>';
+        if (!sd) return;
+        Object.keys(REGION_DATA[sd]).forEach(gu => $sigungu.innerHTML += `<option value="${gu}">${gu}</option>`);
+    }
 
-        if (status === 'REQUESTED') {
-            // 버튼이 생성된 경우에만 이벤트 리스너 연결
-            const confirmButton = careDiv.querySelector('.confirm-btn');
-            if (confirmButton) {
-                confirmButton.addEventListener('click', (event) => {
-                    const session_Id = parseInt(event.target.dataset.sessionId);
-                    const sender_Id = parseInt(event.target.dataset.senderId);
+    function fillDong() {
+        const sd = $sido.value;
+        const gu = $sigungu.value;
+        $dong.innerHTML = '<option value="">동 선택</option>';
+        if (!sd || !gu) return;
+        REGION_DATA[sd][gu].forEach(d => $dong.innerHTML += `<option value="${d}">${d}</option>`);
+    }
+
+    $sido.addEventListener('change', fillSigungu);
+    $sigungu.addEventListener('change', fillDong);
+
+    function buildRegionText() {
+        return [$sido.value, $sigungu.value, $dong.value].filter(Boolean).join(' ');
+    }
+    
+    // ⭐️ 새로 추가된 함수: 좌표를 주소로 변환하고 드롭다운을 설정합니다.
+    function reverseGeocode(lat, lon, loc) {
+        geocoder.coord2RegionCode(lon, lat, (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                const regionInfo = result.find(item => item.region_type === 'H');
+                
+                if (regionInfo) {
+                    const { region_1depth_name, region_2depth_name, region_3depth_name } = regionInfo;
                     
-                    // sessionId가 유효한지 확인하고, 유효하지 않으면 동작하지 않도록 처리
-                    if (session_Id !== -1) {
-                         confirmCareRequest(session_Id, sender_Id);
-                    } else {
-                        alert("돌봄 세션 ID가 없어 확정할 수 없습니다. 서버의 채팅 히스토리 응답을 확인해주세요.");
+                    // 드롭다운에 시/도와 시/군/구 설정
+                    $sido.value = region_1depth_name;
+                    fillSigungu();
+                    $sigungu.value = region_2depth_name;
+                    fillDong();
+                    
+                    // Geocoder 결과와 비슷한 동(dong) 찾기
+                    const dongList = REGION_DATA[region_1depth_name] ? REGION_DATA[region_1depth_name][region_2depth_name] : null;
+                    const matchedDong = dongList ? dongList.find(d => region_3depth_name.includes(d) || d.includes(region_3depth_name)) : null;
+
+                    if (matchedDong) {
+                        $dong.value = matchedDong;
                     }
-                });
+                    
+                    // 주소와 위경도 필드 자동 채움
+                    const fullAddress = `${region_1depth_name} ${region_2depth_name} ${matchedDong || region_3depth_name}`;
+                    document.getElementById('address1').value = fullAddress;
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lon;
+                    
+                    addCenterMarkerAndCircle(loc);
+                }
+            } else {
+                console.error("주소 변환에 실패했습니다.");
+                addCenterMarkerAndCircle(loc);
             }
+        });
+    }
+
+    function addCenterMarkerAndCircle(position) {
+        markers.forEach(m => m.setMap(null));
+        markers.length = 0;
+        if (circle) {
+            circle.setMap(null);
         }
-    } else if (chatMessage.type === "CARE_CONFIRM") {
-        messageDiv.classList.add('care-confirmed');
-        messageDiv.innerText = chatMessage.content;
-    } else {
-        messageDiv.innerText = chatMessage.content;
+
+        const centerMarker = new kakao.maps.Marker({
+            map: map,
+            position: position,
+            image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(36, 46))
+        });
+        markers.push(centerMarker);
+
+        circle = new kakao.maps.Circle({
+            center: position,
+            radius: 3000,
+            strokeWeight: 5,
+            strokeColor: '#75B8FA',
+            strokeOpacity: 0.8,
+            strokeStyle: 'dashed',
+            fillColor: '#CFE7FF',
+            fillOpacity: 0.5
+        });
+
+        circle.setMap(map);
+        map.setCenter(position);
+        map.setLevel(7);
     }
 
-    messageArea.appendChild(messageDiv);
-    messageArea.scrollTop = messageArea.scrollHeight;
-}
+    function searchLocation() {
+        if (!$sido.value || !$sigungu.value) {
+            alert('시/도와 시/군/구를 선택해주세요.');
+            return;
+        }
 
-function displayChatHistory(history) {
-    messageArea.innerHTML = '';
-    if (history && Array.isArray(history)) {
-        history.forEach(msg => displayMessage(msg));
+        const address = buildRegionText();
+        
+        document.getElementById('address1').value = address;
+
+        geocoder.addressSearch(address, (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                addCenterMarkerAndCircle(coords);
+
+                document.getElementById('latitude').value = coords.getLat();
+                document.getElementById('longitude').value = coords.getLng();
+            } else {
+                alert('주소 검색에 실패했습니다.');
+            }
+        });
     }
-}
+
+  
+    $searchBtn.addEventListener('click', searchLocation);
+
 </script>
+	</div>
 </body>
 </html>

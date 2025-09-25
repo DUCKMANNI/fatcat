@@ -36,10 +36,10 @@ public class CareServiceReviewController {
     @ResponseBody // JSON 데이터를 반환하기 위해 필요
     public ResponseEntity<CareReviewResopnseDto> createReview(@RequestBody CareReviewRequestDto request) {
     	
-        Integer authorUserSeq = 1;
+       
         
         CareReviewResopnseDto newReview = careServiceReviewService.createReview(
-            authorUserSeq,
+            request.getAuthorUserSeq(),
             request.getTargetUserSeq(),
             request.getCareReview(),
             request.getCareRating(),
