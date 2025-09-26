@@ -1,189 +1,195 @@
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
-
+ 
+  <html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
 
 <body>
-	<div layout:fragment="content">
-	
- <style>
-        /* 따뜻한 단일 탄(tan) 색상 팔레트 */
+<div layout:fragment="content">
+
+    <style>
         :root {
-            --white-background: #FFFFFF;      /* 깔끔한 흰색 배경 */
-            --light-tan: #F2E3D4;             /* FAQ 질문 배경색 */
-            --tan-medium: #C3997A;            /* 주요 버튼, 강조색 */
-            --tan-darker: #7E5F4D;            /* 텍스트, 아이콘 */
-            --tan-darkest: #4C3C30;           /* 제목, 진한 텍스트 */
-            --border-color: #E0E0E0;          /* 연한 테두리 색상 */
-        }
-        body {
-            background-color: var(--tan-background);
-            color: var(--tan-darker);
-        }
+    --white-background: #FFFFFF;  /* 전체 배경 흰색 */
+    --tan-medium: #D6A77A;        /* 포인트/버튼색 */
+    --tan-dark: #B58B63;          /* hover */
+    --tan-text: #5C4A3A;          /* 기본 텍스트 */
+    --tan-border: #E6CCB2;        /* 경계선 */
+}
 
-        .page-header {
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--tan-darkest);
-        }
+body {
+    background-color: var(--white-background); /* ✅ 배경 흰색 */
+    color: var(--tan-text); /* ✅ 전체 텍스트 탄색 */
+}
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+/* ✅ 카테고리 제목 */
+.page-header {
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--tan-text);
+    font-size: 25px;
+    font-weight: bold;
+}
 
-        .btn-group-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+/* ✅ 메뉴 링크 */
+.menu-links {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 25px;
+}
 
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            text-align: center;
-            text-decoration: none;
-            color: var(--white);
-            background-color: var(--tan-medium);
-            border: 1px solid var(--tan-medium);
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+.menu-links a {
+    text-decoration: none;
+    color: var(--tan-text);
+    font-size: 20px;
+    font-weight: 600;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s, color 0.3s;
+}
 
-        .btn:hover {
-            background-color: var(--tan-darker);
-            border-color: var(--tan-darker);
-        }
+.menu-links a:hover {
+    border-bottom: 2px solid var(--tan-medium);
+    color: var(--tan-medium);
+}
 
-        .btn-secondary {
-            background-color: var(--tan-medium);
-            border-color: var(--tan-medium);
-            color: var(--white);
-        }
-        
-        .btn-secondary:hover {
-            background-color: var(--tan-darker);
-            border-color: var(--tan-darker);
-        }
+/* ✅ 검색창 */
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px auto;
+    width: 80%;
+}
 
-        .search-container {
-            flex-grow: 1; 
-            display: flex;
-            justify-content: center; 
-        }
+.search-form {
+    display: flex;
+    width: 400px;
+}
 
-        .search-form {
-            display: flex;
-            gap: 10px;
-            width: 400px;
-        }
+.search-form input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid var(--tan-medium);
+    border-radius: 5px 0 0 5px;
+    font-size: 16px;
+    color: var(--tan-text); /* 입력 텍스트 탄색 */
+}
 
-        .search-form input {
-            padding: 8px;
-            border: 1px solid var(--tan-medium);
-            border-radius: 5px;
-            flex-grow: 1;
-        }
+.search-form input::placeholder {
+    color: var(--tan-text);
+    opacity: 0.6;
+}
 
-        .search-form input::placeholder {
-            color: var(--tan-darker);
-            opacity: 0.7;
-        }
+.search-form button {
+    padding: 10px 18px;
+    border: 1px solid var(--tan-medium);
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    background-color: var(--tan-medium);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
 
-        .faq-container {
-            width: 80%;
-            margin: 0 auto;
-            border-top: 2px solid var(--tan-medium);
-        }
+.search-form button:hover {
+    background-color: var(--tan-dark);
+}
 
-        .faq-item {
-            border-bottom: 1px solid var(--tan-medium);
-        }
+/* ✅ FAQ */
+.faq-container {
+    width: 80%;
+    margin: 0 auto;
+    border-top: 2px solid var(--tan-medium);
+}
 
-        .faq-question {
-            padding: 15px;
-            cursor: pointer;
-            background-color: var(--tan-lighter);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--tan-darkest);
-        }
+.faq-item {
+    border-bottom: 1px solid var(--tan-border);
+}
 
-        .faq-question:hover {
-            background-color: var(--tan-background);
-        }
+.faq-question {
+    padding: 15px;
+    cursor: pointer;
+    background-color: var(--white-background); /* ✅ 질문 배경 흰색 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--tan-text);
+    font-size: 20px;
+    font-weight: 600;
+}
 
-        .faq-answer {
-            padding: 15px;
-            background-color: var(--white);
-            color: var(--tan-darkest);
-            display: none;
-        }
+.faq-answer {
+    padding: 15px;
+    background-color: var(--white-background); /* ✅ 답변 배경 흰색 */
+    color: var(--tan-text);
+    display: none;
+}
 
-        .faq-answer.show {
-            display: block;
-        }
+.faq-answer.show {
+    display: block;
+}
 
-        .pagination {
-            justify-content: center;
-        }
-        
-        .page-item {
-            list-style: none;
-        }
+/* ✅ 페이지네이션 */
+.pagination {
+    justify-content: center;
+    margin-top: 20px;
+}
 
-        .page-link {
-            display: block;
-            padding: 8px 16px;
-            text-decoration: none;
-            color: var(--tan-darker);
-            background-color: var(--tan-background);
-            border: 1px solid var(--tan-medium);
-            margin: 0 4px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        
-        .page-link:hover {
-            background-color: var(--tan-lighter);
-        }
+.page-item {
+    list-style: none;
+}
 
-        .page-item.active .page-link {
-            background-color: var(--tan-medium);
-            border-color: var(--tan-medium);
-            color: var(--white);
-        }
+.page-link {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: var(--tan-text);
+    background-color: var(--white-background);
+    border: 1px solid var(--tan-medium);
+    margin: 0 4px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
 
-        .page-item.disabled .page-link {
-            color: #A99380;
-            pointer-events: none;
-            background-color: var(--tan-lighter);
-            border-color: var(--tan-lighter);
-        }
+.page-link:hover {
+    background-color: var(--tan-medium);
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: var(--tan-medium);
+    border-color: var(--tan-medium);
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #A99380;
+    pointer-events: none;
+    background-color: var(--white-background);
+    border-color: var(--tan-border);
+}
     </style>
 
-    <div class="page-header">
-        <h1>고객센터</h1>
+    <!-- ✅ 카테고리 제목 -->
+    <div class="page-header" style="font-family: 'BagelFat', sans-serif; font-size: 80px; color: #CD853F;">
+        고객센터
     </div>
 
-    <div class="header-content">
-        <div>
-            <div class="btn-group-vertical">
-                <a th:href="@{/chat}" class="btn">1:1 채팅 상담하기</a>
-                <a th:href="@{/faq/ask}" class="btn btn-secondary">질문하기</a>
-            </div>
-        </div>
-        <div class="search-container">
-            <form th:action="@{/faq/list}" method="get" class="search-form" style="margin-left: auto;">
-                <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요">
-                <button type="submit" class="btn">검색</button>
-            </form>
-        </div>
+    <!-- ✅ 메뉴 -->
+    <div class="menu-links">
+        <a th:href="@{/chat}">1:1 채팅 상담하기</a>
+        <a th:href="@{/faq/ask}">질문하기</a>
     </div>
 
+    <!-- ✅ 검색창 (FAQ 바로 위로 이동, 오른쪽 정렬) -->
+    <div class="search-container">
+        <form th:action="@{/faq/list}" method="get" class="search-form">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요">
+            <button type="submit">검색</button>
+        </form>
+    </div>
+
+    <!-- ✅ FAQ -->
     <div class="faq-container">
         <div class="faq-item" th:each="faq : ${paging}">
             <div class="faq-question">
@@ -201,217 +207,38 @@
             </div>
         </div>
     </div>
-    
- <div th:if="${!paging.isEmpty()}">
-    <ul class="pagination justify-content-center">
-        <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
-            <a class="page-link"
-               th:href="@{|/faq/list?page=${paging.number-1}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}">이전</a>
-        </li>
-        
-        <li th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
-            th:if="${page >= paging.number-5 and page <= paging.number+5}"
-            th:classappend="${page == paging.number} ? 'active'" class="page-item">
-            <a th:text="${page+1}" class="page-link"
-               th:href="@{|/faq/list?page=${page}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}"></a>
-        </li>
-        
-        <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
-            <a class="page-link"
-               th:href="@{|/faq/list?page=${paging.number+1}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}">다음</a>
-        </li>
-    </ul>
-</div>
-    <script th:inline="javascript">
-        document.querySelectorAll('.faq-question').forEach(item => {
-            item.addEventListener('click', event => {
-                const answer = item.nextElementSibling;
-                answer.classList.toggle('show');
-            });
-        });
-    </script>
-	</div>
-</body>
-</html>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
-
-
-<body>
-	<div layout:fragment="content">
-	
-
-	
-	
-	
- <style>
-        .page-header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .header-content {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .btn-group-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-            background-color: #007bff;
-            border: 1px solid #007bff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-        .search-container {
-            flex-grow: 1; /* 남은 공간을 채우도록 함 */
-            display: flex;
-            justify-content: center; /* 내부 요소를 가운데 정렬 */
-            /* margin-left: auto; */
-            /* margin-right: auto; */
-        }
-        .search-form {
-            display: flex;
-            gap: 10px;
-            width: 400px; /* 검색 폼의 최대 너비 설정 */
-        }
-        .search-form input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            flex-grow: 1;
-        }
-        .faq-container {
-            width: 80%;
-            margin: 0 auto;
-            border-top: 2px solid #ddd;
-        }
-        .faq-item {
-            border-bottom: 1px solid #ddd;
-        }
-        .faq-question {
-            padding: 15px;
-            cursor: pointer;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .faq-question:hover {
-            background-color: #f0f0f0;
-        }
-        .faq-answer {
-            padding: 15px;
-            background-color: #fff;
-            display: none;
-        }
-        .faq-answer.show {
-            display: block;
-        }
-    </style>
-
-    <div class="page-header">
-        <h1>고객센터</h1>
-    </div>
-
-    <div class="header-content">
-        <div>
-            <div class="btn-group-vertical">
-                <a th:href="@{/chat}" class="btn">1:1 채팅 상담하기</a>
-                <a th:href="@{/faq/ask}" class="btn btn-secondary">질문하기</a>
-            </div>
-        </div>
-        <div class="search-container">
-            <form th:action="@{/faq/list}" method="get" class="search-form" style="margin-left: auto;">
-                <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요">
-                <button type="submit" class="btn">검색</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="faq-container">
-        <div class="faq-item" th:each="faq : ${paging}">
-            <div class="faq-question">
-                <b>질문: <span th:text="${faq.question}"></span></b>
-                <span>▶</span>
-            </div>
-            <div class="faq-answer">
-                <div th:if="${faq.answer == '답변 대기 중'}">
-                    <p><b>답변:</b> <span th:text="${faq.answer}"></span></p>
-                    <a th:if="${isAdmin}" th:href="@{|/faq/answer/${faq.faqSeq}|}">답변하기</a>
-                </div>
-                <div th:unless="${faq.answer == '답변 대기 중'}">
-                    <p><b>답변:</b> <span th:text="${faq.answer}"></span></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+    <!-- ✅ 페이지네이션 -->
     <div th:if="${!paging.isEmpty()}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{|/faq/list?page=${paging.number-1}&keyword=${keyword}|}">이전</a>
+                   th:href="@{|/faq/list?page=${paging.number-1}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}">이전</a>
             </li>
+
             <li th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
                 th:if="${page >= paging.number-5 and page <= paging.number+5}"
                 th:classappend="${page == paging.number} ? 'active'" class="page-item">
                 <a th:text="${page+1}" class="page-link"
-                   th:href="@{|/faq/list?page=${page}&keyword=${keyword}|}"></a>
+                   th:href="@{|/faq/list?page=${page}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}"></a>
             </li>
+
             <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
                 <a class="page-link"
-                   th:href="@{|/faq/list?page=${paging.number+1}&keyword=${keyword}|}">다음</a>
+                   th:href="@{|/faq/list?page=${paging.number+1}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}">다음</a>
             </li>
         </ul>
     </div>
-    
+
     <script th:inline="javascript">
         document.querySelectorAll('.faq-question').forEach(item => {
-            item.addEventListener('click', event => {
+            item.addEventListener('click', () => {
                 const answer = item.nextElementSibling;
                 answer.classList.toggle('show');
             });
         });
     </script>
-    
-	
-	
-	
-	
-	</div>
+</div>
 </body>
-</html> -->
+</html>
+  

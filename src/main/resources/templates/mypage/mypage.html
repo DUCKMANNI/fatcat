@@ -1,600 +1,132 @@
-<!-- 
- <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{shared/layout}">
 
-<div layout:fragment="content">
-    <style>
-        /* CSS 변수: 더 깔끔하고 부드러운 팔레트 */
-        :root {
-            --tan-color: #d7bfa5; /* 부드러운 탄색 */
-            --dark-tan-color: #8c735d; /* 짙은 탄색 (텍스트, 제목) */
-            --light-tan-color: #fcf9f6; /* 아주 연한 배경색 */
-            --border-color: #e6e6e6; /* 옅은 경계선 */
-            --text-color: #555555; /* 기본 텍스트 색상 */
-        }
-        
-        /* 마이페이지 컨테이너를 감싸는 div (중앙 정렬용) */
-        .page-content-wrapper {
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-            background-color: var(--light-tan-color); /* 배경색 설정 */
-        }
-
-        /* 마이페이지 컨테이너 */
-        .mypage-container {
-            width: 100%;
-            max-width: 1000px;
-            background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            display: flex;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        /* 사이드바 스타일 */
-        .sidebar {
-            width: 280px;
-            background-color: var(--tan-color);
-            padding: 40px 30px;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            box-sizing: border-box;
-        }
-
-        .sidebar h2 {
-            font-size: 1.8em;
-            text-align: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.2em;
-            padding: 15px 20px;
-            border-radius: 10px;
-            transition: background-color 0.3s ease, transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: var(--dark-tan-color);
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 메인 콘텐츠 스타일 */
-        .main-content {
-            flex-grow: 1;
-            padding: 50px;
-            background-color: var(--light-tan-color);
-            box-sizing: border-box;
-        }
-
-        .main-content h1 {
-            font-size: 2.5em;
-            color: var(--dark-tan-color);
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 15px;
-        }
-
-        /* 각 섹션의 스타일 */
-        .section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .section:hover {
-            transform: translateY(-8px);
-        }
-
-        .section h3 {
-            font-size: 1.5em;
-            color: var(--dark-tan-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* 고양이 정보 섹션 간의 여백 추가 */
-        .cat-info-section + .cat-info-section {
-            margin-top: 20px;
-        }
-
-        .info-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .info-item {
-            margin-bottom: 12px;
-            line-height: 1.6;
-        }
-
-        .info-item strong {
-            display: inline-block;
-            width: 140px;
-            color: var(--dark-tan-color);
-            font-weight: 600;
-        }
-
-        /* 테이블 스타일 */
-        .order-list table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 15px;
-            text-align: left;
-        }
-
-        .order-list th, .order-list td {
-            padding: 18px;
-            border-bottom: none;
-        }
-
-        .order-list th {
-            background-color: var(--tan-color);
-            color: #fff;
-        }
-        
-        .order-list tbody tr {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-radius: 10px;
-            transition: transform 0.2s;
-        }
-        
-        .order-list tbody tr:hover {
-            background-color: var(--light-tan-color);
-            transform: translateY(-4px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        /* 버튼 스타일 */
-        .edit-button {
-            background-color: var(--dark-tan-color);
-            color: white;
-            padding: 14px 25px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        .edit-button:hover {
-            background-color: #7b624f;
-            transform: translateY(-2px);
-        }
-        
-        
-        
-        
-        
-        
-        .cat-info-section {
-    display: flex; /* Flexbox 적용 */
-    align-items: flex-start; /* 세로 정렬 상단에 맞춤 */
-    gap: 30px; /* 사진과 정보 사이 간격 */
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    width: 100%;
-}
-
-.profile-image-wrapper {
-    flex-shrink: 0; /* 사진 크기 고정 */
-    width: 100px;
-    height: 100px;
-}
-
-.cat-details {
-    flex-grow: 1; /* 남은 공간을 채움 */
-}
-
-/* 기존 CSS에서 h3, info-list, info-item 스타일은 그대로 유지합니다. */
-.cat-details h3 {
-    margin-top: 0; /* 제목 위 여백 제거 */
-}
-
-/* 버튼 위치를 적절히 조절하기 위해 CSS 추가 */
-.edit-button {
-    align-self: flex-start; /* 버튼을 고양이 정보 섹션 상단에 정렬 */
-    margin-left: auto; /* 버튼을 오른쪽 끝으로 이동 */
-}
-        
-        
-        
-        
-    </style>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+   
+<body>
     
-    <div class="page-content-wrapper">
-        <div class="mypage-container">
-            <div class="sidebar">
-                <h2>🐈 My Page</h2>
-                <a href="#my-info" class="active">내 정보</a>
-                <a href="#cat-info">고양이 정보</a>
-                <a href="#wishlist">관심상품</a>
-                <a href="#orders">주문내역</a>
-                <a href="#customer-service">고객센터</a>
-            </div>
-    
-            <div class="main-content">
-                <div id="my-info" class="section">
-                    <h1>내 정보</h1>
-                    <ul class="info-list">
-                        <li class="info-item"><strong>이름</strong>: 김유정</li>
-                        <li class="info-item"><strong>이메일</strong>: yujeong@example.com</li>
-                        <li class="info-item"><strong>연락처</strong>: 010-1234-5678</li>
-                        <li class="info-item"><strong>회원 등급</strong>: 냥집사</li>
-                    </ul>
-                    <a href="#" class="edit-button">정보 수정</a>
-                </div>
-                
-                
-                
-                
-<div id="cat-info" class="section">
-    <h1>고양이 정보</h1>
-    <div th:each="cat : ${cats}" class="cat-info-section">
-        <div class="profile-image-wrapper">
-            <img th:if="${cat.catImageUrl != null and not #strings.isEmpty(cat.catImageUrl)}"
-                 th:src="@{${cat.catImageUrl}}"
-                 class="profile-image" 
-                 th:alt="${cat.catName} + ' 프로필 사진'">
-            
-            <img th:unless="${cat.catImageUrl != null and not #strings.isEmpty(cat.catImageUrl)}"
-                 th:src="@{/images/default-cat.png}"
-                 class="profile-image" 
-                 th:alt="${cat.catName} + ' 프로필 사진'">
-        </div>
-
-        <div class="cat-details">
-            <h3 th:text="|🐱 ${cat.catName}|">🐱 고양이 이름</h3>
-            <ul class="info-list">
-                <li class="info-item"><strong>품종</strong>: <span th:text="${cat.catBreed}"></span></li>
-                <li class="info-item"><strong>생일</strong>: <span th:text="${#temporals.format(cat.catBirtthday, 'yyyy년 MM월 dd일')}"></span></li>
-                <li class="info-item"><strong>성별</strong>: <span th:text="${cat.catGender}"></span></li>
-            </ul>
-        </div>
-        
-        <a th:href="@{|/cats/modify/${cat.catSeq}|}" class="edit-button">정보 수정</a>
-    </div>
-</div>
-
-
-                
-                
-                
-                
-                <div id="wishlist" class="section">
-                    <h1>관심상품</h1>
-                    <ul class="info-list">
-                        <li class="info-item"><strong>상품명</strong>: 캣타워</li>
-                        <li class="info-item"><strong>상품명</strong>: 고양이 장난감 세트</li>
-                        <li class="info-item"><strong>상품명</strong>: 연어맛 사료</li>
-                    </ul>
-                </div>
-    
-                <div id="orders" class="section">
-                    <h1>주문내역</h1>
-                    <div class="order-list">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>주문 번호</th>
-                                    <th>주문 상품</th>
-                                    <th>총 금액</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#20231015-001</td>
-                                    <td>고양이 간식 5종 세트</td>
-                                    <td>35,000원</td>
-                                    <td>배송 완료</td>
-                                </tr>
-                                <tr>
-                                    <td>#20230920-002</td>
-                                    <td>탄색 캣타워</td>
-                                    <td>120,000원</td>
-                                    <td>배송 중</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div id="customer-service" class="section">
-                    <h1>고객센터</h1>
-                    <p>자주 묻는 질문(FAQ)을 확인하고 싶으시면 아래 링크를 클릭해주세요.</p>
-                    <a th:href="@{/faq/list}" class="edit-button">FAQ 보러가기</a>
-                    <p style="margin-top: 15px;">기타 문의사항은 고객센터(1588-XXXX)로 연락 바랍니다.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-</html>
- -->
- 
- 
- 
- 
  <div layout:fragment="content">
     <style>
-        /* CSS 변수: 더 깔끔하고 부드러운 팔레트 */
+        
+      /* CSS 변수: 폰트 크기 변수 추가 및 배경색 변수 변경 */
         :root {
-            --tan-color: #d7bfa5; /* 부드러운 탄색 */
-            --dark-tan-color: #8c735d; /* 짙은 탄색 (텍스트, 제목) */
-            --light-tan-color: #fcf9f6; /* 아주 연한 배경색 */
-            --border-color: #e6e6e6; /* 옅은 경계선 */
-            --text-color: #555555; /* 기본 텍스트 색상 */
+            --tan-color: #d7bfa5; 
+            --dark-tan-color: #8c735d; 
+            --light-tan-color: #ffffff; /* ✅ 배경색을 흰색으로 변경 */
+            --border-color: #e6e6e6; 
+            --text-color: #555555; 
+            --font-size-body: 20px;     /* ✅ 본문 기본 폰트 크기 */
+            --font-size-category: 25px; /* ✅ 카테고리 폰트 크기 */
         }
         
-        /* 마이페이지 컨테이너를 감싸는 div (중앙 정렬용) */
+        /* 마이페이지 컨테이너를 감싸는 div (배경색 조정) */
         .page-content-wrapper {
             display: flex;
             justify-content: center;
             padding: 40px 20px;
-            background-color: var(--light-tan-color); /* 배경색 설정 */
+            background-color: var(--light-tan-color); /* ✅ 흰색 배경 적용 */
         }
 
         /* 마이페이지 컨테이너 */
-        .mypage-container {
+        .mypage-container-new {
             width: 100%;
-            max-width: 1000px;
-            background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            display: flex;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        /* 사이드바 스타일 */
-        .sidebar {
-            width: 280px;
-            background-color: var(--tan-color);
-            padding: 40px 30px;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1000px; 
+            background-color: transparent; 
+            border: none; 
+            padding: 0; 
             box-sizing: border-box;
         }
-
-        .sidebar h2 {
-            font-size: 1.8em;
-            text-align: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.2em;
-            padding: 15px 20px;
-            border-radius: 10px;
-            transition: background-color 0.3s ease, transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: var(--dark-tan-color);
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 메인 콘텐츠 스타일 */
-        .main-content {
-            flex-grow: 1;
-            padding: 50px;
-            background-color: var(--light-tan-color);
-            box-sizing: border-box;
-        }
-
-        .main-content h1 {
-            font-size: 2.5em;
+        
+        /* 마이페이지 제목 */
+        .mypage-title {
+            font-family: 'Juache', sans-serif;
+            font-size: 2.8em;
             color: var(--dark-tan-color);
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 15px;
-        }
-
-        /* 각 섹션의 스타일 */
-        .section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .section:hover {
-            transform: translateY(-8px);
-        }
-
-        .section h3 {
-            font-size: 1.5em;
-            color: var(--dark-tan-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
             margin-bottom: 20px;
+            text-align: center;
         }
 
-        /* 고양이 정보 섹션 간의 여백 추가 */
-        .cat-info-section + .cat-info-section {
-            margin-top: 20px;
-        }
+        /* 탭 바 스타일 (카테고리 폰트 크기 25px 적용) */
+       .mypage-tabs {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 30px;
 
-        .info-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    display: flex;              /* ✅ flex로 변경 */
+    justify-content: center;    /* ✅ 가운데 정렬 */
+}
 
-        .info-item {
-            margin-bottom: 12px;
-            line-height: 1.6;
-        }
-
-        .info-item strong {
-            display: inline-block;
-            width: 140px;
-            color: var(--dark-tan-color);
-            font-weight: 600;
-        }
-
-        /* 테이블 스타일 */
-        .order-list table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 15px;
-            text-align: left;
-        }
-
-        .order-list th, .order-list td {
-            padding: 18px;
-            border-bottom: none;
-        }
-
-        .order-list th {
-            background-color: var(--tan-color);
-            color: #fff;
-        }
         
-        .order-list tbody tr {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-radius: 10px;
-            transition: transform 0.2s;
-        }
-        
-        .order-list tbody tr:hover {
-            background-color: var(--light-tan-color);
-            transform: translateY(-4px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .mypage-tabs .nav-link {
+            font-family: 'Juache', sans-serif;
+            font-weight: normal;
+            font-size: var(--font-size-category); /* ✅ 25px 적용 */
+            padding: 15px 0; 
+            margin-right: 30px; 
+            
+            color: var(--dark-tan-color); 
+            background-color: transparent !important;
+            border: none !important;
+            border-radius: 0 !important; 
+            text-decoration: none; 
+            transition: color 0.2s, border-bottom 0.2s;
         }
 
-        /* 버튼 스타일 */
-        .edit-button {
-            background-color: var(--dark-tan-color);
-            color: white;
-            padding: 14px 25px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            text-decoration: none;
+        .mypage-tabs .nav-link:hover {
+            color: var(--tan-color); 
+            border-bottom: none; 
+        }
+
+        .mypage-tabs .nav-link.active {
+            color: var(--dark-tan-color); 
             font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
-            display: inline-block;
-            margin-top: 20px;
+            border-bottom: 4px solid var(--dark-tan-color) !important; 
+            background-color: transparent !important;
+            box-shadow: none !important;
         }
-
-        .edit-button:hover {
-            background-color: #7b624f;
-            transform: translateY(-2px);
+        
+        /* 탭 내용 영역 */
+        .tab-content {
+            padding: 10px 0;
+            font-size: var(--font-size-body); /* ✅ 본문 기본 폰트 크기 20px 적용 */
         }
-
-        /* --- 추가/수정된 CSS --- */
-        /* 고양이 정보 섹션 (전체 박스) */
+        
+        /* 섹션 제목 (h2) 폰트 크기는 그대로 유지 (2em이 20px보다 큼) */
+        .section h2 { 
+            font-size: 2em; 
+            color: var(--dark-tan-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        /* ✅ 본문 글자 크기 조정 */
+        .info-item, .cat-details p, .cat-details ul, .coupon-item p, .section p {
+            font-size: var(--font-size-body); /* 20px 적용 */
+        }
+        
+        /* 고양이 정보 섹션 */
         .cat-info-section {
             display: flex;
-            align-items: center; /* 세로 정렬 중앙에 맞춤 */
+            align-items: center; 
             gap: 30px;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #f9f9f9; 
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
             margin-bottom: 20px;
         }
-
-        /* 프로필 사진 컨테이너 */
-        .profile-image-wrapper {
-            flex-shrink: 0;
-            width: 100px;
-            height: 100px;
-        }
-
-        /* 프로필 사진 자체 */
-        .profile-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%; /* 동그란 모양으로 */
-            object-fit: cover;
-            border: 2px solid var(--tan-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .profile-image:hover {
-            transform: scale(1.05);
-        }
-
-        /* 고양이 이름과 정보 컨테이너 */
-        .cat-details {
-            flex-grow: 1;
-        }
-
+        
+        /* 고양이 이름 (h3) 크기 조정 */
         .cat-details h3 {
+            font-size: 1.5em; /* 20px보다 크게 유지 */
+            color: var(--dark-tan-color);
             margin-top: 0;
             margin-bottom: 10px;
-            border-bottom: none; /* 이전에 있던 불필요한 선 제거 */
-            padding-bottom: 0;
-        }
-
-        /* 정보 리스트 */
-        .info-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .info-item {
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-
-        .info-item strong {
-            display: inline-block;
-            width: 80px; /* 라벨 너비 조정 */
-            color: var(--dark-tan-color);
-            font-weight: 600;
         }
 
         /* 버튼 */
         .edit-button {
-            align-self: center;
+            font-size: var(--font-size-body); /* 20px 적용 */
             background-color: var(--dark-tan-color);
             color: white;
             padding: 14px 25px;
@@ -606,107 +138,163 @@
             transition: background-color 0.3s, transform 0.2s;
             display: inline-block;
             margin-top: 0;
-            margin-left: auto; /* 버튼을 오른쪽 끝으로 밀어냅니다. */
+            margin-left: auto; 
         }
+        
+        /* 테이블 폰트 크기 조정 */
+        .order-list th, .order-list td {
+            padding: 18px;
+            border-bottom: none;
+            font-size: var(--font-size-body); /* 20px 적용 */
+        }
+
+        /* (나머지 CSS는 이전과 동일) */
+        .section { margin-bottom: 40px; padding: 0; background-color: transparent; border-radius: 0; box-shadow: none; transition: none; }
+        .section:hover { transform: none; }
+        .cat-info-section:last-child { margin-bottom: 0; }
+        .profile-image-wrapper { flex-shrink: 0; width: 100px; height: 100px; }
+        .profile-image { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--tan-color); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); transition: transform 0.3s; }
+        .profile-image:hover { transform: scale(1.05); }
+        .cat-details { flex-grow: 1; }
+        .info-list { list-style: none; padding: 0; margin: 0; }
+        .info-item { margin-bottom: 8px; line-height: 1.6; }
+        .info-item strong { display: inline-block; width: 100px; color: var(--dark-tan-color); font-weight: 600; }
+        .coupon-item { padding: 15px; border: 1px dashed var(--tan-color); border-radius: 8px; background-color: #fff8f0; margin-bottom: 10px; }
+        .coupon-item strong { color: var(--dark-tan-color); font-weight: 700; }
+        .order-list table { width: 100%; border-collapse: separate; border-spacing: 0 15px; text-align: left; }
+        .order-list th { background-color: var(--tan-color); color: #fff; }
+        .order-list tbody tr { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 10px; transition: transform 0.2s; }
+        .order-list tbody tr:hover { background-color: var(--light-tan-color); transform: translateY(-4px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
     </style>
     
     <div class="page-content-wrapper">
-        <div class="mypage-container">
-            <div class="sidebar">
-                <h2>🐈 My Page</h2>
-                <a href="#my-info" class="active">내 정보</a>
-                <a href="#cat-info">고양이 정보</a>
-                <a href="#wishlist">관심상품</a>
-                <a href="#orders">주문내역</a>
-                <a href="#customer-service">고객센터</a>
-            </div>
+        <div class="mypage-container-new"> <h1 class="mypage-title">마이페이지</h1>
+            
+         <ul class="nav nav-tabs mypage-tabs" id="mypageTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#my-info" href="#my-info" role="tab" aria-controls="my-info" aria-selected="true">내 정보</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="cat-tab" data-bs-toggle="tab" data-bs-target="#cat-info" href="#cat-info" role="tab" aria-controls="cat-info" aria-selected="false">고양이 정보</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" href="#orders" role="tab" aria-controls="orders" aria-selected="false">주문내역</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="coupon-tab" data-bs-toggle="tab" data-bs-target="#coupons" href="#coupons" role="tab" aria-controls="coupons" aria-selected="false">내 쿠폰함</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="cs-tab" data-bs-toggle="tab" data-bs-target="#customer-service" href="#customer-service" role="tab" aria-controls="customer-service" aria-selected="false">고객센터</a>
+    </li>
+</ul>
     
-            <div class="main-content">
-                <div id="my-info" class="section">
-                    <h1>내 정보</h1>
-                    <ul class="info-list">
-                        <li class="info-item"><strong>이름</strong>: 김유정</li>
-                        <li class="info-item"><strong>이메일</strong>: yujeong@example.com</li>
-                        <li class="info-item"><strong>연락처</strong>: 010-1234-5678</li>
-                        <li class="info-item"><strong>회원 등급</strong>: 냥집사</li>
-                    </ul>
-                    <a href="#" class="edit-button">정보 수정</a>
+            <div class="tab-content" id="mypageTabContent">
+                
+                <div class="tab-pane fade show active" id="my-info" role="tabpanel" aria-labelledby="info-tab">
+                    <div class="section">
+                        <h2>내 정보</h2>
+                        <ul class="info-list" style="padding-left: 20px;"> 
+                            <li class="info-item"><strong>이름</strong>: 김유정</li>
+                            <li class="info-item"><strong>이메일</strong>: yujeong@example.com</li>
+                            <li class="info-item"><strong>연락처</strong>: 010-1234-5678</li>
+                            <li class="info-item"><strong>회원 등급</strong>: 냥집사</li>
+                        </ul>
+                        <a href="#" class="edit-button" style="margin-left: 20px;">정보 수정</a> 
+                    </div>
                 </div>
                 
-                <div id="cat-info" class="section">
-                    <h1>고양이 정보</h1>
-                    <div th:each="cat : ${cats}" class="cat-info-section">
-                        <div class="profile-image-wrapper">
-                            <img th:if="${cat.catImageUrl != null and not #strings.isEmpty(cat.catImageUrl)}"
-                                 th:src="@{${cat.catImageUrl}}"
-                                 class="profile-image" 
-                                 th:alt="${cat.catName} + ' 프로필 사진'">
+                <div class="tab-pane fade" id="cat-info" role="tabpanel" aria-labelledby="cat-tab">
+                    <div class="section">
+                        <h2>고양이 정보</h2>
+                        <div th:each="cat : ${cats}" class="cat-info-section">
+                             <div class="profile-image-wrapper">
+                                <img th:if="${cat.catImageUrl != null and not #strings.isEmpty(cat.catImageUrl)}"
+                                     th:src="@{${cat.catImageUrl}}"
+                                     class="profile-image" 
+                                     th:alt="${cat.catName} + ' 프로필 사진'">
+                                
+                                <img th:unless="${cat.catImageUrl != null and not #strings.isEmpty(cat.catImageUrl)}"
+                                     th:src="@{/images/default-cat.png}"
+                                     class="profile-image" 
+                                     th:alt="${cat.catName} + ' 프로필 사진'">
+                            </div>
+    
+                            <div class="cat-details">
+                                <h3 th:text="|🐱 ${cat.catName}|">🐱 고양이 이름</h3>
+                                <ul class="info-list">
+                                    <li class="info-item"><strong>품종</strong>: <span th:text="${cat.catBreed}"></span></li>
+                                    <li class="info-item"><strong>생일</strong>: <span th:text="${#temporals.format(cat.catBirtthday, 'yyyy년 MM월 dd일')}"></span></li>
+                                    <li class="info-item"><strong>성별</strong>: <span th:text="${cat.catGender}"></span></li>
+                                </ul>
+                            </div>
                             
-                            <img th:unless="${cat.catImageUrl != null and not #strings.isEmpty(cat.catImageUrl)}"
-                                 th:src="@{/images/default-cat.png}"
-                                 class="profile-image" 
-                                 th:alt="${cat.catName} + ' 프로필 사진'">
+                            <a th:href="@{|/cats/modify/${cat.catSeq}|}" class="edit-button">정보 수정</a>
                         </div>
-
-                        <div class="cat-details">
-                            <h3 th:text="|🐱 ${cat.catName}|">🐱 고양이 이름</h3>
-                            <ul class="info-list">
-                                <li class="info-item"><strong>품종</strong>: <span th:text="${cat.catBreed}"></span></li>
-                                <li class="info-item"><strong>생일</strong>: <span th:text="${#temporals.format(cat.catBirtthday, 'yyyy년 MM월 dd일')}"></span></li>
-                                <li class="info-item"><strong>성별</strong>: <span th:text="${cat.catGender}"></span></li>
-                            </ul>
-                        </div>
-                        
-                        <a th:href="@{|/cats/modify/${cat.catSeq}|}" class="edit-button">정보 수정</a>
                     </div>
                 </div>
                 
-                <div id="wishlist" class="section">
-                    <h1>관심상품</h1>
-                    <ul class="info-list">
-                        <li class="info-item"><strong>상품명</strong>: 캣타워</li>
-                        <li class="info-item"><strong>상품명</strong>: 고양이 장난감 세트</li>
-                        <li class="info-item"><strong>상품명</strong>: 연어맛 사료</li>
-                    </ul>
-                </div>
-    
-                <div id="orders" class="section">
-                    <h1>주문내역</h1>
-                    <div class="order-list">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>주문 번호</th>
-                                    <th>주문 상품</th>
-                                    <th>총 금액</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#20231015-001</td>
-                                    <td>고양이 간식 5종 세트</td>
-                                    <td>35,000원</td>
-                                    <td>배송 완료</td>
-                                </tr>
-                                <tr>
-                                    <td>#20230920-002</td>
-                                    <td>탄색 캣타워</td>
-                                    <td>120,000원</td>
-                                    <td>배송 중</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                    <div class="section">
+                        <h2>주문내역</h2>
+                         <div class="order-list" style="padding: 0 20px;"> 
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>주문 번호</th>
+                                        <th>주문 상품</th>
+                                        <th>총 금액</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#20231015-001</td>
+                                        <td>고양이 간식 5종 세트</td>
+                                        <td>35,000원</td>
+                                        <td>배송 완료</td>
+                                    </tr>
+                                    <tr>
+                                        <td>#20230920-002</td>
+                                        <td>탄색 캣타워</td>
+                                        <td>120,000원</td>
+                                        <td>배송 중</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 
-                <div id="customer-service" class="section">
-                    <h1>고객센터</h1>
-                    <p>자주 묻는 질문(FAQ)을 확인하고 싶으시면 아래 링크를 클릭해주세요.</p>
-                    <a th:href="@{/faq/list}" class="edit-button">FAQ 보러가기</a>
-                    <p style="margin-top: 15px;">기타 문의사항은 고객센터(1588-XXXX)로 연락 바랍니다.</p>
+                <div class="tab-pane fade" id="coupons" role="tabpanel" aria-labelledby="coupon-tab">
+                    <div class="section">
+                        <h2>내 쿠폰함</h2>
+                        <div style="padding: 0 20px;"> 
+                            <div class="coupon-item">
+                                <p><strong>🎁 10% 할인 쿠폰</strong> - 유효기간: ~2025.12.31</p>
+                            </div>
+                            <div class="coupon-item">
+                                <p><strong>🚚 무료배송 쿠폰</strong> - 유효기간: ~2025.10.31</p>
+                            </div>
+                            <p style="margin-top: 20px;">보유하신 쿠폰을 확인하고 쇼핑에 사용하세요.</p>
+                            <a href="#" class="edit-button" style="margin-left: 0;">쿠폰 등록/사용</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="customer-service" role="tabpanel" aria-labelledby="cs-tab">
+                    <div class="section">
+                        <h2>고객센터</h2>
+                        <div style="padding: 0 20px;"> 
+                            <p>자주 묻는 질문(FAQ)을 확인하고 싶으시면 아래 링크를 클릭해주세요.</p>
+                            <a th:href="@{/faq/list}" class="edit-button">FAQ 보러가기</a>
+                            <p style="margin-top: 15px;">기타 문의사항은 고객센터(1588-XXXX)로 연락 바랍니다.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+</body>
+</html>

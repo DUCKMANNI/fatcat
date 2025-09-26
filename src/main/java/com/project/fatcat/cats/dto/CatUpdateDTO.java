@@ -35,12 +35,12 @@ public class CatUpdateDTO {
     @NotNull(message="성별은 필수입니다.")
     private Cat.Gender catGender;
 
-    private String catBreed;
+    private String catBreed; // 종
 
     @NotNull(message="중성화 여부는 필수입니다.")
     private Boolean isNeutered;
 
-    // 질병은 여러 개 선택 가능하도록 List<String> 타입으로 변경
+    
     private String hasDisease;
 
     private String hasAllergy;
