@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<
+
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
@@ -9,23 +9,131 @@
 </head>
 <body>
 
-	<div layout:fragment="content"
-		class="container my-3 d-flex flex-column align-items-center">
-
+	<div layout:fragment="content" class="custom-container"
+		style="text-align: center; padding: 40px 0;">
 		<!-- 제목 -->
-		<label class="mb-5"
-			style="font-family: 'BagelFat', sans-serif; font-size: 80px; color: #CD853F;">회원가입</label>
+		<h1
+			style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;">
+			고양이 지식방 - 수의사에게 질문</h1>
 
-		<!-- 아이디 입력 -->
-		<input type="text" class="login-input mb-3" placeholder="아이디">
+		<!-- 입력 폼 -->
+		<form action="user/signup" method="post" style="max-width: 600px; margin: 0 auto;">
 
-		<!-- 비밀번호 입력 -->
-		<input type="password" class="login-input mb-4" placeholder="비밀번호">
+			<!-- 🔹 기본 정보 -->
+		      <input type="email" name="userEmail" class="login-input" placeholder="E-mail (아이디)" required>
+		      <input type="password" name="userPassword" class="login-input" placeholder="비밀번호" required>
+		      <input type="password" name="passwordConfirm" class="login-input" placeholder="비밀번호 확인" required>
+		      <input type="text" name="userName" class="login-input" placeholder="이름" required>
+		      <input type="text" name="nickname" class="login-input" placeholder="닉네임" required>
+		      <input type="text" name="phoneNumber" class="login-input" placeholder="휴대폰 번호" required>
 
-		<!-- 로그인 버튼 -->
-		<button class="login-btn mb-4">로그인</button>
+			<!-- 🔹 주소 정보 -->
+		     <div class="address-group">
+				 <input type="text" id="zipCode" name="zipCode" class="login-input" placeholder="우편번호" readonly>
+				 <button type="button" onclick="execDaumPostcode()" class="btn-fatcat">주소 검색</button>
+			  </div>
+		      <input type="text" id="address1" name="address1" class="login-input" placeholder="기본 주소" readonly>
+		      <input type="text" id="address2" name="address2" class="login-input" placeholder="상세 주소 입력">
+		
+		      <!-- 위도/경도 (hidden) -->
+		      <input type="hidden" id="latitude" name="latitude">
+		      <input type="hidden" id="longitude" name="longitude">
+			
+			<!-- 🔹 추가 정보 -->
+		      <!-- 프로필 이미지 -->
+			<div class="file-input-row">
+			  <label for="profileImage">프로필 이미지 (선택)</label>
+			  <div class="file-input-wrapper">
+			    <label for="profileImage" class="custom-file-label">파일 선택</label>
+			    <span id="fileName" class="file-name">선택된 파일 없음</span>
+			    <div id="profileThumb" class="profile-thumb"></div>
+			    <input type="file" id="profileImage" name="profileImageUrl" accept="image/*" onchange="previewInline(this)">
+			  </div>
+			</div>
 
 
+		      <!-- 수의사 면허 이미지 -->
+			<div class="file-input-row">
+			  <label for="vetLicenseImage">수의사 면허 이미지 (선택)</label>
+			  <div class="file-input-wrapper">
+			    <label for="vetLicenseImage" class="custom-file-label">파일 선택</label>
+			    <span id="vetFileName" class="file-name">선택된 파일 없음</span>
+			    <input type="file" id="vetLicenseImage" name="vetLicenseImage" accept="image/*" onchange="showFileName(this, 'vetFileName')">
+			  </div>
+			</div>
+
+
+			<!-- 가입 버튼 -->
+			<button type="submit" class="login-btn mt-4">가입하기</button>
+
+		</form>
+		
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<!-- 카카오 지도 API (좌표 변환용) -->
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
+<script>
+function execDaumPostcode() {
+	  new daum.Postcode({
+	    oncomplete: function(data) {
+	      // ✅ 기본주소 & 우편번호 채우기
+	      document.getElementById('address1').value = data.roadAddress;
+	      document.getElementById('zipCode').value = data.zonecode;
+
+	      try {
+	        // ✅ 좌표 변환 (에러 나도 팝업은 닫히게)
+	        var geocoder = new kakao.maps.services.Geocoder();
+	        geocoder.addressSearch(data.roadAddress, function(result, status) {
+	          if (status === kakao.maps.services.Status.OK) {
+	            document.getElementById('latitude').value = result[0].y;
+	            document.getElementById('longitude').value = result[0].x;
+	          }
+	        });
+	      } catch (e) {
+	        console.error("Geocoder 에러:", e);
+	      }
+	    }
+	  }).open(); // 👉 팝업으로 열기
+	}
+	
+function previewInline(input) {
+	  const fileName = document.getElementById('fileName');
+	  const thumb = document.getElementById('profileThumb');
+	  thumb.innerHTML = "";
+
+	  if (input.files && input.files[0]) {
+	    fileName.textContent = input.files[0].name; // 파일명 표시
+	    const reader = new FileReader();
+	    reader.onload = function(e) {
+	      const img = document.createElement("img");
+	      img.src = e.target.result;
+	      thumb.appendChild(img);
+	      thumb.style.display = "block";
+	    };
+	    reader.readAsDataURL(input.files[0]);
+	  } else {
+	    fileName.textContent = "선택된 파일 없음";
+	    thumb.style.display = "none";
+	  }
+	}
+	
+function showFileName(input, targetId) {
+	  const fileName = document.getElementById(targetId);
+
+	  if (input.files && input.files[0]) {
+	    fileName.textContent = input.files[0].name; // 파일명 표시
+	  } else {
+	    fileName.textContent = "선택된 파일 없음";
+	  }
+	}
+
+</script>
+
+
+		
 	</div>
+	
+	
 </body>
+
+
 </html>

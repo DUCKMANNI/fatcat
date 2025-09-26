@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
-import com.mysql.cj.log.Log;
-
 import com.project.fatcat.catBoard.service.BoardService;
 import com.project.fatcat.catBoard.service.PostService;
 import com.project.fatcat.entity.KnowledgeBoard;

@@ -14,7 +14,7 @@ import com.project.fatcat.chat.repository.CareChatHistoryRepository;
 import com.project.fatcat.chat.repository.ChatRoomRepository;
 import com.project.fatcat.entity.CareChatHistory;
 import com.project.fatcat.entity.CareChatRoom;
-import com.project.fatcat.users.UserRepository;
+import com.project.fatcat.users.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

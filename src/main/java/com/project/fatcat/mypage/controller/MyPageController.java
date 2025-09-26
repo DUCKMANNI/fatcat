@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.project.fatcat.cats.service.CatService;
 import com.project.fatcat.entity.Cat;
 import com.project.fatcat.entity.User;
-import com.project.fatcat.users.UserRepository;
+import com.project.fatcat.users.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
