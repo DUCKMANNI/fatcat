@@ -10,7 +10,7 @@ import com.project.fatcat.care.repository.CareSessionRepository;
 import com.project.fatcat.entity.CareSession;
 import com.project.fatcat.entity.User;
 import com.project.fatcat.entity.enums.CareSessionStatus;
-import com.project.fatcat.users.UserRepository;
+import com.project.fatcat.users.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor

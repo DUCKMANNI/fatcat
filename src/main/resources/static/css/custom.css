@@ -35,11 +35,12 @@ body {
 .btn-fatcat {
 	background-color: #D2B48C;
 	color: #fff;
-	border-radius: 20px; /* 둥글게 */
+	border-radius: 20px;
 	padding: 6px 16px;
 	border: none;
 	font-weight: 500;
 }
+
 
 .btn-fatcat:hover {
 	background-color: #a38b6a; /* hover 시 조금 진하게 */
@@ -69,7 +70,7 @@ body {
 	border: 1px solid #ccc;
 	border-radius: 999px;
 	padding: 0 20px;
-	font-size: 20px;
+	font-size: 22px;
 	outline: none;
 	display: block;
 	margin-bottom: 16px;
@@ -100,92 +101,204 @@ body {
 }
 
 .product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-
-  width: 100%;
-  max-width: 1600px;     /* 👉 여백을 조절하는 핵심 (1200~1600px 사이에서 조정) */
-  margin: 0 auto;        /* 👉 중앙 정렬 */
-  padding: 0 20px;       /* 👉 화면 끝에 딱 붙지 않게 최소 여백 */
-  box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 30px;
+	width: 100%;
+	max-width: 1600px; /* 👉 여백을 조절하는 핵심 (1200~1600px 사이에서 조정) */
+	margin: 0 auto; /* 👉 중앙 정렬 */
+	padding: 0 20px; /* 👉 화면 끝에 딱 붙지 않게 최소 여백 */
+	box-sizing: border-box;
 }
 
 .product-card {
-  background: #fff;
-  text-align: center;
+	background: #fff;
+	text-align: center;
 }
 
 .product-card img {
-  width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  object-fit: cover !important;
-  display: block;
+	width: 100% !important;
+	height: auto !important;
+	aspect-ratio: 1/1 !important;
+	object-fit: cover !important;
+	display: block;
 }
 
-
-
 /* 대분류 hover → 바로 아래 중분류 메뉴만 표시 */
-.nav-item.dropdown:hover > .dropdown-menu {
-  display: block;
+.nav-item.dropdown:hover>.dropdown-menu {
+	display: block;
 }
 
 /* 중분류 hover → 해당 소분류만 표시 */
-.dropdown-submenu:hover > .dropdown-menu {
-  display: block;
+.dropdown-submenu:hover>.dropdown-menu {
+	display: block;
 }
-
 
 .dropdown-submenu {
-  position: relative;
+	position: relative;
 }
 /* 기본적으로 소분류 숨김 */
-.dropdown-submenu > .dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 100%; /* 오른쪽에 붙기 */
-  margin-top: -1px;
+.dropdown-submenu>.dropdown-menu {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 100%; /* 오른쪽에 붙기 */
+	margin-top: -1px;
 }
 
 /* 중분류 hover 시 해당 소분류만 보이게 */
-.dropdown-submenu:hover > .dropdown-menu {
-  display: block;
+.dropdown-submenu:hover>.dropdown-menu {
+	display: block;
 }
 
 .nav-item.dropdown a.nav-link {
-  font-size:25px;
-  color:black;
-  margin-right: 50px;
+	font-size: 25px;
+	color: black;
+	margin-right: 50px;
 }
 
 .custom-container {
-  max-width: 1600px;  /* 원하는 크기 */
-  margin: 0 auto;     /* 가운데 정렬 */
+	max-width: 1600px; /* 원하는 크기 */
+	margin: 0 auto; /* 가운데 정렬 */
 }
 
 /* 탭 기본 글자색 검정 */
 .nav-tabs .nav-link {
-  color: #000;          /* 검정 */
-  font-weight: 500;     /* 중간 두께 */
-  font-size:20px;
+	color: #000; /* 검정 */
+	font-weight: 500; /* 중간 두께 */
+	font-size: 20px;
 }
 
 /* hover 시 */
 .nav-tabs .nav-link:hover {
-  color: #000;          /* 그대로 검정 유지 */
+	color: #000; /* 그대로 검정 유지 */
 }
 
 /* active (선택된 탭) */
 .nav-tabs .nav-link.active {
-  font-weight: 700;     /* 굵게 */
-  color: #000;          /* 검정 */
-  background-color: #fff; /* 선택된 탭 배경 흰색 유지 */
-  border-color: #dee2e6 #dee2e6 #fff; /* 아래쪽 경계선 지우기 */
+	font-weight: 700; /* 굵게 */
+	color: #000; /* 검정 */
+	background-color: #fff; /* 선택된 탭 배경 흰색 유지 */
+	border-color: #dee2e6 #dee2e6 #fff; /* 아래쪽 경계선 지우기 */
 }
 
 .btn.primary {
-background-color: #3282f6;
-color: #f9fcff;
+	background-color: #3282f6;
+	color: #f9fcff;
+}
+
+.separator a:not(:last-child)::after {
+	content: "|";
+	padding: 0 20px; /* 구분 기호와 링크 사이 간격 */
+	color: #333; /* 구분 기호 색상 */
+	font-size: 20px;
+}
+
+/* 주소 입력 (우편번호 + 버튼) */
+.address-group {
+	display: flex;
+	gap: 10px;
+}
+
+.address-group input {
+	flex: 1;
+}
+
+/* 파일 업로드 input 커스터마이징 */
+.file-input {
+	width: 600px;
+	height: 60px;
+	border-radius: 999px;
+	background-color: #fffaf5;
+	border: 1px solid #ccc;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+	font-size: 16px;
+	cursor: pointer;
+	margin-bottom: 16px;
+}
+
+.file-input label {
+	cursor: pointer;
+	color: #555;
+	flex: 1;
+}
+
+.file-input input {
+	display: none;
+}
+
+
+/* 주소 검색 버튼만을 위한 스타일 */
+.address-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.address-group .btn-fatcat {
+  height: 80px;              /* 입력창과 높이 맞추기 */
+  padding: 0 30px;
+  border-radius: 999px;      /* 완전 둥근 pill 모양 */
+  font-size: 18px;
+  margin-top: -20px;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 600px;
+  height: 70px;
+  border-radius: 999px;
+  background-color: #fffaf5;
+  border: 1px solid #ccc;
+  padding: 0 20px;
+  margin: 0 auto 16px;
+}
+
+/* 브라우저 기본 파일 input 숨기기 */
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+/* 커스텀 버튼 */
+.custom-file-label {
+  background: #D2B48C;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* 파일명 */
+.file-name {
+  margin-left: 15px;
+  flex-grow: 1;
+  color: #666;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 썸네일 */
+.profile-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #D2B48C;
+  margin-left: 15px;
+  display: none;
+  flex-shrink: 0;
+}
+.profile-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

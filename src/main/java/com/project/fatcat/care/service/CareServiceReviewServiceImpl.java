@@ -11,7 +11,7 @@ import com.project.fatcat.care.dto.CareReviewResopnseDto;
 import com.project.fatcat.care.repository.CareServiceReviewRepository;
 import com.project.fatcat.entity.CareServiceReview;
 import com.project.fatcat.entity.User;
-import com.project.fatcat.users.UserRepository;
+import com.project.fatcat.users.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

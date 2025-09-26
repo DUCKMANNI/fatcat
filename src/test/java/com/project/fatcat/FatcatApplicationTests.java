@@ -14,7 +14,7 @@ import com.project.fatcat.entity.Cat;
 import com.project.fatcat.entity.KnowledgeBoard;
 import com.project.fatcat.entity.KnowledgePost;
 import com.project.fatcat.entity.User;
-import com.project.fatcat.users.UserRepository;
+import com.project.fatcat.users.repository.UserRepository;
 
 @SpringBootTest
 class FatcatApplicationTests {

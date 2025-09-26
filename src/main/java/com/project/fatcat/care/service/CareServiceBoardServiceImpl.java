@@ -13,7 +13,7 @@ import com.project.fatcat.care.dto.CareServiceBoardListDto;
 import com.project.fatcat.care.repository.CareServiceBoardRepository;
 import com.project.fatcat.entity.CareServiceBoard;
 import com.project.fatcat.entity.User;
-import com.project.fatcat.users.UserRepository;
+import com.project.fatcat.users.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
