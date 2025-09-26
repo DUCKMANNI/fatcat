@@ -7,400 +7,250 @@
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
 /* ---------------------------------------------------------------------------------- */
-body {
-	font-family: Arial;
-	margin: 0;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-}
-
-#user-select {
-	display: flex;
-	justify-content: center;
-	gap: 15px;
-	padding: 10px;
-	border-bottom: 1px solid #ddd;
-	background: #fafafa;
-}
-
-select, input, textarea {
-	padding: 5px 10px;
-	border-radius: 6px;
-	border: 1px solid #ccc;
-}
-
-#chat-container {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	border: 1px solid #ddd;
-	margin: 10px;
-	border-radius: 8px;
-	overflow: hidden;
-	position: relative; /* 팝업을 위해 필수 */
-}
-
-#message-area {
-	flex-grow: 1;
-	padding: 10px;
-	overflow-y: auto;
-	background: #f7f7f7;
-	display: flex;
-	flex-direction: column;
-}
-
-.message-row {
-	display: flex;
-	margin-bottom: 10px;
-	align-items: flex-end;
-}
-
-.message-row.sent {
-	justify-content: flex-end;
-}
-
-.message-row.received {
-	justify-content: flex-start;
-}
+body { font-family: Arial; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; }
+#user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; }
+select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid #ccc; }
+#chat-container { 
+    flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; 
+    margin:10px; border-radius:8px; overflow:hidden; 
+    position: relative; /* 팝업을 위해 필수 */
+} 
+#message-area { flex-grow:1; padding:10px; overflow-y:auto; background:#f7f7f7; display:flex; flex-direction:column; }
+.message-row { display: flex; margin-bottom: 10px; align-items: flex-end; }
+.message-row.sent { justify-content: flex-end; }
+.message-row.received { justify-content: flex-start; }
 
 /* 프로필 이미지 (빈 동그라미) 스타일 및 클릭 가능 설정 */
-.profile-placeholder {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	background-color: #ccc;
-	margin-right: 10px;
-	align-self: flex-start;
-	flex-shrink: 0;
-	cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+.profile-placeholder { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    background-color: #ccc; 
+    margin-right: 10px; 
+    align-self: flex-start; 
+    flex-shrink: 0;
+    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
 }
 
 /* 메시지 내용 및 시간 포함하는 컨텐츠 랩퍼 */
-.message-content-wrapper {
-	display: flex;
-	flex-direction: column;
-	max-width: 70%;
+.message-content-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    max-width: 70%; 
 }
-
-.message-row.sent .message-content-wrapper {
-	align-items: flex-end;
-}
-
-.message-row.received .message-content-wrapper {
-	align-items: flex-start;
-}
+.message-row.sent .message-content-wrapper { align-items: flex-end; }
+.message-row.received .message-content-wrapper { align-items: flex-start; }
 
 /* 닉네임 -> User Name 스타일 및 클릭 가능 설정 */
-.user-nickname {
-	font-size: 12px;
-	color: #555;
-	margin-bottom: 4px;
-	cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+.user-nickname { 
+    font-size: 12px; color: #555; margin-bottom: 4px; 
+    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
 }
-
-.message-row.sent .user-nickname {
-	display: none;
-}
+.message-row.sent .user-nickname { display: none; }
 
 /* 기존 메시지 박스 스타일 */
-.message {
-	padding: 8px 12px;
-	border-radius: 18px;
-	max-width: 100%;
-	word-wrap: break-word;
-	position: relative;
-}
-
-.sent .message {
-	background: #dcf8c6;
-}
-
-.received .message {
-	background: #fff;
-}
+.message { padding:8px 12px; border-radius:18px; max-width:100%; word-wrap:break-word; position: relative; } 
+.sent .message { background:#dcf8c6; }
+.received .message { background:#fff; }
 
 /* 시간 스타일 */
-.message-time {
-	font-size: 10px;
-	color: #555;
-	margin-top: 2px;
-	align-self: flex-end;
-	white-space: nowrap;
-}
-
-.message-row.received .message-time {
-	align-self: flex-start;
-}
-
-.care-request {
-	background: #FFFACD;
-	padding: 6px 10px;
-	border-radius: 12px;
-	margin-top: 4px;
-}
-
-.care-confirmed {
-	background: #8FBC8F;
-	padding: 6px 10px;
-	border-radius: 12px;
-	margin-top: 4px;
-}
+.message-time { font-size: 10px; color: #555; margin-top: 2px; align-self: flex-end; white-space: nowrap; }
+.message-row.received .message-time { align-self: flex-start; }
+.care-request { background:#FFFACD; padding:6px 10px; border-radius:12px; margin-top:4px; }
+.care-confirmed { background:#8FBC8F; padding:6px 10px; border-radius:12px; margin-top:4px; }
 
 /* 입력 영역 스타일 */
-#input-area {
-	display: flex;
-	padding: 10px;
-	border-top: 1px solid #ddd;
-	gap: 10px;
-}
-
-#message-input {
-	flex-grow: 1;
-	padding: 8px;
-	border-radius: 20px;
-	border: 1px solid #ccc;
-	outline: none;
-}
-
-#send-button, #care-toggle {
-	padding: 8px 16px;
-	border: none;
-	background: #CD853F;
-	color: white;
-	border-radius: 20px;
-	cursor: pointer;
-}
-
-#care-form {
-	display: none;
-	flex-direction: column;
-	gap: 5px;
-	padding: 10px;
-	background: #fafafa;
-	border-top: 1px solid #ddd;
-}
-
-#care-form input, #care-form select, #care-form textarea {
-	width: 100%;
-}
-
-#confirm-care {
-	background: #8FBC8F;
-	color: white;
-	border: none;
-	padding: 8px 16px;
-	border-radius: 20px;
-	cursor: pointer;
-}
+#input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
+#message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
+#send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
+#care-form { display:none; flex-direction:column; gap:5px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
+#care-form input, #care-form select, #care-form textarea { width:100%; }
+#confirm-care { background:#8FBC8F; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; }
 
 /* ---------------------------------------------------------------------------------- */
 /* 2. 리뷰 팝업 스타일 */
 /* ---------------------------------------------------------------------------------- */
+
 #review-popup {
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 350px;
-	height: 100%;
-	background: white;
-	box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-	z-index: 100;
-	transform: translateX(100%);
-	transition: transform 0.3s ease-in-out;
-	display: flex;
-	flex-direction: column;
-	padding: 15px;
-	box-sizing: border-box;
-	border-left: 1px solid #ddd;
-	overflow-y: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    box-sizing: border-box;
+    border-left: 1px solid #ddd;
+    overflow-y: auto;
 }
-
 #review-popup.show {
-	transform: translateX(0);
+    transform: translateX(0);
 }
-
 .popup-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
 }
-
 .popup-header button {
-	background: none;
-	border: none;
-	font-size: 20px;
-	cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
 }
-
 #review-rating-summary {
-	text-align: center;
-	padding: 10px 0;
-	border-bottom: 1px solid #eee;
-	margin-bottom: 15px;
+    text-align: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
 }
-
-#review-rating-summary h3 {
-	margin: 0;
-	font-size: 1.5em;
-}
-
-#review-rating-summary p {
-	margin: 5px 0 0;
-	color: #666;
-}
-
-.star-rating {
-	color: gold;
-	font-size: 1.2em;
-}
+#review-rating-summary h3 { margin: 0; font-size: 1.5em; }
+#review-rating-summary p { margin: 5px 0 0; color: #666; }
+.star-rating { color: gold; font-size: 1.2em; }
 
 /* 리뷰 목록 스타일 */
 #review-list {
-	flex-grow: 1;
-	overflow-y: auto;
-	padding-right: 5px; /* 스크롤바 공간 */
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px; /* 스크롤바 공간 */
 }
-
 .review-item {
-	padding: 10px 0;
-	border-bottom: 1px dotted #ddd;
+    padding: 10px 0;
+    border-bottom: 1px dotted #ddd;
 }
-
 .review-item:last-child {
-	border-bottom: none;
+    border-bottom: none;
 }
-
 .review-header {
-	display: flex;
-	justify-content: space-between;
-	font-size: 0.9em;
-	color: #444;
-	margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #444;
+    margin-bottom: 5px;
 }
-
 .review-body {
-	font-size: 0.95em;
-	color: #333;
+    font-size: 0.95em;
+    color: #333;
 }
-
 .review-date {
-	font-size: 0.8em;
-	color: #999;
+    font-size: 0.8em;
+    color: #999;
 }
 
 /* 리뷰 등록 폼 스타일 */
 #review-form-area {
-	padding-top: 15px;
-	border-top: 1px solid #eee;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
 }
-
-#review-form-area h4 {
-	margin-top: 0;
-}
-
+#review-form-area h4 { margin-top: 0; }
 #review-form-area textarea {
-	width: 100%;
-	margin-bottom: 10px;
-	box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
-
 .rating-input {
-	margin-bottom: 10px;
+    margin-bottom: 10px;
 }
-
 .rating-input span {
-	font-size: 1.5em;
-	cursor: pointer;
-	color: #ccc; /* 비활성 별 색상 */
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #ccc; /* 비활성 별 색상 */
 }
-
 .rating-input span.active {
-	color: gold; /* 활성 별 색상 */
+    color: gold; /* 활성 별 색상 */
+}
+#submit-review-btn {
+    width: 100%;
+    padding: 8px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-#submit-review-btn {
-	width: 100%;
-	padding: 8px;
-	background: #007bff;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
 </style>
-<script
-	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script
-	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
 
-	<div id="user-select">
-		<label>보내는 사람: <select id="sender-select">
-				<option value="">선택하세요</option>
-				<option value="1" data-username="김유정">User 1</option>
-				<option value="2" data-username="유정">User 2</option>
-				<option value="3" data-username="관리왕">User 3</option>
-		</select>
-		</label> <label>받는 사람: <select id="receiver-select">
-				<option value="">선택하세요</option>
-				<option value="1" data-username="김유정">User 1</option>
-				<option value="2" data-username="유정">User 2</option>
-				<option value="3" data-username="관리왕">User 3</option>
-		</select>
-		</label>
-	</div>
+<div id="user-select">
+    <label>보내는 사람:
+        <select id="sender-select">
+            <option value="">선택하세요</option>
+            <option value="1" data-username="김유정">User 1</option>
+            <option value="2" data-username="유정">User 2</option>
+            <option value="3" data-username="관리왕">User 3</option>
+        </select>
+    </label>
+    <label>받는 사람:
+        <select id="receiver-select">
+            <option value="">선택하세요</option>
+            <option value="1" data-username="김유정">User 1</option>
+            <option value="2" data-username="유정">User 2</option>
+            <option value="3" data-username="관리왕">User 3</option>
+        </select>
+    </label>
+</div>
 
-	<div id="chat-container">
-		<div id="message-area"></div>
-		<div id="input-area">
-			<input type="text" id="message-input" placeholder="메시지를 입력하세요...">
-			<button id="send-button">전송</button>
-			<button id="care-toggle">돌봄 예약</button>
-		</div>
-		<div id="care-form">
-			시작일: <input type="datetime-local" id="start-date"> 종료일: <input
-				type="datetime-local" id="end-date"> 상태: <select
-				id="session-status">
-				<option value="REQUESTED">요청</option>
-				<option value="CONFIRMED">확정</option>
-				<option value="CANCELLED">취소</option>
-			</select> 메모:
-			<textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
-			<button id="confirm-care">예약 전송</button>
-		</div>
+<div id="chat-container">
+    <div id="message-area"></div>
+    <div id="input-area">
+        <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+        <button id="send-button">전송</button>
+        <button id="care-toggle">돌봄 예약</button>
+    </div>
+    <div id="care-form">
+        시작일: <input type="datetime-local" id="start-date">
+        종료일: <input type="datetime-local" id="end-date">
+        상태:
+        <select id="session-status">
+            <option value="REQUESTED">요청</option>
+            <option value="CONFIRMED">확정</option>
+            <option value="CANCELLED">취소</option>
+        </select>
+        메모: <textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
+        <button id="confirm-care">예약 전송</button>
+    </div>
+    
+    <div id="review-popup">
+        <div class="popup-header">
+            <h2 id="review-target-name"></h2>
+            <button onclick="closeReviewPopup()">×</button>
+        </div>
+        
+        <div id="review-rating-summary">
+            <h3 id="avg-rating"></h3>
+            <p id="total-reviews"></p>
+        </div>
 
-		<div id="review-popup">
-			<div class="popup-header">
-				<h2 id="review-target-name"></h2>
-				<button onclick="closeReviewPopup()">×</button>
-			</div>
+        <div id="review-form-area">
+            <h4>리뷰 등록</h4>
+            <div class="rating-input" id="new-rating">
+                <span data-rating="1">★</span>
+                <span data-rating="2">★</span>
+                <span data-rating="3">★</span>
+                <span data-rating="4">★</span>
+                <span data-rating="5">★</span>
+            </div>
+            <textarea id="new-review-text" rows="3" placeholder="리뷰 내용을 입력하세요."></textarea>
+            <button id="submit-review-btn">리뷰 작성</button>
+        </div>
 
-			<div id="review-rating-summary">
-				<h3 id="avg-rating"></h3>
-				<p id="total-reviews"></p>
-			</div>
+        <h4>리뷰 목록</h4>
+        <div id="review-list">
+            </div>
+    </div>
+</div>
 
-			<div id="review-form-area">
-				<h4>리뷰 등록</h4>
-				<div class="rating-input" id="new-rating">
-					<span data-rating="1">★</span> <span data-rating="2">★</span> <span
-						data-rating="3">★</span> <span data-rating="4">★</span> <span
-						data-rating="5">★</span>
-				</div>
-				<textarea id="new-review-text" rows="3" placeholder="리뷰 내용을 입력하세요."></textarea>
-				<button id="submit-review-btn">리뷰 작성</button>
-			</div>
-
-			<h4>리뷰 목록</h4>
-			<div id="review-list"></div>
-		</div>
-	</div>
-
-	<script>
+<script>
 let senderId = null;
 let receiverId = null;
 let chatRoomId = null;
@@ -420,19 +270,9 @@ const endDateInput = document.getElementById('end-date');
 const confirmCare = document.getElementById('confirm-care');
 
 // --------------------------------------------------------
-// LocalStorage 헬퍼 함수
+// LocalStorage 헬퍼 함수 💥 제거됨 💥
+// (DB의 status 필드를 사용하므로 더 이상 필요하지 않습니다.)
 // --------------------------------------------------------
-
-function getConfirmedSessions() {
-    const json = localStorage.getItem('confirmedSessions');
-    return new Set(json ? JSON.parse(json) : []);
-}
-
-function addConfirmedSession(sessionId) {
-    const sessions = getConfirmedSessions();
-    sessions.add(sessionId);
-    localStorage.setItem('confirmedSessions', JSON.stringify(Array.from(sessions)));
-}
 
 // --------------------------------------------------------
 // 초기화 및 이벤트 리스너 (User Name 저장 로직 반영)
@@ -489,14 +329,18 @@ window.onload = function() {
 };
 
 // --------------------------------------------------------
-// 돌봄 요청/확정 로직 (이전과 동일)
+// 돌봄 요청/확정 로직 (LocalStorage 로직 제거)
 // --------------------------------------------------------
 
+/**
+ * 돌봄 요청 메시지를 서버로 전송합니다.
+ */
 function sendCareRequest() {
     const start = startDateInput.value;
     const end = endDateInput.value;
     if (!start || !end) return alert("날짜를 선택하세요.");
 
+    // 초(seconds)를 추가하여 백엔드 DTO @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")에 맞춥니다.
     const startWithSeconds = start + ':00';
     const endWithSeconds = end + ':00';
 
@@ -517,22 +361,66 @@ function sendCareRequest() {
     careForm.style.display = 'none';
     startDateInput.value = '';
     endDateInput.value = '';
-    document.getElementById('session-status').value = 'REQUESTED';
+    // document.getElementById('session-status').value = 'REQUESTED'; // 해당 HTML 요소는 제거되었음
     document.getElementById('session-note').value = '';
 }
 
+/**
+ * 돌봄 요청을 확정하는 메시지를 서버로 전송합니다.
+ * @param {number} sessionId 확정할 CareSession ID
+ * @param {number} senderIdFromMsg 요청 메시지를 보낸 사람 ID (요청자)
+ */
 function confirmCareRequest(sessionId, senderIdFromMsg) {
     const chatMessage = {
         chatRoomId: chatRoomId,
-        senderId: senderId,
-        receiverId: senderIdFromMsg,
+        senderId: senderId, // 확정하는 사람 (나)
+        receiverId: senderIdFromMsg, // 요청자 (상대방)
         type: "CARE_CONFIRM",
         sessionId: sessionId,
         content: `✅ 돌봄 예약이 확정되었습니다.`
     };
     stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
+}
 
-    addConfirmedSession(sessionId);
+
+/**
+ * 실시간 CARE_CONFIRM 메시지 수신 시,
+ * 화면에 존재하는 모든 해당 CARE_REQUEST UI를 업데이트하여 버튼을 제거하고 확정 상태를 표시합니다.
+ * @param {number} sessionId 확정된 세션 ID
+ * @param {string} confirmedTime 확정 시간 문자열
+ */
+function updateCareRequestUI(sessionId, confirmedTime) {
+    const requestElements = document.querySelectorAll(`[data-session-id="${sessionId}"]`);
+    
+    // YYYY-MM-DDTHH:mm:ss -> YYYY-MM-DD HH:mm 형식으로 포맷팅
+    const confirmedDate = new Date(confirmedTime.replace(' ', 'T'));
+    const formattedDate = `${confirmedDate.getFullYear()}-${(confirmedDate.getMonth() + 1).toString().padStart(2, '0')}-${confirmedDate.getDate().toString().padStart(2, '0')}`;
+    const hours = confirmedDate.getHours();
+    const minutes = confirmedDate.getMinutes().toString().padStart(2,'0');
+    const ampm = hours >= 12 ? '오후' : '오전';
+    const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+    const formattedTime = `${formattedDate} ${ampm} ${hour12}:${minutes}`;
+
+    requestElements.forEach(element => {
+        // 기존 확정 버튼 제거
+        const confirmButton = element.querySelector('.confirm-btn');
+        if (confirmButton) {
+            confirmButton.remove();
+        }
+        
+        // 확정 상태 표시 (시간 정보 포함)
+        const existingStatusSpan = element.querySelector('.care-status');
+        if (existingStatusSpan) {
+            existingStatusSpan.innerHTML = `[✅ 확정됨 - ${formattedTime}]`;
+        } else {
+            const confirmedSpan = document.createElement('span');
+            confirmedSpan.classList.add('care-status'); // 클래스 추가
+            confirmedSpan.style.color = 'green';
+            confirmedSpan.style.fontWeight = 'bold';
+            confirmedSpan.innerText = `[✅ 확정됨 - ${formattedTime}]`;
+            element.querySelector('.care-request').appendChild(confirmedSpan);
+        }
+    });
 }
 
 // --------------------------------------------------------
@@ -562,6 +450,11 @@ function connectWebSocket() {
         stompClient.subscribe(`/topic/chat/${chatRoomId}`, (message) => {
             const chatMessage = JSON.parse(message.body);
             displayMessage(chatMessage);
+            
+            // ⭐ 실시간 CARE_CONFIRM 메시지 수신 시 UI 업데이트
+            if (chatMessage.type === "CARE_CONFIRM") {
+                updateCareRequestUI(chatMessage.sessionId, chatMessage.confirmedTime);
+            }
         });
     }, (error) => console.error("Connection error: ", error));
 }
@@ -583,7 +476,7 @@ function sendMessage() {
 }
 
 // --------------------------------------------------------
-// 리뷰 팝업 관련 함수
+// 리뷰 팝업 관련 함수 (이전과 동일)
 // --------------------------------------------------------
 
 /**
@@ -733,7 +626,9 @@ async function submitReview() {
         });
 
         if (!response.ok) {
-            throw new Error('리뷰 등록에 실패했습니다. (HTTP Error)');
+            // 서버에서 에러 메시지를 JSON으로 반환하면 처리
+            const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
+            throw new Error(`리뷰 등록에 실패했습니다. (${errorData.message})`);
         }
 
         alert("리뷰가 성공적으로 등록되었습니다!");
@@ -748,14 +643,36 @@ async function submitReview() {
 
     } catch (error) {
         console.error("리뷰 등록 오류:", error);
-        alert("리뷰 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        alert(error.message || "리뷰 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
 }
 
 // --------------------------------------------------------
-// 메시지 표시 (클릭 이벤트 추가)
+// 메시지 표시 (클릭 이벤트 추가) - DB 상태 반영
 // --------------------------------------------------------
 
+/**
+ * 날짜 문자열(YYYY-MM-DDTHH:mm:ss)을 포맷팅합니다.
+ * @param {string} dateString DTO에서 넘어온 날짜 문자열
+ * @returns {string} 포맷팅된 날짜 문자열 (YYYY-MM-DD HH:mm)
+ */
+function formatDateTime(dateString) {
+    if (!dateString) return '';
+    // YYYY-MM-DDTHH:mm:ss 또는 YYYY-MM-DD HH:mm:ss 형태를 파싱
+    const date = new Date(dateString.replace(' ', 'T'));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+
+/**
+ * 단일 메시지를 화면에 표시합니다.
+ * @param {object} chatMessage 백엔드에서 받은 ChatMessageDto 객체
+ */
 function displayMessage(chatMessage) {
     const isSent = chatMessage.senderId === senderId;
     const senderIdForPopup = chatMessage.senderId; // 리뷰 대상은 메시지 보낸 사람
@@ -765,11 +682,11 @@ function displayMessage(chatMessage) {
     const messageRow = document.createElement('div');
     messageRow.classList.add('message-row');
     messageRow.classList.add(isSent ? 'sent' : 'received');
-
-    // 시간 포맷팅
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2,'0');
+    
+    // ⭐ 시각 정보 포맷팅 (DB 저장 시간)
+    const timeToFormat = chatMessage.timestamp ? new Date(chatMessage.timestamp.replace(' ', 'T')) : new Date();
+    const hours = timeToFormat.getHours();
+    const minutes = timeToFormat.getMinutes().toString().padStart(2,'0');
     const ampm = hours >= 12 ? '오후' : '오전';
     const hour12 = hours % 12 === 0 ? 12 : hours % 12;
     const timeString = `${ampm} ${hour12}:${minutes}`;
@@ -803,47 +720,60 @@ function displayMessage(chatMessage) {
 
     if (chatMessage.type === "CARE_REQUEST") {
         const careDiv = document.createElement('div');
+        // ⭐ data-session-id 속성 추가 (CARE_CONFIRM 수신 시 UI 업데이트를 위함)
+        careDiv.setAttribute('data-session-id', chatMessage.sessionId || -1); 
         careDiv.classList.add('care-request');
 
+        // ⭐ DB에서 넘어온 status 필드만 사용합니다.
         const status = chatMessage.status || 'REQUESTED';
         const sessionId = chatMessage.sessionId || -1;
-        
-        const confirmedSessions = getConfirmedSessions(); 
-        const isConfirmedLocally = confirmedSessions.has(sessionId); 
-
-        let confirmButtonHtml = '';
         const isReceiver = chatMessage.senderId !== senderId;
 
-        if (status === 'REQUESTED' && isReceiver && !isConfirmedLocally) {
+        let confirmButtonHtml = '';
+        let statusDisplay = '';
+
+        // ⭐ status 필드를 기준으로 상태 표시 및 버튼 결정
+        if (status === 'REQUESTED' && isReceiver) {
             confirmButtonHtml = `<button class="confirm-btn" data-session-id="${sessionId}" data-sender-id="${chatMessage.senderId}">확정</button>`;
-        } else if (status === 'CONFIRMED' || isConfirmedLocally) {
-            confirmButtonHtml = `<span style="color: green; font-weight: bold;">[✅ 확정됨]</span>`;
+        } else if (status === 'CONFIRMED') {
+            // ⭐ 확정 시간 포맷팅 및 표시
+            const formattedConfirmTime = chatMessage.confirmedTime ? 
+                formatDateTime(chatMessage.confirmedTime) : 
+                '시간 정보 없음';
+            statusDisplay = `<span class="care-status" style="color: green; font-weight: bold;">[✅ 확정됨 - ${formattedConfirmTime}]</span>`;
         } else if (status === 'CANCELLED') {
-            confirmButtonHtml = `<span style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
+            statusDisplay = `<span class="care-status" style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
         }
+        
+        // ⭐ 돌봄 기간 포맷팅
+        const formattedStartDate = formatDateTime(chatMessage.startDate);
+        const formattedEndDate = formatDateTime(chatMessage.endDate);
+
 
         careDiv.innerHTML = `
-            <div>돌봄 요청: ${chatMessage.startDate} ~ ${chatMessage.endDate}</div>
-            <div>메모: ${chatMessage.note || ''}</div>
+            <div style="font-weight: bold;">${chatMessage.content}</div>
+            <div style="font-size: 0.9em;">기간: ${formattedStartDate} ~ ${formattedEndDate}</div>
+            <div style="font-size: 0.9em;">메모: ${chatMessage.note || '없음'}</div>
+            ${statusDisplay}
             ${confirmButtonHtml}
         `;
         messageDiv.appendChild(careDiv);
 
-        if (status === 'REQUESTED' && isReceiver && !isConfirmedLocally) {
+        // 확정 버튼 클릭 이벤트 리스너
+        if (status === 'REQUESTED' && isReceiver) {
             const confirmButton = careDiv.querySelector('.confirm-btn');
             if (confirmButton) {
                 confirmButton.addEventListener('click', (event) => {
                     const session_Id = parseInt(event.target.dataset.sessionId);
                     const sender_Id = parseInt(event.target.dataset.senderId);
                     if (session_Id !== -1) {
+                        // 서버로 확정 메시지 전송
                         confirmCareRequest(session_Id, sender_Id);
 
-                        confirmButton.remove();
-                        const confirmedSpan = document.createElement('span');
-                        confirmedSpan.style.color = 'green';
-                        confirmedSpan.style.fontWeight = 'bold';
-                        confirmedSpan.innerText = `[✅ 확정됨]`;
-                        careDiv.appendChild(confirmedSpan);
+                        // ⭐ UI 즉시 업데이트 (로컬에서만 업데이트, 실제 확정은 서버 응답 후 갱신되지만, UX를 위해 즉시 변경 시도)
+                        // 주의: 이 로직은 서버 응답(CARE_CONFIRM)을 기다리는 것이 더 안전하지만, 빠른 UX를 위해 임시로 즉시 변경
+                        const tempConfirmedTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                        updateCareRequestUI(session_Id, tempConfirmedTime);
                     }
                 });
             }
