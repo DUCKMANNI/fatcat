@@ -1,170 +1,192 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{shared/layout}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 <head>
-    <meta charset="utf-8">
-    <title>동물병원 검색</title>
-    <style>
-        /* CSS 스타일 */
-        #controls {
-            background: rgba(255, 255, 255, 0.96);
-            border: 1px solid #ddd;
-            border-radius: 14px;
-            padding: 10px 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin: 20px auto;
-            width: fit-content;
-        }
-        #controls select, #controls button {
-            height: 36px;
-            font-size: 14px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            padding: 0 10px;
-        }
-        #controls button {
+<meta charset="utf-8">
+<title>동물병원 검색</title>
+<style>
+/* CSS 스타일 */
+#controls {
+	background: rgba(255, 255, 255, 0.96);
+	border: 1px solid #ddd;
+	border-radius: 14px;
+	padding: 10px 14px;
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin: 20px auto;
+	width: fit-content;
+}
+
+#controls select {
+	height: 36px;
+	font-size: 20px;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	margin: 5px auto;
+	padding: 0 10px;
+}
+/*  #controls button {
             cursor: pointer;
             border: none;
             background: #CD853F;
             color: #fff;
             font-weight: 600;
-        }
-        #mapListContainer {
-            display: flex;
-            width: calc(100% - 20px);
-            height: 80vh;
-            margin: 20px 15px 0;
-            gap: 16px;
-            box-sizing: border-box;
-        }
-        #map, #menu_wrap, #detailPanel {
-            transition: all 0.3s ease;
-        }
-        #map {
-            flex: 0.9;
-            height: 100%;
-            border: 1px solid #e5e5e5;
-            border-radius: 24px;
-            position: relative;
-        }
-        #menu_wrap {
-            flex: 0.5;
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 24px;
-            padding: 8px;
-            font-size: 14px;
-            overflow-y: auto;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-        }
-        #menu_wrap h3 {
-            margin: 6px 8px 10px;
-            font-size: 16px;
-        }
-        #placesList {
-            margin: 0;
-            padding: 0 6px 8px;
-        }
-        #placesList li {
-            list-style: none;
-        }
-        #placesList .item {
-            display: flex;
-            align-items: flex-start;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-        }
-        #placesList .marker-number {
-            width: 23px;
-            height: 23px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #CD853F;
-            color: white;
-            border-radius: 20%;
-            font-size: 13px;
-            font-weight: bold;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-        #placesList .info {
-            flex: 1;
-        }
-        #placesList .info h5 {
-            margin: 0 0 4px;
-            font-size: 15px;
-            font-weight: bold;
-        }
-        #placesList .info p {
-            margin: 2px 0;
-            font-size: 13px;
-            color: #555;
-        }
-        #pagination {
-            text-align: center;
-            padding: 6px 0 10px;
-        }
-        #pagination a {
-            display: inline-block;
-            margin: 0 6px;
-            text-decoration: none;
-            color: #2b74e4;
-        }
-        #pagination .on {
-            font-weight: 700;
-            color: #444;
-            pointer-events: none;
-        }
-        .fixed-element button {
+        } */
+#mapListContainer {
+	display: flex;
+	width: calc(100% - 20px);
+	height: 80vh;
+	margin: 20px 15px 0;
+	gap: 16px;
+	box-sizing: border-box;
+}
+
+#map, #menu_wrap, #detailPanel {
+	transition: all 0.3s ease;
+}
+
+#map {
+	flex: 0.9;
+	height: 100%;
+	border: 1px solid #e5e5e5;
+	border-radius: 24px;
+	position: relative;
+}
+
+#menu_wrap {
+	flex: 0.5;
+	background: rgba(255, 255, 255, 0.96);
+	border-radius: 24px;
+	padding: 8px;
+	font-size: 14px;
+	overflow-y: auto;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+#menu_wrap h3 {
+	margin: 6px 8px 10px;
+	font-size: 16px;
+}
+
+#placesList {
+	margin: 0;
+	padding: 0 6px 8px;
+}
+
+#placesList li {
+	list-style: none;
+}
+
+#placesList .item {
+	display: flex;
+	align-items: flex-start;
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+	cursor: pointer;
+}
+
+#placesList .marker-number {
+	width: 23px;
+	height: 23px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #D2B48C;
+	color: white;
+	border-radius: 20px;
+	font-size: 13px;
+	font-weight: bold;
+	margin-right: 10px;
+	flex-shrink: 0;
+}
+
+#placesList .info {
+	flex: 1;
+}
+
+#placesList .info h5 {
+	margin: 0 0 4px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+#placesList .info p {
+	margin: 2px 0;
+	font-size: 18px;
+	color: #555;
+}
+
+#pagination {
+	text-align: center;
+	padding: 6px 0 10px;
+}
+
+#pagination a {
+	display: inline-block;
+	margin: 0 6px;
+	text-decoration: none;
+	color: #666;
+}
+
+#pagination .on {
+	font-weight: 700;
+	color: #6C3C30;
+	pointer-events: none;
+}
+/*  .fixed-element button {
             display: block !important;
-        }
-        #detailPanel {
-            flex: 0;
-            width: 0;
-            padding: 0;
-            overflow-y: auto;
-            background: #fff;
-            border-radius: 24px;
-            box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        #detailPanel.show {
-            flex: 0.5;
-            width: 300px;
-            padding: 10px;
-        }
-        #detailPanel #closeDetail {
-            float: right;
-            cursor: pointer;
-            border-radius: 60px;
-            background: white;
-            border-color: white;
-            color: #CD853F;
-        }
-        #reviewForm {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            background: #f9f9f9;
-        }
-        #reviewForm label {
-            font-weight: bold;
-            font-size: 14px;
-        }
-        #reviewForm textarea {
-            width: 100%;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        #reviewForm textarea,
-        #reviewForm button {
+        } */
+#detailPanel {
+	flex: 0;
+	width: 0;
+	padding: 0;
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 24px;
+	box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+}
+
+#detailPanel.show {
+	flex: 0.5;
+	width: 300px;
+	padding: 10px;
+}
+
+#detailPanel #closeDetail {
+	float: right;
+	cursor: pointer;
+	border-radius: 60px;
+	background: white;
+	border-color: white;
+	color: #CD853F;
+}
+
+#reviewForm {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 15px;
+	border: 1px solid #eee;
+	border-radius: 10px;
+	background: #f9f9f9;
+}
+
+#reviewForm label {
+	font-weight: bold;
+	font-size: 14px;
+}
+
+#reviewForm textarea {
+	width: 100%;
+	border-radius: 10px;
+	box-sizing: border-box;
+	resize: vertical;
+}
+/*   #reviewForm textarea, */
+/*     #reviewForm button {
             padding: 8px;
             border-radius: 5px;
             border: 1px solid #ccc;
@@ -179,49 +201,52 @@
         }
         #reviewForm button:hover {
             background-color: #b87a37;
-        }
-        .star-rating {
-            display: inline-block;
-        }
-        .star-rating .star {
-            cursor: pointer;
-            color: #ccc;
-            font-size: 24px;
-        }
-        .star-rating .star.selected,
-        .star-rating .star.hovered {
-            color: #FFD700;
-        }
-        .review-actions {
-            margin-top: 5px;
-            text-align: right;
-        }
-        .review-actions button {
+        } */
+.star-rating {
+	display: inline-block;
+}
+
+.star-rating .star {
+	cursor: pointer;
+	color: #ccc;
+	font-size: 24px;
+}
+
+.star-rating .star.selected, .star-rating .star.hovered {
+	color: #FFD700;
+}
+
+.review-actions {
+	margin-top: 5px;
+	text-align: right;
+}
+/*   .review-actions button {
             background: #eee;
             border: 1px solid #ccc;
             border-radius: 4px;
             padding: 2px 6px;
             font-size: 12px;
             cursor: pointer;
-        }
-        .update-form {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-        .update-form textarea {
-            border: 1px solid #ccc;
-            padding: 5px;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        .update-form button {
+        } */
+.update-form {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	margin-top: 10px;
+}
+
+.update-form textarea {
+	border: 1px solid #ccc;
+	padding: 5px;
+	border-radius: 4px;
+	width: 100%;
+	box-sizing: border-box;
+	resize: vertical;
+}
+/*       .update-form button {
             border: none;
             padding: 6px;
             border-radius: 5px;
@@ -235,35 +260,64 @@
         .update-form .cancel-btn {
             background-color: #dc3545;
             color: white;
-        }
-    </style>
+        } */
+
+/* 기존 .btn-fatcat 스타일을 .edit-btn 및 .delete-btn에 적용 */
+.edit-btn, .delete-btn {
+	background-color: #D2B48C !important; /* 배경색 적용 */
+	color: #fff !important; /* 글자색 적용 */
+	border-radius: 20px !important; /* 둥근 모서리 적용 */
+	padding: 6px 16px !important; /* 패딩 적용 */
+	border: none !important; /* 테두리 제거 */
+	font-weight: 500 !important;
+}
+
+/* 호버 효과 적용 */
+.edit-btn:hover, .delete-btn:hover {
+	background-color: #a38b6a !important; /* hover 시 조금 진하게 */
+	color: #fff !important;
+}
+
+/* 버튼이 들어있는 부모 영역의 font-size: 20px 때문에 버튼이 커지는 것을 방지 */
+.review-actions button {
+	font-size: 0.75em; /* 부모 크기의 75%로 설정 (약 15px) */
+}
+</style>
 </head>
 <body>
-    <div layout:fragment="content">
-        <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
+	<div layout:fragment="content">
+		<script
+			src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
 
-        <div id="controls">
-            <label>시/도<select id="sido"></select></label>
-            <label>시/군/구<select id="sigungu"></select></label>
-            <label>동<select id="dong"></select></label>
-            <button id="searchBtn">검색</button>
-            <button id="btn" class="btn btn-primary" onclick='toggleListView()'>리스트만보기</button>
-        </div>
+		<label class="container my-3 d-flex flex-column align-items-center"
+			style="font-family: 'BagelFat', sans-serif; font-size: 50px; /* (80-&gt;50px) */ color: #CD853F;">동물병원
+			찾기</label>
 
-        <div id="mapListContainer">
-            <div id="map"></div>
-            <div id="menu_wrap">
-                <h3>동물병원 검색 결과</h3>
-                <ul id="placesList"></ul>
-                <div id="pagination"></div>
-            </div>
-            <div id="detailPanel">
-                <button id="closeDetail">X</button>
-                <div id="detailContent"></div>
-            </div>
-        </div>
+		<div id="controls" style="font-size: 20px;">
+			<label>시/도<select id="sido" class="m-1"
+				style="font-size: 18px;"></select></label> <label>시/군/구<select
+				id="sigungu" class="m-1" style="font-size: 18px;"></select></label> <label>동<select
+				id="dong" class="m-1" style="font-size: 18px;"></select></label>
+			<button id="searchBtn" class="btn btn-fatcat"
+				style="font-size: 20px;">검색</button>
+			<button id="btn" class="btn btn-fatcat " style="font-size: 20px;"
+				onclick='toggleListView()'>리스트만보기</button>
+		</div>
 
-        <script>
+		<div id="mapListContainer">
+			<div id="map"></div>
+			<div id="menu_wrap">
+				<h3 style="font-size: 25px">동물병원 검색 결과</h3>
+				<ul id="placesList"></ul>
+				<div id="pagination"></div>
+			</div>
+			<div id="detailPanel">
+				<button id="closeDetail">X</button>
+				<div id="detailContent"></div>
+			</div>
+		</div>
+
+		<script>
             let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7, maxItems = 45;
             let openedPlaceId = null, originalCenter = null;
             const markers = [];
@@ -469,11 +523,10 @@
                         
                         const detailContent = document.getElementById('detailContent');
                         detailContent.innerHTML = `
-                            <div id="clinicInfo">
-                                <h4>${place.place_name}</h4>
-                                <p><strong>주소:</strong> ${place.road_address_name || place.address_name}</p>
-                                <p><strong>전화:</strong> ${place.phone || '정보 없음'}</p>
-                                <p><strong>카테고리:</strong> ${place.category_name || '-'}</p>
+                            <div id="clinicInfo" style="font-size : 20px">
+                        			<strong style="font-size : 25px">${place.place_name}</strong>
+                                <p>주소:${place.road_address_name || place.address_name}</p>
+                                <p>전화:${place.phone || '정보 없음'}</p>
                             </div>
                             <hr>
                             <div id="reviewSection">
@@ -481,13 +534,13 @@
                                     <h5>평점: <span id="avgRating">...</span></h5>
                                 </div>
                                 <hr>
-                                <h5>리뷰 작성하기</h5>
+                                <strong style="font-size : 25px;">리뷰 작성하기</strong>
                                 <form id="reviewForm">
                                     <input type="hidden" id="placeNameInput" name="placeName" value="${place.place_name}">
                                     <input type="hidden" id="addressInput" name="address" value="${place.address_name || place.road_address_name}">
                                     
-                                    <div class="form-group">
-                                        <label>별점:</label>
+                                    <div class="form-group" >
+                                        <label style="font-size : 20px;" >별점:</label>
                                         <div id="ratingStars" class="star-rating">
                                             <span class="star" data-rating="1">★</span>
                                             <span class="star" data-rating="2">★</span>
@@ -499,16 +552,16 @@
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label>리뷰:</label>
-                                        <textarea id="reviewContentInput" name="reviewContent" rows="3" required></textarea>
+                                        <label style="font-size : 20px;">리뷰:</label>
+                                        <textarea id="reviewContentInput" name="reviewContent" rows="3" class="form-control" required></textarea>
                                     </div>
                                     
-                                    <button type="submit">리뷰 등록</button>
+                                    <button type="submit" class="btn btn-fatcat" style="font-size : 20px;">리뷰 등록</button>
                                 </form>
                                 <hr>
                                 <div id="reviewList">
-                                    <h5>등록된 리뷰</h5>
-                                    <p>... 리뷰 로딩 중 ...</p>
+                                    <strong style="font-size : 25px;">등록된 리뷰</strong>
+                                    <p  style="font-size : 20px;">... 리뷰 로딩 중 ...</p>
                                 </div>
                             </div>
                         `;
@@ -655,16 +708,16 @@
                     }
 
                     const reviewListEl = document.getElementById('reviewList');
-                    reviewListEl.innerHTML = `<h5>등록된 리뷰</h5>`;
+                    reviewListEl.innerHTML = `<h5 style="font-size : 25px;">등록된 리뷰</h5>`;
 
                     if (data.reviews && data.reviews.length > 0) {
                         data.reviews.forEach(review => {
                             const reviewItem = document.createElement('div');
                             reviewItem.id = `review-${review.vetReviewSeq}`;
                             reviewItem.innerHTML = `
-                                <p><strong>별점: ${'★'.repeat(review.vetRating)}</strong></p>
-                                <p>${review.vetReview}</p>
-                                <div class="review-actions">
+                                <p style="font-size : 20px; color:#555555;">별점: ${'★'.repeat(review.vetRating)}</strong></p>
+                                <p style="font-size : 20px;">${review.vetReview}</p>
+                                <div class="review-actions" style="font-size : 20px;">
                                     <button class="edit-btn">수정</button>
                                     <button class="delete-btn">삭제</button>
                                 </div>
@@ -680,7 +733,7 @@
                             });
                         });
                     } else {
-                        reviewListEl.innerHTML += `<p>등록된 리뷰가 없습니다.</p>`;
+                        reviewListEl.innerHTML += `<p  style="font-size : 20px;">등록된 리뷰가 없습니다.</p>`;
                     }
                 } catch (error) {
                     console.error('리뷰 정보를 가져오는 데 실패했습니다.', error);
@@ -699,8 +752,8 @@
                 const updateForm = document.createElement('div');
                 updateForm.className = 'update-form';
                 updateForm.innerHTML = `
-                    <div class="form-group">
-                        <label>별점:</label>
+                    <div class="form-group" style="font-size : 20px;">
+                        <label >별점:</label>
                         <div class="star-rating update-stars">
                             <span class="star" data-rating="1">★</span>
                             <span class="star" data-rating="2">★</span>
@@ -766,6 +819,6 @@
                 } catch (error) { alert('네트워크 오류로 리뷰 등록에 실패했습니다.'); }
             }
         </script>
-    </div>
+	</div>
 </body>
 </html>
