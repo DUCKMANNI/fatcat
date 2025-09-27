@@ -7,4 +7,6 @@ public interface CareSessionService {
     CareSessionDto createSession(CareSessionDto dto);
 
 	CareSessionDto confirmSession(Integer sessionId);
+
+	CareSessionDto getSessionById(Integer sessionId);
 }

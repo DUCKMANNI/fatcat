@@ -33,17 +33,13 @@ public class ChatController {
     @MessageMapping("/private-chat")
     public void processMessage(@Payload ChatMessageDto chatMessageDto) {
         
-        // 날짜/시간 파싱 포맷 (프론트와 맞춤)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         switch (chatMessageDto.getType()) {
-            // ... (CARE_REQUEST, CARE_CONFIRM 로직은 동일) ...
             case "CARE_REQUEST":
-                // 받은 날짜 문자열 → LocalDateTime 변환
                 LocalDateTime startDate = LocalDateTime.parse(chatMessageDto.getStartDate(), formatter);
                 LocalDateTime endDate = LocalDateTime.parse(chatMessageDto.getEndDate(), formatter);
 
-                // CareSession 저장
                 CareSessionDto request = CareSessionDto.builder()
                         .ownerUserId(chatMessageDto.getSenderId())
                         .sitterUserId(chatMessageDto.getReceiverId())
@@ -55,38 +51,38 @@ public class ChatController {
 
                 CareSessionDto savedRequest = careSessionService.createSession(request);
 
-                // 프론트 표시용 날짜 포맷
                 DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 String formattedStartDate = savedRequest.getStartDate().format(displayFormatter);
                 String formattedEndDate = savedRequest.getEndDate().format(displayFormatter);
 
-                // 👉 DTO에 세션 관련 정보 저장 (DB JSON 직렬화용)
                 chatMessageDto.setSessionId(savedRequest.getId());
                 chatMessageDto.setStatus("REQUESTED");
                 
-                // 프론트의 Date 객체 파싱 안정성을 위해 ISO 형식으로 재설정
                 chatMessageDto.setStartDate(savedRequest.getStartDate().toString()); 
                 chatMessageDto.setEndDate(savedRequest.getEndDate().toString());
                 chatMessageDto.setContent("📌 돌봄 요청: " + formattedStartDate + " ~ " + formattedEndDate);
                 break;
                 
             case "CARE_CONFIRM":
-                careSessionService.confirmSession(chatMessageDto.getSessionId());
+                // ⭐ 수정: confirmSession이 CareSessionDto를 반환한다고 가정하고 확정 시간을 얻어옵니다.
+                CareSessionDto confirmedSession = careSessionService.confirmSession(chatMessageDto.getSessionId());
 
                 chatMessageDto.setStatus("CONFIRMED");
                 chatMessageDto.setContent("✅ 돌봄 예약이 확정되었습니다.");
+                
+                // ⭐ ⭐ ⭐ 추가: 확정 시간을 DTO에 설정 ⭐ ⭐ ⭐
+                if (confirmedSession.getConfirmedDate() != null) {
+                    // DTO의 confirmedTime은 String 타입이므로 toString() 사용
+                    chatMessageDto.setConfirmedTime(confirmedSession.getConfirmedDate().toString()); 
+                }
                 break;
 
             default:
                 break;
         }
 
-        // DB 저장 및 시각 정보 획득
-        // chatService.saveMessage는 DB에 메시지를 저장하고,
-        // 저장 시 사용한 LocalDateTime을 포함한 ChatMessageDto를 반환해야 합니다.
-        ChatMessageDto savedDto = chatService.saveMessage(chatMessageDto); // ⭐ Service 수정 필수
+        ChatMessageDto savedDto = chatService.saveMessage(chatMessageDto);
 
-     // 구독자들에게 전송
      if (savedDto.getChatRoomId() != null) {
          messagingTemplate.convertAndSend(
                  "/topic/chat/" + savedDto.getChatRoomId(),

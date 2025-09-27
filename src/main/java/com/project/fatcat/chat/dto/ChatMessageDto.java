@@ -32,4 +32,24 @@ public class ChatMessageDto {
     // 저장된 시간
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
+    
+    // ⭐ ⭐ ⭐ 추가된 필드: 확정 시간 ⭐ ⭐ ⭐
+    // CareSession CONFIRMED 상태일 때 프론트엔드 UI 업데이트를 위해 사용됩니다.
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String confirmedTime;
+    
+    public ChatMessageDto(ChatMessageDto other) {
+        this.chatRoomId = other.chatRoomId;
+        this.senderId = other.senderId;
+        this.receiverId = other.receiverId;
+        this.type = other.type;
+        this.content = other.content;
+        this.startDate = other.startDate;
+        this.endDate = other.endDate;
+        this.status = other.status;
+        this.note = other.note;
+        this.sessionId = other.sessionId;
+        this.timestamp = other.timestamp;
+        this.confirmedTime = other.confirmedTime;
+    }
 }
