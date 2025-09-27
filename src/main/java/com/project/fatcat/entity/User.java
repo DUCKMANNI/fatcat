@@ -78,16 +78,18 @@ public class User implements UserDetails{
 	private UserRole role;
 	
 	@Column(length = 50)
-    private String userType;
+    private String userType;	//A ->냥집사, B ->예비집사
 	
 	private String vetLicenseImage;
 	
-	@Column(nullable = false, columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
+	@Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime createDate;
 	
 	private LocalDateTime lastLoginDate;
 	
-	@Column( nullable = false, columnDefinition = "BOOLEAN DEFAULT 0")
+	@Column(insertable = false, nullable = false,
+	        columnDefinition = "BOOLEAN DEFAULT 0")
 	private Boolean isDeleted;
 	
 	@Builder.Default
