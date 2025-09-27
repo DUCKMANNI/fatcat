@@ -48,15 +48,15 @@ public class CareChatHistory {
 	private String chatSender;
 	
 	//필드 추가
-	// ⭐ 1. 돌봄 세션 ID 추가: CARE_REQUEST, CARE_CONFIRM 메시지에 사용
+	// CARE_REQUEST, CARE_CONFIRM 메시지에 사용
     @Column(name = "session_id", nullable = true)
     private Integer sessionId;
 
-    // ⭐ 2. 메시지 유형 추가: CHAT, CARE_REQUEST, CARE_CONFIRM 구분
+    // CHAT, CARE_REQUEST, CARE_CONFIRM 구분
     @Column(name = "message_type", nullable = false)
     private String messageType; // ChatMessageDto의 type 필드와 동일
 
-    // ⭐ 3. 상태 추가: REQUESTED, CONFIRMED, CANCELLED 저장
+    //  REQUESTED, CONFIRMED, CANCELLED 저장
     @Column(name = "care_status", nullable = true)
     private String careStatus;
 

@@ -63,6 +63,10 @@ public class CareSession {
     
     @OneToMany(mappedBy = "careSession", cascade = CascadeType.ALL)
     private List<CareServiceReview> careServiceReviewList = new ArrayList<>();
+    
+    @Column
+	private LocalDateTime confirmedDate;
+	
 
 
 }

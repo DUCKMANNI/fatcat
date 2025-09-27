@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.fatcat.care.dto.CareSessionDto;
+import com.project.fatcat.care.service.CareSessionService;
 import com.project.fatcat.chat.dto.ChatMessageDto;
 import com.project.fatcat.chat.repository.CareChatHistoryRepository;
 import com.project.fatcat.chat.repository.ChatRoomRepository;
@@ -26,6 +28,8 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final CareChatHistoryRepository chatHistoryRepository;
     private final UserRepository userRepository;
+    
+    private final CareSessionService careSessionService; 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -48,20 +52,55 @@ public class ChatServiceImpl implements ChatService {
         CareChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
         if (chatRoom != null) {
             List<CareChatHistory> history = chatHistoryRepository.findByCareChatRoomOrderByChatDateAsc(chatRoom);
-            return history.stream().map(this::convertToDto).collect(Collectors.toList());
+            return history.stream()
+                          .map(this::convertToDtoWithLatestStatus) 
+                          .collect(Collectors.toList());
         }
         return List.of();
     }
 
     @Override
     public ChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
-        CareChatHistory chatHistory = convertToEntity(chatMessageDto);
+        // DTO 복사본을 만들어 saveMessage에 전달하여 원본 DTO를 건드리지 않음
+        ChatMessageDto dtoToSave = new ChatMessageDto(chatMessageDto);
+        
+        CareChatHistory chatHistory = convertToEntity(dtoToSave);
         chatHistory.setChatDate(LocalDateTime.now());
         CareChatHistory savedHistory = chatHistoryRepository.save(chatHistory);
-        return convertToDto(savedHistory);
+        
+        ChatMessageDto savedDto = convertToDto(savedHistory);
+        
+        // CARE_CONFIRM의 경우, 확정 시간을 savedDto에 설정하여 웹소켓으로 반환
+        if ("CARE_CONFIRM".equals(savedDto.getType()) && savedDto.getSessionId() != null) {
+            // 컨트롤러에서 설정한 값이 JSON 직렬화 시 포함되었거나, DB에서 다시 조회 (안전성 확보)
+            CareSessionDto confirmedSession = careSessionService.getSessionById(savedDto.getSessionId()); 
+            if (confirmedSession != null && confirmedSession.getConfirmedDate() != null) {
+                savedDto.setConfirmedTime(confirmedSession.getConfirmedDate().toString());
+            }
+        }
+        return savedDto;
     }
 
-    // --- DTO → 엔티티 변환 ---
+    // 최신 CareSession 상태 반영 메서드 (히스토리 조회 시 사용)
+    private ChatMessageDto convertToDtoWithLatestStatus(CareChatHistory entity) {
+        ChatMessageDto dto = convertToDto(entity); 
+
+        if ("CARE_REQUEST".equals(dto.getType()) && dto.getSessionId() != null) {
+            
+            CareSessionDto sessionDto = careSessionService.getSessionById(dto.getSessionId()); 
+
+            if (sessionDto != null) {
+                dto.setStatus(sessionDto.getStatus());
+                
+                if ("CONFIRMED".equals(sessionDto.getStatus()) && sessionDto.getConfirmedDate() != null) {
+                    dto.setConfirmedTime(sessionDto.getConfirmedDate().toString());
+                }
+            }
+        }
+        return dto;
+    }
+
+    // --- DTO → 엔티티 변환 (Data Truncation 방지 로직 추가) ---
     private CareChatHistory convertToEntity(ChatMessageDto dto) {
         CareChatHistory entity = new CareChatHistory();
         CareChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow();
@@ -69,12 +108,33 @@ public class ChatServiceImpl implements ChatService {
         entity.setChatSender(String.valueOf(dto.getSenderId()));
         entity.setCareChatRoom(chatRoom);
 
+        String messageType = dto.getType();
+        if (messageType == null || messageType.isEmpty()) {
+            messageType = "CHAT"; 
+        }
+        entity.setMessageType(messageType); 
+        
+        if (dto.getSessionId() != null) {
+            entity.setSessionId(dto.getSessionId());
+            entity.setCareStatus(dto.getStatus()); 
+        }
+
+        // ⭐ ⭐ ⭐ Data Truncation 방지 로직: 불필요한 필드를 null로 설정하여 JSON 길이 축소 ⭐ ⭐ ⭐
+        if ("CARE_REQUEST".equals(dto.getType())) {
+            // chatMessage 컬럼에 저장할 JSON 길이를 줄이기 위해
+            // 내용(Content)에 이미 포함되거나 History 조회 시 CareSessionService에서 조회할 정보는 제거합니다.
+            dto.setStartDate(null); 
+            dto.setEndDate(null);
+            dto.setConfirmedTime(null);
+            // dto.setNote(null); // NOTE가 길다면 이것도 null 처리 고려
+        }
+        // ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ 
+
         try {
             if ("CARE_REQUEST".equals(dto.getType()) || "CARE_CONFIRM".equals(dto.getType())) {
-                // CARE 관련 메시지는 JSON 직렬화
+                // CARE 관련 메시지는 길이 최적화된 DTO를 JSON 직렬화
                 entity.setChatMessage(objectMapper.writeValueAsString(dto));
             } else {
-                // 일반 채팅은 content만 저장
                 entity.setChatMessage(dto.getContent());
             }
         } catch (Exception e) {
@@ -84,7 +144,7 @@ public class ChatServiceImpl implements ChatService {
         return entity;
     }
 
-    // --- 엔티티 → DTO 변환 ---
+    // --- 엔티티 → DTO 변환 (변경 없음) ---
     private ChatMessageDto convertToDto(CareChatHistory entity) {
         ChatMessageDto dto = new ChatMessageDto();
 
@@ -96,7 +156,6 @@ public class ChatServiceImpl implements ChatService {
         Integer member1 = Integer.parseInt(ids[0]);
         Integer member2 = Integer.parseInt(ids[1]);
 
-        // 보낸 사람 기준으로 받는 사람 계산
         dto.setReceiverId(Integer.parseInt(entity.getChatSender()) == member1 ? member2 : member1);
         dto.setTimestamp(entity.getChatDate());
 
@@ -113,14 +172,14 @@ public class ChatServiceImpl implements ChatService {
                 dto.setStartDate(payload.getStartDate());
                 dto.setEndDate(payload.getEndDate());
                 dto.setNote(payload.getNote());
+                dto.setConfirmedTime(payload.getConfirmedTime());
             } else {
                 // 일반 채팅
-                dto.setType("CHAT");
+                dto.setType(entity.getMessageType() != null ? entity.getMessageType() : "CHAT"); 
                 dto.setContent(rawMessage);
             }
         } catch (Exception e) {
-            // 파싱 실패 시 fallback
-            dto.setType("CHAT");
+            dto.setType(entity.getMessageType() != null ? entity.getMessageType() : "CHAT");
             dto.setContent(entity.getChatMessage());
         }
 

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8">
-<title>1:1 채팅 + CareSession 테스트</title>
+<title>1:1 채팅 + CareSession + 리뷰 인라인 수정 최종본 (내용 유지)</title>
 <style>
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
@@ -13,14 +13,12 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 #chat-container { 
     flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; 
     margin:10px; border-radius:8px; overflow:hidden; 
-    position: relative; /* 팝업을 위해 필수 */
+    position: relative; 
 } 
 #message-area { flex-grow:1; padding:10px; overflow-y:auto; background:#f7f7f7; display:flex; flex-direction:column; }
 .message-row { display: flex; margin-bottom: 10px; align-items: flex-end; }
 .message-row.sent { justify-content: flex-end; }
 .message-row.received { justify-content: flex-start; }
-
-/* 프로필 이미지 (빈 동그라미) 스타일 및 클릭 가능 설정 */
 .profile-placeholder { 
     width: 40px; 
     height: 40px; 
@@ -29,10 +27,8 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
     margin-right: 10px; 
     align-self: flex-start; 
     flex-shrink: 0;
-    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+    cursor: pointer; 
 }
-
-/* 메시지 내용 및 시간 포함하는 컨텐츠 랩퍼 */
 .message-content-wrapper { 
     display: flex; 
     flex-direction: column; 
@@ -40,26 +36,18 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 }
 .message-row.sent .message-content-wrapper { align-items: flex-end; }
 .message-row.received .message-content-wrapper { align-items: flex-start; }
-
-/* 닉네임 -> User Name 스타일 및 클릭 가능 설정 */
 .user-nickname { 
     font-size: 12px; color: #555; margin-bottom: 4px; 
-    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+    cursor: pointer; 
 }
 .message-row.sent .user-nickname { display: none; }
-
-/* 기존 메시지 박스 스타일 */
 .message { padding:8px 12px; border-radius:18px; max-width:100%; word-wrap:break-word; position: relative; } 
 .sent .message { background:#dcf8c6; }
 .received .message { background:#fff; }
-
-/* 시간 스타일 */
 .message-time { font-size: 10px; color: #555; margin-top: 2px; align-self: flex-end; white-space: nowrap; }
 .message-row.received .message-time { align-self: flex-start; }
 .care-request { background:#FFFACD; padding:6px 10px; border-radius:12px; margin-top:4px; }
 .care-confirmed { background:#8FBC8F; padding:6px 10px; border-radius:12px; margin-top:4px; }
-
-/* 입력 영역 스타일 */
 #input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
 #message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
 #send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
@@ -118,11 +106,16 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 #review-list {
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 5px; /* 스크롤바 공간 */
+    padding-right: 5px; 
 }
 .review-item {
     padding: 10px 0;
     border-bottom: 1px dotted #ddd;
+    position: relative; 
+}
+/* 리뷰 내용 래퍼는 항상 표시 (내용 유지 요청에 따라) */
+.review-content-wrapper {
+    display: block;
 }
 .review-item:last-child {
     border-bottom: none;
@@ -137,10 +130,34 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 .review-body {
     font-size: 0.95em;
     color: #333;
+    word-break: break-all; 
 }
 .review-date {
     font-size: 0.8em;
     color: #999;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+}
+
+/* 수정/삭제 버튼 스타일 */
+.review-actions button {
+    font-size: 0.75em;
+    padding: 3px 6px;
+    margin-left: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #fff;
+}
+.review-actions button.edit {
+    color: #007bff;
+    border-color: #007bff;
+}
+.review-actions button.delete {
+    color: #dc3545;
+    border-color: #dc3545;
 }
 
 /* 리뷰 등록 폼 스타일 */
@@ -160,10 +177,10 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 .rating-input span {
     font-size: 1.5em;
     cursor: pointer;
-    color: #ccc; /* 비활성 별 색상 */
+    color: #ccc; 
 }
 .rating-input span.active {
-    color: gold; /* 활성 별 색상 */
+    color: gold; 
 }
 #submit-review-btn {
     width: 100%;
@@ -175,6 +192,62 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
     cursor: pointer;
 }
 
+/* ---------------------------------------------------------------------------------- */
+/* 3. 인라인 리뷰 수정 폼 스타일 (이미지 레이아웃에 맞게 조정) */
+/* ---------------------------------------------------------------------------------- */
+.edit-inline-form {
+    padding: 10px 0 0 0; 
+    margin-top: 0px; 
+    margin-bottom: 5px; 
+    width: 100%; 
+    box-sizing: border-box;
+    display: block; 
+}
+/* 수정 폼 내부의 경계선 스타일 */
+.edit-inline-form > div {
+    margin-top: 10px; 
+    padding-top: 10px; 
+    border-top: 1px dashed #ccc; 
+}
+.edit-inline-form h4 { 
+    margin: 5px 0 5px 0; 
+    font-size: 0.9em; 
+}
+.edit-review-textarea { 
+    width: 100%;
+    box-sizing: border-box; 
+    margin-bottom: 10px;
+    border: 1px solid #ccc; /* 테두리 추가 */
+    padding: 5px;
+}
+.edit-inline-rating { 
+    margin-bottom: 5px; 
+}
+.edit-inline-rating span {
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #ccc; 
+}
+.edit-inline-rating span.active {
+    color: gold; 
+}
+.edit-actions button {
+    font-size: 0.8em !important; 
+    padding: 5px 10px !important; 
+}
+.edit-actions button.save {
+    background: #28a745; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+.edit-actions button.cancel {
+    background: #dc3545; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-left: 5px;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -246,7 +319,7 @@ select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid 
 
         <h4>리뷰 목록</h4>
         <div id="review-list">
-            </div>
+        </div>
     </div>
 </div>
 
@@ -255,10 +328,12 @@ let senderId = null;
 let receiverId = null;
 let chatRoomId = null;
 let stompClient = null;
-let targetUserSeqForReview = null; // 현재 리뷰 대상 사용자 ID
-let currentRating = 0; // 리뷰 등록 시 선택된 별점
-
-let userNames = {}; // User Name 매핑 객체
+let targetUserSeqForReview = null; 
+let currentRating = 0; 
+let currentEditReviewId = null; 
+let currentEditRating = 0; 
+let currentEditForm = null; 
+let userNames = {}; 
 
 const messageArea = document.getElementById('message-area');
 const messageInput = document.getElementById('message-input');
@@ -269,24 +344,18 @@ const startDateInput = document.getElementById('start-date');
 const endDateInput = document.getElementById('end-date');
 const confirmCare = document.getElementById('confirm-care');
 
-// --------------------------------------------------------
-// LocalStorage 헬퍼 함수 💥 제거됨 💥
-// (DB의 status 필드를 사용하므로 더 이상 필요하지 않습니다.)
-// --------------------------------------------------------
 
 // --------------------------------------------------------
-// 초기화 및 이벤트 리스너 (User Name 저장 로직 반영)
+// 초기화 및 이벤트 리스너
 // --------------------------------------------------------
 
 window.onload = function() {
     const senderSelect = document.getElementById('sender-select');
     const receiverSelect = document.getElementById('receiver-select');
 
-    // 드롭다운에서 user_name 정보를 추출하여 userNames에 저장
     function extractUserNames(selectElement) {
         Array.from(selectElement.options).forEach(option => {
             if (option.value) {
-                // data-username 속성 사용
                 userNames[option.value] = option.dataset.username || `User ${option.value}`;
             }
         });
@@ -297,6 +366,9 @@ window.onload = function() {
 
     senderSelect.addEventListener('change', async (e) => {
         senderId = parseInt(e.target.value);
+        if(document.getElementById('review-popup').classList.contains('show') && targetUserSeqForReview) {
+            fetchReviews(targetUserSeqForReview);
+        }
         if (senderId && receiverId) await initChatRoom();
     });
     
@@ -316,31 +388,25 @@ window.onload = function() {
 
     confirmCare.addEventListener('click', sendCareRequest);
 
-    // 리뷰 별점 선택 이벤트 리스너 설정
     document.querySelectorAll('#new-rating span').forEach(star => {
         star.addEventListener('click', () => {
             currentRating = parseInt(star.dataset.rating);
-            updateStarRating(currentRating);
+            updateStarRating(currentRating, document.getElementById('new-rating'));
         });
     });
 
-    // 리뷰 등록 버튼 이벤트 리스너 설정
     document.getElementById('submit-review-btn').addEventListener('click', submitReview);
 };
 
 // --------------------------------------------------------
-// 돌봄 요청/확정 로직 (LocalStorage 로직 제거)
+// 채팅 및 돌봄 요청 로직 
 // --------------------------------------------------------
 
-/**
- * 돌봄 요청 메시지를 서버로 전송합니다.
- */
 function sendCareRequest() {
     const start = startDateInput.value;
     const end = endDateInput.value;
     if (!start || !end) return alert("날짜를 선택하세요.");
 
-    // 초(seconds)를 추가하여 백엔드 DTO @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")에 맞춥니다.
     const startWithSeconds = start + ':00';
     const endWithSeconds = end + ':00';
 
@@ -361,20 +427,14 @@ function sendCareRequest() {
     careForm.style.display = 'none';
     startDateInput.value = '';
     endDateInput.value = '';
-    // document.getElementById('session-status').value = 'REQUESTED'; // 해당 HTML 요소는 제거되었음
     document.getElementById('session-note').value = '';
 }
 
-/**
- * 돌봄 요청을 확정하는 메시지를 서버로 전송합니다.
- * @param {number} sessionId 확정할 CareSession ID
- * @param {number} senderIdFromMsg 요청 메시지를 보낸 사람 ID (요청자)
- */
 function confirmCareRequest(sessionId, senderIdFromMsg) {
     const chatMessage = {
         chatRoomId: chatRoomId,
-        senderId: senderId, // 확정하는 사람 (나)
-        receiverId: senderIdFromMsg, // 요청자 (상대방)
+        senderId: senderId,
+        receiverId: senderIdFromMsg,
         type: "CARE_CONFIRM",
         sessionId: sessionId,
         content: `✅ 돌봄 예약이 확정되었습니다.`
@@ -382,17 +442,9 @@ function confirmCareRequest(sessionId, senderIdFromMsg) {
     stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
 }
 
-
-/**
- * 실시간 CARE_CONFIRM 메시지 수신 시,
- * 화면에 존재하는 모든 해당 CARE_REQUEST UI를 업데이트하여 버튼을 제거하고 확정 상태를 표시합니다.
- * @param {number} sessionId 확정된 세션 ID
- * @param {string} confirmedTime 확정 시간 문자열
- */
 function updateCareRequestUI(sessionId, confirmedTime) {
     const requestElements = document.querySelectorAll(`[data-session-id="${sessionId}"]`);
     
-    // YYYY-MM-DDTHH:mm:ss -> YYYY-MM-DD HH:mm 형식으로 포맷팅
     const confirmedDate = new Date(confirmedTime.replace(' ', 'T'));
     const formattedDate = `${confirmedDate.getFullYear()}-${(confirmedDate.getMonth() + 1).toString().padStart(2, '0')}-${confirmedDate.getDate().toString().padStart(2, '0')}`;
     const hours = confirmedDate.getHours();
@@ -402,19 +454,17 @@ function updateCareRequestUI(sessionId, confirmedTime) {
     const formattedTime = `${formattedDate} ${ampm} ${hour12}:${minutes}`;
 
     requestElements.forEach(element => {
-        // 기존 확정 버튼 제거
         const confirmButton = element.querySelector('.confirm-btn');
         if (confirmButton) {
             confirmButton.remove();
         }
         
-        // 확정 상태 표시 (시간 정보 포함)
         const existingStatusSpan = element.querySelector('.care-status');
         if (existingStatusSpan) {
             existingStatusSpan.innerHTML = `[✅ 확정됨 - ${formattedTime}]`;
         } else {
             const confirmedSpan = document.createElement('span');
-            confirmedSpan.classList.add('care-status'); // 클래스 추가
+            confirmedSpan.classList.add('care-status'); 
             confirmedSpan.style.color = 'green';
             confirmedSpan.style.fontWeight = 'bold';
             confirmedSpan.innerText = `[✅ 확정됨 - ${formattedTime}]`;
@@ -423,23 +473,23 @@ function updateCareRequestUI(sessionId, confirmedTime) {
     });
 }
 
-// --------------------------------------------------------
-// 채팅방 및 웹소켓 연결 (이전과 동일)
-// --------------------------------------------------------
-
 async function initChatRoom() {
     if (!senderId || !receiverId) return;
     if (stompClient && stompClient.connected) stompClient.disconnect();
 
-    const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
-    const data = await res.json();
-    chatRoomId = data.chatSeq;
+    try {
+        const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
+        const data = await res.json();
+        chatRoomId = data.chatSeq;
 
-    const histRes = await fetch(`/api/chat/history?roomId=${chatRoomId}`);
-    const history = await histRes.json();
-    displayChatHistory(history);
+        const histRes = await fetch(`/api/chat/history?roomId=${chatRoomId}`);
+        const history = await histRes.json();
+        displayChatHistory(history);
 
-    connectWebSocket();
+        connectWebSocket();
+    } catch (error) {
+        console.error("채팅방 초기화 오류:", error);
+    }
 }
 
 function connectWebSocket() {
@@ -451,7 +501,6 @@ function connectWebSocket() {
             const chatMessage = JSON.parse(message.body);
             displayMessage(chatMessage);
             
-            // ⭐ 실시간 CARE_CONFIRM 메시지 수신 시 UI 업데이트
             if (chatMessage.type === "CARE_CONFIRM") {
                 updateCareRequestUI(chatMessage.sessionId, chatMessage.confirmedTime);
             }
@@ -476,189 +525,11 @@ function sendMessage() {
 }
 
 // --------------------------------------------------------
-// 리뷰 팝업 관련 함수 (이전과 동일)
+// 메시지 표시 
 // --------------------------------------------------------
 
-/**
- * 프로필이나 닉네임 클릭 시 리뷰 팝업을 엽니다.
- * @param {number} targetSeq 리뷰 대상 사용자 ID
- */
-function openReviewPopup(targetSeq) {
-    if (!targetSeq || targetSeq === senderId) {
-        alert("본인에 대한 리뷰는 등록하거나 확인할 수 없습니다.");
-        return;
-    }
-
-    targetUserSeqForReview = targetSeq;
-    const targetName = userNames[targetSeq] || `User ${targetSeq}`;
-
-    document.getElementById('review-target-name').innerText = `${targetName} 님 리뷰`;
-    document.getElementById('review-popup').classList.add('show');
-
-    // 리뷰 목록 및 평점 가져오기
-    fetchReviews(targetSeq);
-}
-
-function closeReviewPopup() {
-    document.getElementById('review-popup').classList.remove('show');
-    targetUserSeqForReview = null;
-    currentRating = 0;
-    document.getElementById('new-review-text').value = '';
-    updateStarRating(0);
-}
-
-/**
- * 서버에서 리뷰 목록을 가져와 화면에 표시합니다.
- */
-async function fetchReviews(targetSeq) {
-    const listArea = document.getElementById('review-list');
-    const avgRatingElem = document.getElementById('avg-rating');
-    const totalReviewsElem = document.getElementById('total-reviews');
-    listArea.innerHTML = '불러오는 중...';
-
-    try {
-        const response = await fetch(`/api/care-reviews?targetUserSeq=${targetSeq}`);
-        if (!response.ok) throw new Error('Failed to fetch reviews');
-        
-        const reviews = await response.json();
-        listArea.innerHTML = '';
-        
-        let totalRating = 0;
-        
-        if (reviews.length === 0) {
-            listArea.innerHTML = '<p style="text-align: center; color: #999;">등록된 리뷰가 없습니다.</p>';
-            avgRatingElem.innerHTML = '평점: <span class="star-rating">0.0</span>';
-            totalReviewsElem.innerText = '총 0개의 리뷰';
-            return;
-        }
-
-        reviews.forEach(review => {
-            totalRating += review.careRating;
-            listArea.appendChild(createReviewItem(review));
-        });
-
-        // 평점 요약 계산 및 표시
-        const average = (totalRating / reviews.length).toFixed(1);
-        const starHtml = '★'.repeat(Math.round(average)) + '☆'.repeat(5 - Math.round(average));
-        
-        avgRatingElem.innerHTML = `평점: <span class="star-rating">${average}</span> (${starHtml})`;
-        totalReviewsElem.innerText = `총 ${reviews.length}개의 리뷰`;
-
-    } catch (error) {
-        console.error("리뷰 로드 오류:", error);
-        listArea.innerHTML = '<p style="color: red;">리뷰를 불러오는 중 오류가 발생했습니다.</p>';
-        avgRatingElem.innerHTML = '평점: <span class="star-rating">--</span>';
-        totalReviewsElem.innerText = '총 --개의 리뷰';
-    }
-}
-
-/**
- * 리뷰 아이템 DOM 요소를 생성합니다.
- */
-function createReviewItem(review) {
-    const item = document.createElement('div');
-    item.classList.add('review-item');
-    
-    const starHtml = '★'.repeat(review.careRating) + '☆'.repeat(5 - review.careRating);
-    const date = new Date(review.createDate);
-    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-
-    item.innerHTML = `
-        <div class="review-header">
-            <span>${review.authorNickname}</span>
-            <span class="star-rating">${starHtml}</span>
-        </div>
-        <div class="review-body">${review.careReview}</div>
-        <div class="review-date">${dateString}</div>
-    `;
-    return item;
-}
-
-/**
- * 별점 아이콘의 활성화 상태를 업데이트합니다.
- */
-function updateStarRating(rating) {
-    document.querySelectorAll('#new-rating span').forEach(star => {
-        if (parseInt(star.dataset.rating) <= rating) {
-            star.classList.add('active');
-        } else {
-            star.classList.remove('active');
-        }
-    });
-}
-
-/**
- * 새로운 리뷰를 등록합니다.
- * 백엔드 DTO에 맞게 senderId를 authorUserSeq로 전송합니다.
- */
-async function submitReview() {
-    const reviewText = document.getElementById('new-review-text').value.trim();
-
-    if (currentRating === 0) {
-        return alert("별점을 선택해주세요.");
-    }
-    if (reviewText.length < 5) {
-        return alert("리뷰 내용을 5자 이상 입력해주세요.");
-    }
-    if (!targetUserSeqForReview || targetUserSeqForReview === senderId) {
-        return alert("리뷰 대상을 확인할 수 없습니다.");
-    }
-    if (!senderId) {
-        return alert("리뷰를 작성할 '보내는 사람'을 선택해주세요.");
-    }
-
-    const requestBody = {
-        // 백엔드 DTO에 맞게 senderId를 작성자로 설정
-        authorUserSeq: senderId, 
-        targetUserSeq: targetUserSeqForReview,
-        careReview: reviewText,
-        careRating: currentRating,
-        targetRole: "provider" 
-    };
-
-    try {
-        const response = await fetch('/api/care-reviews', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            // 서버에서 에러 메시지를 JSON으로 반환하면 처리
-            const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
-            throw new Error(`리뷰 등록에 실패했습니다. (${errorData.message})`);
-        }
-
-        alert("리뷰가 성공적으로 등록되었습니다!");
-        
-        // 폼 초기화
-        document.getElementById('new-review-text').value = '';
-        currentRating = 0;
-        updateStarRating(0);
-
-        // 리뷰 목록 새로고침
-        fetchReviews(targetUserSeqForReview);
-
-    } catch (error) {
-        console.error("리뷰 등록 오류:", error);
-        alert(error.message || "리뷰 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-    }
-}
-
-// --------------------------------------------------------
-// 메시지 표시 (클릭 이벤트 추가) - DB 상태 반영
-// --------------------------------------------------------
-
-/**
- * 날짜 문자열(YYYY-MM-DDTHH:mm:ss)을 포맷팅합니다.
- * @param {string} dateString DTO에서 넘어온 날짜 문자열
- * @returns {string} 포맷팅된 날짜 문자열 (YYYY-MM-DD HH:mm)
- */
 function formatDateTime(dateString) {
     if (!dateString) return '';
-    // YYYY-MM-DDTHH:mm:ss 또는 YYYY-MM-DD HH:mm:ss 형태를 파싱
     const date = new Date(dateString.replace(' ', 'T'));
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -669,13 +540,9 @@ function formatDateTime(dateString) {
 }
 
 
-/**
- * 단일 메시지를 화면에 표시합니다.
- * @param {object} chatMessage 백엔드에서 받은 ChatMessageDto 객체
- */
 function displayMessage(chatMessage) {
     const isSent = chatMessage.senderId === senderId;
-    const senderIdForPopup = chatMessage.senderId; // 리뷰 대상은 메시지 보낸 사람
+    const senderIdForPopup = chatMessage.senderId; 
 
     const senderName = userNames[chatMessage.senderId] || `User ${chatMessage.senderId}`;
     
@@ -683,7 +550,6 @@ function displayMessage(chatMessage) {
     messageRow.classList.add('message-row');
     messageRow.classList.add(isSent ? 'sent' : 'received');
     
-    // ⭐ 시각 정보 포맷팅 (DB 저장 시간)
     const timeToFormat = chatMessage.timestamp ? new Date(chatMessage.timestamp.replace(' ', 'T')) : new Date();
     const hours = timeToFormat.getHours();
     const minutes = timeToFormat.getMinutes().toString().padStart(2,'0');
@@ -691,40 +557,32 @@ function displayMessage(chatMessage) {
     const hour12 = hours % 12 === 0 ? 12 : hours % 12;
     const timeString = `${ampm} ${hour12}:${minutes}`;
     
-    // 2. 받은 메시지인 경우에만 프로필 플레이스홀더 추가
     if (!isSent) {
         const profilePlaceholder = document.createElement('div');
         profilePlaceholder.classList.add('profile-placeholder');
-        // 프로필 클릭 이벤트 리스너 추가
         profilePlaceholder.addEventListener('click', () => openReviewPopup(senderIdForPopup));
         messageRow.appendChild(profilePlaceholder);
     }
 
-    // 3. User Name, 메시지 본문, 시간을 담는 content wrapper 생성
     const contentWrapper = document.createElement('div');
     contentWrapper.classList.add('message-content-wrapper');
 
-    // User Name 추가 (받은 메시지에만 표시)
     if (!isSent) {
         const nameDiv = document.createElement('div');
         nameDiv.classList.add('user-nickname'); 
         nameDiv.innerText = senderName; 
-        // User Name 클릭 이벤트 리스너 추가
         nameDiv.addEventListener('click', () => openReviewPopup(senderIdForPopup));
         contentWrapper.appendChild(nameDiv);
     }
 
-    // 메시지 본문
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
 
     if (chatMessage.type === "CARE_REQUEST") {
         const careDiv = document.createElement('div');
-        // ⭐ data-session-id 속성 추가 (CARE_CONFIRM 수신 시 UI 업데이트를 위함)
         careDiv.setAttribute('data-session-id', chatMessage.sessionId || -1); 
         careDiv.classList.add('care-request');
 
-        // ⭐ DB에서 넘어온 status 필드만 사용합니다.
         const status = chatMessage.status || 'REQUESTED';
         const sessionId = chatMessage.sessionId || -1;
         const isReceiver = chatMessage.senderId !== senderId;
@@ -732,11 +590,9 @@ function displayMessage(chatMessage) {
         let confirmButtonHtml = '';
         let statusDisplay = '';
 
-        // ⭐ status 필드를 기준으로 상태 표시 및 버튼 결정
         if (status === 'REQUESTED' && isReceiver) {
             confirmButtonHtml = `<button class="confirm-btn" data-session-id="${sessionId}" data-sender-id="${chatMessage.senderId}">확정</button>`;
         } else if (status === 'CONFIRMED') {
-            // ⭐ 확정 시간 포맷팅 및 표시
             const formattedConfirmTime = chatMessage.confirmedTime ? 
                 formatDateTime(chatMessage.confirmedTime) : 
                 '시간 정보 없음';
@@ -745,7 +601,6 @@ function displayMessage(chatMessage) {
             statusDisplay = `<span class="care-status" style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
         }
         
-        // ⭐ 돌봄 기간 포맷팅
         const formattedStartDate = formatDateTime(chatMessage.startDate);
         const formattedEndDate = formatDateTime(chatMessage.endDate);
 
@@ -759,7 +614,6 @@ function displayMessage(chatMessage) {
         `;
         messageDiv.appendChild(careDiv);
 
-        // 확정 버튼 클릭 이벤트 리스너
         if (status === 'REQUESTED' && isReceiver) {
             const confirmButton = careDiv.querySelector('.confirm-btn');
             if (confirmButton) {
@@ -767,11 +621,8 @@ function displayMessage(chatMessage) {
                     const session_Id = parseInt(event.target.dataset.sessionId);
                     const sender_Id = parseInt(event.target.dataset.senderId);
                     if (session_Id !== -1) {
-                        // 서버로 확정 메시지 전송
                         confirmCareRequest(session_Id, sender_Id);
 
-                        // ⭐ UI 즉시 업데이트 (로컬에서만 업데이트, 실제 확정은 서버 응답 후 갱신되지만, UX를 위해 즉시 변경 시도)
-                        // 주의: 이 로직은 서버 응답(CARE_CONFIRM)을 기다리는 것이 더 안전하지만, 빠른 UX를 위해 임시로 즉시 변경
                         const tempConfirmedTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
                         updateCareRequestUI(session_Id, tempConfirmedTime);
                     }
@@ -803,6 +654,354 @@ function displayChatHistory(history) {
     messageArea.innerHTML = '';
     if (history && Array.isArray(history)) {
         history.forEach(msg => displayMessage(msg)); 
+    }
+}
+
+
+// --------------------------------------------------------
+// 리뷰 팝업 및 로직 
+// --------------------------------------------------------
+
+function openReviewPopup(targetSeq) {
+    if (!targetSeq || targetSeq === senderId) {
+        alert("본인에 대한 리뷰는 등록하거나 확인할 수 없습니다.");
+        return;
+    }
+    
+    if (currentEditForm) {
+        cancelEdit();
+    }
+
+    targetUserSeqForReview = targetSeq;
+    const targetName = userNames[targetSeq] || `User ${targetSeq}`;
+
+    document.getElementById('review-target-name').innerText = `${targetName} 님 리뷰`;
+    document.getElementById('review-popup').classList.add('show');
+
+    fetchReviews(targetSeq);
+}
+
+function closeReviewPopup() {
+    document.getElementById('review-popup').classList.remove('show');
+    targetUserSeqForReview = null;
+    
+    currentRating = 0;
+    document.getElementById('new-review-text').value = '';
+    updateStarRating(0, document.getElementById('new-rating'));
+
+    if (currentEditForm) {
+        cancelEdit();
+    }
+}
+
+async function fetchReviews(targetSeq) {
+    const listArea = document.getElementById('review-list');
+    const avgRatingElem = document.getElementById('avg-rating');
+    const totalReviewsElem = document.getElementById('total-reviews');
+    listArea.innerHTML = '불러오는 중...';
+
+    try {
+        // 이 API 경로는 사용자의 서버 환경에 맞게 조정되어야 합니다.
+        const response = await fetch(`/api/care-reviews?targetUserSeq=${targetSeq}`);
+        if (!response.ok) throw new Error('Failed to fetch reviews');
+        
+        const reviews = await response.json();
+        listArea.innerHTML = '';
+        
+        let totalRating = 0;
+        
+        if (reviews.length === 0) {
+            listArea.innerHTML = '<p style="text-align: center; color: #999;">등록된 리뷰가 없습니다.</p>';
+            avgRatingElem.innerHTML = '평점: <span class="star-rating">0.0</span>';
+            totalReviewsElem.innerText = '총 0개의 리뷰';
+            return;
+        }
+
+        reviews.forEach(review => {
+            totalRating += review.careRating;
+            listArea.appendChild(createReviewItem(review));
+        });
+
+        const average = (totalRating / reviews.length).toFixed(1);
+        const starHtml = '★'.repeat(Math.round(average)) + '☆'.repeat(5 - Math.round(average));
+        
+        avgRatingElem.innerHTML = `평점: <span class="star-rating">${average}</span> (${starHtml})`;
+        totalReviewsElem.innerText = `총 ${reviews.length}개의 리뷰`;
+
+    } catch (error) {
+        console.error("리뷰 로드 오류:", error);
+        listArea.innerHTML = '<p style="color: red;">리뷰를 불러오는 중 오류가 발생했습니다.</p>';
+        avgRatingElem.innerHTML = '평점: <span class="star-rating">--</span>';
+        totalReviewsElem.innerText = '총 --개의 리뷰';
+    }
+}
+
+/**
+ * 리뷰 아이템 DOM 요소를 생성합니다. 
+ */
+function createReviewItem(review) {
+    const item = document.createElement('div');
+    item.classList.add('review-item');
+    
+    const starHtml = '★'.repeat(review.careRating) + '☆'.repeat(5 - review.careRating);
+    const date = new Date(review.createDate);
+    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+
+    // 현재 로그인된 사용자가 리뷰 작성자인 경우에만 수정/삭제 버튼 표시
+    let actionButtons = '';
+    if (review.authorUserSeq === senderId) { 
+        actionButtons = `
+            <div class="review-actions">
+                <button class="edit" onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
+                <button class="delete" onclick="deleteReview(${review.reviewSeq})">삭제</button>
+            </div>
+        `;
+    }
+
+
+    item.innerHTML = `
+        <div class="review-content-wrapper">
+            <div class="review-header">
+                <span>${review.authorNickname}</span>
+                <span class="star-rating">${starHtml}</span>
+            </div>
+            <div class="review-body">${review.careReview}</div>
+            <div class="review-date">
+                <span>${dateString}</span>
+                ${actionButtons}
+            </div>
+        </div>
+    `;
+    item.id = `review-item-${review.reviewSeq}`;
+
+    return item;
+}
+
+function updateStarRating(rating, container) {
+    container.querySelectorAll('span').forEach(star => {
+        if (parseInt(star.dataset.rating) <= rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+async function submitReview() {
+    const reviewText = document.getElementById('new-review-text').value.trim();
+
+    if (currentRating === 0) {
+        return alert("별점을 선택해주세요.");
+    }
+    if (reviewText.length < 5) {
+        return alert("리뷰 내용을 5자 이상 입력해주세요.");
+    }
+    if (!targetUserSeqForReview || targetUserSeqForReview === senderId) {
+        return alert("리뷰 대상을 확인할 수 없습니다.");
+    }
+    if (!senderId) {
+        return alert("리뷰를 작성할 '보내는 사람'을 선택해주세요. (API 호출에 필요)");
+    }
+
+    const requestBody = {
+        authorUserSeq: senderId, 
+        targetUserSeq: targetUserSeqForReview,
+        careReview: reviewText,
+        careRating: currentRating,
+        targetRole: "provider" 
+    };
+
+    try {
+        // 이 API 경로는 사용자의 서버 환경에 맞게 조정되어야 합니다.
+        const response = await fetch('/api/care-reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
+            throw new Error(`리뷰 등록에 실패했습니다. (${errorData.message})`);
+        }
+
+        alert("리뷰가 성공적으로 등록되었습니다!");
+        
+        currentRating = 0;
+        document.getElementById('new-review-text').value = '';
+        updateStarRating(0, document.getElementById('new-rating'));
+
+        fetchReviews(targetUserSeqForReview); 
+
+    } catch (error) {
+        console.error("리뷰 등록 오류:", error);
+        alert(error.message || "리뷰 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+}
+
+/**
+ * ⭐ 인라인 수정 폼을 생성하고 해당 리뷰 밑에 표시합니다. (원본 내용 유지)
+ */
+function editReview(reviewId, content, rating) {
+    // 이미 다른 폼이 열려 있다면 닫습니다.
+    if (currentEditForm) {
+        cancelEdit();
+    }
+    
+    const reviewItem = document.getElementById(`review-item-${reviewId}`);
+    if (!reviewItem) return;
+
+    currentEditReviewId = reviewId;
+    currentEditRating = rating;
+
+    // ⭐ 버튼 일시적으로 숨기기
+    const actions = reviewItem.querySelector('.review-actions');
+    if (actions) actions.style.visibility = 'hidden'; 
+    
+    // 폼 내용 (이미지 모양과 일치하도록)
+    const starHtml = `
+        <div class="rating-input edit-inline-rating">
+            <span data-rating="1">★</span>
+            <span data-rating="2">★</span>
+            <span data-rating="3">★</span>
+            <span data-rating="4">★</span>
+            <span data-rating="5">★</span>
+        </div>
+    `;
+    
+    const formHtml = document.createElement('div');
+    formHtml.classList.add('edit-inline-form');
+    // ⭐ div로 감싸고 border-top 스타일을 적용하여 분리된 느낌 연출
+    formHtml.innerHTML = `
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;">
+            <h4>별점:</h4>
+            ${starHtml}
+            <h4>내용:</h4>
+            <textarea class="edit-review-textarea" rows="3">${content}</textarea>
+            <div class="edit-actions" style="margin-top: 5px; text-align: right;">
+                <button class="save" onclick="saveEditReview()">저장</button>
+                <button class="cancel" onclick="cancelEdit()">취소</button>
+            </div>
+        </div>
+    `;
+
+    // ⭐ 기존 리뷰 내용 바로 밑에 수정 폼 추가
+    reviewItem.appendChild(formHtml);
+    currentEditForm = formHtml;
+    
+    // 별점 UI 설정
+    const starContainer = formHtml.querySelector('.edit-inline-rating');
+    updateStarRating(rating, starContainer); 
+
+    starContainer.querySelectorAll('span').forEach(star => {
+        star.addEventListener('click', () => {
+            currentEditRating = parseInt(star.dataset.rating);
+            updateStarRating(currentEditRating, starContainer);
+        });
+    });
+
+    // 스크롤 이동
+    const reviewList = document.getElementById('review-list');
+    const itemOffset = reviewItem.offsetTop;
+    const listHeight = reviewList.clientHeight;
+    // 수정 폼이 중앙에서 약간 위에 오도록 스크롤 위치 조정
+    reviewList.scrollTop = itemOffset - (listHeight / 4);
+}
+
+
+/**
+ * ⭐ 수정 폼을 닫고 버튼을 복원합니다.
+ */
+function cancelEdit() {
+    if (!currentEditReviewId || !currentEditForm) return;
+
+    const reviewItem = document.getElementById(`review-item-${currentEditReviewId}`);
+    
+    currentEditForm.remove();
+
+    // ⭐ 버튼 다시 표시
+    if (reviewItem) {
+        const actions = reviewItem.querySelector('.review-actions');
+        if (actions) actions.style.visibility = 'visible';
+    }
+    
+    currentEditReviewId = null;
+    currentEditRating = 0;
+    currentEditForm = null;
+}
+
+
+async function saveEditReview() {
+    if (!currentEditReviewId || !currentEditForm) return alert("수정할 리뷰를 찾을 수 없습니다.");
+    if (!senderId) return alert("'보내는 사람'을 선택해야 수정이 가능합니다. (API 호출에 필요)"); 
+
+    const editedText = currentEditForm.querySelector('.edit-review-textarea').value.trim();
+
+    if (currentEditRating === 0) {
+        return alert("별점을 선택해주세요.");
+    }
+    if (editedText.length < 5) {
+        return alert("리뷰 내용을 5자 이상 입력해주세요.");
+    }
+    
+    const requestBody = {
+        authorUserSeq: senderId, 
+        targetUserSeq: targetUserSeqForReview, 
+        careReview: editedText,
+        careRating: currentEditRating,
+        targetRole: "provider" 
+    };
+
+    try {
+        // 이 API 경로는 사용자의 서버 환경에 맞게 조정되어야 합니다.
+        const response = await fetch(`/api/care-reviews/${currentEditReviewId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
+            throw new Error(`리뷰 수정에 실패했습니다. (${errorData.message})`);
+        }
+
+        alert("리뷰가 성공적으로 수정되었습니다!");
+        
+        cancelEdit(); 
+        fetchReviews(targetUserSeqForReview); 
+
+    } catch (error) {
+        console.error("리뷰 수정 오류:", error);
+        alert(error.message || "리뷰 수정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+}
+
+
+async function deleteReview(reviewId) {
+    if (!senderId) return alert("'보내는 사람'을 선택해야 삭제가 가능합니다. (API 호출에 필요)"); 
+    if (!confirm("정말로 이 리뷰를 삭제하시겠습니까?")) return;
+
+    if (currentEditReviewId === reviewId) {
+        cancelEdit();
+    }
+
+    try {
+        // 이 API 경로는 사용자의 서버 환경에 맞게 조정되어야 합니다.
+        const response = await fetch(`/api/care-reviews/${reviewId}?authorUserSeq=${senderId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
+            throw new Error(`리뷰 삭제에 실패했습니다. (${errorData.message})`);
+        }
+
+        alert("리뷰가 성공적으로 삭제되었습니다!");
+        fetchReviews(targetUserSeqForReview); 
+
+    } catch (error) {
+        console.error("리뷰 삭제 오류:", error);
+        alert(error.message || "리뷰 삭제 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
 }
 </script>

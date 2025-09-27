@@ -15,4 +15,6 @@ public class CareReviewResopnseDto {
 	private Integer careRating;
 	private LocalDateTime createDate;
 
+	
+	private Integer authorUserSeq; 
 }
