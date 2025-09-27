@@ -4,31 +4,42 @@
 	<div th:fragment="navbarFragment">
 		<!-- 네비게이션 바 -->
 		<nav class="navbar navbar-light bg-light border-bottom">
-			<div class="container-fluid">
-				<!-- 로고 + 브랜드 -->
-				<a class="navbar-brand d-flex align-items-center" href="/"> <img
-					th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100"
-					class="me-2"> <img th:src="@{/images/logo.png}" alt="로고"
-					width="70" height="100">
-				</a>
-
-				<!-- 오른쪽 영역 -->
-				<div class="d-flex align-items-center">
-					<a class="btn btn-fatcat me-3" th:href="@{/users/login}"
-						style="font-size: 20px;">로그인</a>
-						
-					<a class="btn btn-fatcat me-3" th:href="@{/shopping/cart}"
-						style="font-size: 20px;">장바구니</a>
-						
-					<!-- 햄버거 버튼 -->
-					<button class="navbar-toggler" type="button"
-						data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-						aria-controls="sidebarMenu" aria-label="Toggle navigation">
-						<span class="navbar-toggler-icon"></span>
-					</button>
-				</div>
-			</div>
+		  <div class="container-fluid">
+		    <!-- 로고 + 브랜드 -->
+		    <a class="navbar-brand d-flex align-items-center" href="/">
+		      <img th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100" class="me-2">
+		      <img th:src="@{/images/logo.png}" alt="로고" width="70" height="100">
+		    </a>
+		
+		    <!-- 오른쪽 영역 -->
+		    <div class="d-flex align-items-center">
+		
+		      <!-- ✅ 로그인 안 했을 때 -->
+		      <a th:href="@{/users/login}" sec:authorize="isAnonymous()" class="btn btn-fatcat me-3"
+		         style="font-size:18px;">로그인</a>
+		
+		      <!-- ✅ 로그인 했을 때 -->
+		      <span sec:authorize="isAuthenticated()" class="me-3" style="font-size:18px;">
+		        <b th:text="${#authentication.principal.userName}"></b> 님 환영합니다
+		      </span>
+		      <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()" class="btn btn-fatcat me-3"
+		         style="font-size:18px;">로그아웃</a>
+		
+		      <!-- 장바구니 버튼 -->
+		      <a class="btn btn-fatcat me-3" th:href="@{/shopping/cart}" style="font-size: 20px;">
+		        장바구니
+		      </a>
+		
+		      <!-- 햄버거 버튼 -->
+		      <button class="navbar-toggler" type="button"
+		              data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+		              aria-controls="sidebarMenu" aria-label="Toggle navigation">
+		        <span class="navbar-toggler-icon"></span>
+		      </button>
+		    </div>
+		  </div>
 		</nav>
+
 
 		<!-- 오프캔버스 (사이드바) -->
 		<div class="offcanvas offcanvas-end" tabindex="-1" id="sidebarMenu"

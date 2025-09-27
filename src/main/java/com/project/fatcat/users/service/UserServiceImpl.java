@@ -2,10 +2,14 @@ package com.project.fatcat.users.service;
 
 import java.io.IOException;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.fatcat.entity.User;
+import com.project.fatcat.entity.enums.UserRole;
 import com.project.fatcat.users.dto.SignupDTO;
 import com.project.fatcat.users.repository.UserRepository;
 
@@ -13,24 +17,23 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService, UserDetailsService{
 
 	private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 🔹 회원가입
     public User register(SignupDTO dto) throws IOException {
-    	// 비밀번호 확인
+        // 비밀번호 확인
         if (!dto.getUserPassword().equals(dto.getPasswordConfirm())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 파일 저장 (프로필 / 수의사 면허 이미지)
-//        String profilePath = saveFile(dto.getProfileImageUrl(), "profile");
-//        String vetLicensePath = saveFile(dto.getVetLicenseImage(), "vet");
-        String profilePath = "";
+        String profilePath = ""; // TODO: 파일 업로드 구현 시 변경
         String vetLicensePath = "";
-        
-        //if()
+
+        System.out.println("getLatitude : " + dto.getLatitude());
+        System.out.println("getLongitude : " + dto.getLongitude());
 
         // User 엔티티 생성
         User user = User.builder()
@@ -44,13 +47,19 @@ public class UserServiceImpl implements UserService{
                 .zipCode(dto.getZipCode())
                 .latitude(dto.getLatitude())
                 .longitude(dto.getLongitude())
-//                .role("ROLE_USER")
-//                .vetLicenseImage(vetLicensePath)
-//                .createDate(LocalDateTime.now())
-//                .isDeleted(false)
+                .role(UserRole.ROLE_USER) 
+                .userType("A")
+                //.vetLicenseImage(vetLicensePath)
                 .build();
 
         return userRepository.save(user);
+    }
+
+    // 🔹 로그인 처리 (Spring Security에서 호출)
+    @Override
+    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+        return userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다: " + userEmail));
     }
     
 //    private String saveFile(MultipartFile file, String folder) throws IOException {

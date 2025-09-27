@@ -32,11 +32,12 @@ public class UserController {
 	@PostMapping("/signup")
     public String signupSubmit(@ModelAttribute SignupDTO dto, Model model) {
         try {
+        	
         	userServiceImpl.register(dto);
-            return "redirect:/login"; // 회원가입 완료 후 로그인 페이지로 이동
+            return "redirect:/users/login"; // 회원가입 완료 후 로그인 페이지로 이동
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "user/signup";
+            return "home/signup";
         }
     }
 }

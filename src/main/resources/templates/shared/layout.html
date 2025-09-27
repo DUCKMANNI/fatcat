@@ -25,6 +25,19 @@
 
 	<!-- 페이지 개별 스크립트 -->
 	<th:block layout:fragment="script"></th:block>
+	
+	<script th:inline="javascript">
+  /*<![CDATA[*/
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has("success")) {
+    alert("로그인 성공!");
+  }
+  if (urlParams.has("logout")) {
+    alert("로그아웃 되었습니다.");
+  }
+  /*]]>*/
+</script>
+
 </body>
 <footer class="text-center py-3">
     <div class="container">

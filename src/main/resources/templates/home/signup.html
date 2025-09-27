@@ -17,7 +17,7 @@
 			고양이 지식방 - 수의사에게 질문</h1>
 
 		<!-- 입력 폼 -->
-		<form action="user/signup" method="post" style="max-width: 600px; margin: 0 auto;">
+		<form th:action="@{/users/signup}" method="post" style="max-width: 600px; margin: 0 auto;">
 
 			<!-- 🔹 기본 정보 -->
 		      <input type="email" name="userEmail" class="login-input" placeholder="E-mail (아이디)" required>
@@ -70,20 +70,30 @@
 		
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <!-- 카카오 지도 API (좌표 변환용) -->
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&libraries=services"></script>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=94d1c331dbd40471d2fb9d113ba5d78b&libraries=services"></script>
 <script>
+
+
 function execDaumPostcode() {
+	console.log("execDaumPostcode 실행됨 ✅");
 	  new daum.Postcode({
+
 	    oncomplete: function(data) {
+	    	
+	    	console.log("oncomplete 실행됨 ✅", data);
 	      // ✅ 기본주소 & 우편번호 채우기
 	      document.getElementById('address1').value = data.roadAddress;
 	      document.getElementById('zipCode').value = data.zonecode;
+	      
+	      console.log("도로명주소:", data.roadAddress);
 
 	      try {
 	        // ✅ 좌표 변환 (에러 나도 팝업은 닫히게)
 	        var geocoder = new kakao.maps.services.Geocoder();
 	        geocoder.addressSearch(data.roadAddress, function(result, status) {
+	        	console.log("status:", status, "result:", result);
 	          if (status === kakao.maps.services.Status.OK) {
+	        	  console.log("변환 성공:", result[0]);
 	            document.getElementById('latitude').value = result[0].y;
 	            document.getElementById('longitude').value = result[0].x;
 	          }
@@ -91,7 +101,7 @@ function execDaumPostcode() {
 	      } catch (e) {
 	        console.error("Geocoder 에러:", e);
 	      }
-	    }
+	    } 
 	  }).open(); // 👉 팝업으로 열기
 	}
 	

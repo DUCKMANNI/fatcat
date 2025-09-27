@@ -26,10 +26,18 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                 .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+            .formLogin(login -> login
+                    .loginPage("/users/login")   // 내가 만든 로그인 페이지
+                    .loginProcessingUrl("/login") // form action이랑 맞춰야 함
+                    .defaultSuccessUrl("/", true) // 로그인 성공 후 이동할 페이지
+                    .failureUrl("/users/login?error=true") // 실패 시
+                    .usernameParameter("userEmail") // DTO에서 이메일을 username처럼 사용
+                    .passwordParameter("userPassword")
+                )
 
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/?logout")
                 .invalidateHttpSession(true))
             .csrf(csrf -> csrf.disable());
         
