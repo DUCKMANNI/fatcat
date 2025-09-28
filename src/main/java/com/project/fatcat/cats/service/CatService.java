@@ -157,6 +157,7 @@ public class CatService {
             String savedImageUrl = cat.getCatImageUrl();
     
             MultipartFile catImageFile = catUpdateDTO.getCatImageFile();
+            
             if (catImageFile != null && !catImageFile.isEmpty()) {
                 try {
                 		
