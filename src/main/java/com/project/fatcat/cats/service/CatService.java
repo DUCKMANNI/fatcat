@@ -115,7 +115,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -129,10 +131,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.project.fatcat.upload.fatcatSftp;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CatService {
+
 
     private final CatRepository catRepository;
 
@@ -154,6 +159,11 @@ public class CatService {
             MultipartFile catImageFile = catUpdateDTO.getCatImageFile();
             if (catImageFile != null && !catImageFile.isEmpty()) {
                 try {
+                		
+                		fatcatSftp fatcatSftp = new fatcatSftp();
+                		fatcatSftp.sftpFileUpload(catImageFile);
+                	
+                		/* 유정쓰가 만든거 잠깐 주석~~~~
                     // 1. 파일 저장 경로 설정 및 디렉토리 생성
                     Path uploadPath = Paths.get(uploadDir); // 변경된 부분
                     if (!Files.exists(uploadPath)) {
@@ -183,12 +193,15 @@ public class CatService {
                             log.error("Failed to delete old image file: " + savedImageUrl, e);
                         }
                     }
+                    */
     
                     // 5. DB에 저장될 URL 업데이트 (웹에서 접근 가능한 URL)
-                    savedImageUrl = "/images/cat-profiles/" + savedFilename;
+                    //savedImageUrl = "/images/cat-profiles/" + savedFilename;
     
                 } catch (IOException e) {
                     log.error("Failed to upload image file", e);
+                } catch (Exception ee) {
+                		
                 }
             }
     

@@ -6,17 +6,31 @@
 <meta charset="UTF-8">
 <title>돌봄서비스 구인등록</title>
 <style>
+
+.form-label {
+    /* Bootstrap 기본값인 mb-1(margin-bottom: 0.25rem)을 0으로 재정의합니다. */
+    margin-bottom: 0;
+}
+
+/* ⭐️ 새로 추가: 가격 입력 필드의 너비를 제한 */
+.price-input-width {
+    width: 700px; /* 원하는 너비로 조정 가능 */
+}
 #controls {
+	 /* 기존: justify-content: space-between; (양 끝으로 벌림) */
+    /* ⭐️ 변경: justify-content: flex-start; (왼쪽으로 모이게 함) */
 	background: rgba(255, 255, 255, 0.96);
 	border: 1px solid #ddd;
 	border-radius: 14px;
 	padding: 15px 20px;
-	gap: 20px;
+	/* 드롭다운 그룹과 검색 버튼 사이의 간격 */
+	gap: 15px; 
 	align-items: center;
-	margin: 20px auto;
-	width: 100%;
+	margin: 2px auto; 
+    /* width: 100%; */
 	display: flex;
-	justify-content: space-between;
+	/* ⭐️ 이 부분을 flex-start로 변경합니다. */
+	justify-content: flex-start;
 }
 
 .controls-item {
@@ -25,7 +39,7 @@
 	align-items: center;
 }
 
-#controls select, #controls button {
+#controls select {
 	height: 36px;
 	font-size: 14px;
 	border-radius: 8px;
@@ -37,14 +51,14 @@
 	width: 120px; /* 드롭다운 너비 고정 */
 }
 
-#controls button {
+/* #controls button {
 	cursor: pointer;
 	border: none;
 	background: #CD853F;
 	color: #fff;
 	font-weight: 600;
 	padding: 10px 12px;
-}
+} */
 
 #map {
 	height: 100%;
@@ -52,10 +66,10 @@
 	border-radius: 24px;
 	position: relative;
 }
-
+/* 
 .fixed-element button {
 	display: block !important;
-}
+} */
 
 /* 폼 컨테이너와 지도 컨테이너의 간격 조절 */
 .row {
@@ -83,60 +97,63 @@
 					
 					<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
 
-					나중에 사용자 정보 로그인하구 히든으로 바꾸세여 지금은 임시로 텍스트 넣는거임 ~~~ <input type="text"
+					<!-- 나중에 사용자 정보 로그인하구 히든으로 바꾸세여 지금은 임시로 텍스트 넣는거임 ~~~ --> <input type="hidden"
 						th:field="*{userSeq}" />
 
 					<div class="mb-2">
-						<label for="careTitle" class="form-label">제목</label> <input
+						<label for="careTitle" class="form-label" style="font-size:25px;">제목</label> <input
 							type="text" id="careTitle" th:field="*{careTitle}"
-							class="form-control" required />
-						<div class="invalid-feedback">제목을 입력해주세요.</div>
+							class="form-control" style="font-size:20px;" required />
+						<div class="invalid-feedback" style="font-size:20px;">제목을 입력해주세요.</div>
 					</div>
 
 					<div class="mb-2">
-						<label for="careContent" class="form-label">내용</label>
+						<label for="careContent" class="form-label" style="font-size:25px;">내용</label>
 						<textarea id="careContent" th:field="*{careContent}" rows="10"
-							class="form-control" required></textarea>
-						<div class="invalid-feedback">내용을 입력해주세요.</div>
+							class="form-control" style="font-size:20px;" required></textarea>
+						<div class="invalid-feedback" style="font-size:20px;">내용을 입력해주세요.</div>
 					</div>
 
 					<div class="mb-2">
-						<label for="price" class="form-label">가격</label> <input
-							type="number" id="price" th:field="*{price}" class="form-control"
-							required />원
+						<label for="price" class="form-label" style="font-size: 25px;">가격</label>
+						<div
+							style="font-size: 20px; display: flex; align-items: center; gap: 5px;">
+							<input type="number" id="price" th:field="*{price}"
+								class="form-control price-input-width" style="font-size:20px;" required /> 원
+						</div>
 						<div class="invalid-feedback">가격을 입력해주세요.</div>
 					</div>
 
-					<div class="mb-3">
-						<label class="form-label">주소 검색</label>
+					<div class="mb-2">
+						<label class="form-label" style="font-size:25px;">주소 검색</label>
 						<div id="controls" class="d-flex">
-							<div class="controls-item">
-								<label class="mx-2">시/도<select id="sido"></select></label> <label
-									class="mx-2">시/군/구<select id="sigungu"></select></label> <label
-									class="mx-2">동<select id="dong"></select></label>
+							<div class="controls-item" style="font-size : 20px;">
+								<label >시/도 <select id="sido" style="font-size:18px;" ></select></label> <label
+									>시/군/구 <select id="sigungu" style="font-size:18px;"></select></label> <label
+									>동 <select id="dong" style="font-size:18px;"></select></label>
 							</div>
-							<button id="searchBtn" type="button">검색</button>
+							<button id="searchBtn" type="button" class="btn btn-fatcat" style="font-size:20px;">검색</button>
 						</div>
 					</div>
 
-					<div class="mb-3">
-						<input type="hidden" id="address1" th:field="*{address1}"
+					<div class="mb-2">
+						<input type="hidden" id="address1" th:field="*{address1}" style="font-size:25px;"
 							class="form-control" required readonly />
-						<div class="invalid-feedback">주소를 검색해주세요.</div>
+						<div class="invalid-feedback" style="font-size : 20px;">주소를 검색해주세요.</div>
 					</div>
 
-					<div class="mb-3">
-						<label for="address2" class="form-label">상세주소</label> <input
+					<div class="mb-2">
+						<label for="address2" class="form-label" style="font-size:25px;">상세주소</label> <input
 							type="text" id="address2" th:field="*{address2}"
-							class="form-control" required />
-						<div class="invalid-feedback">상세주소를 입력해주세요.</div>
+							class="form-control" style="font-size:20px;" required />
+						<div class="invalid-feedback" style="font-size : 20px;">상세주소를 입력해주세요.</div>
 					</div>
 
 					<input type="hidden" id="latitude" th:field="*{latitude}" /> <input
 						type="hidden" id="longitude" th:field="*{longitude}" />
 
-					<div class="d-grid gap-2">
-						<button type="submit" class="btn btn-warning btn-lg">등록하기</button>
+					<div class="d-grid gap-2 mb-2">
+						<button type="submit" class="btn btn-fatcat" style="font-size : 25px;">저장하기</button>
 					</div>
 				</form>
 			</div>

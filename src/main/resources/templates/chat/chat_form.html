@@ -7,323 +7,501 @@
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
 /* ---------------------------------------------------------------------------------- */
-body { font-family: Arial; margin:0; padding:0; display:flex; flex-direction:column; height:100vh; }
-#user-select { display:flex; justify-content:center; gap:15px; padding:10px; border-bottom:1px solid #ddd; background:#fafafa; }
-select, input, textarea { padding:5px 10px; border-radius:6px; border:1px solid #ccc; }
-#chat-container { 
-    flex-grow:1; display:flex; flex-direction:column; border:1px solid #ddd; 
-    margin:10px; border-radius:8px; overflow:hidden; 
-    position: relative; 
+body {
+	font-family: Arial;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
+#user-select {
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+	background: #fafafa;
+}
+
+select, input, textarea {
+	padding: 5px 10px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+}
+
+#chat-container {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #ddd;
+	margin: 10px;
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+}
+
+#message-area {
+	flex-grow: 1;
+	padding: 10px;
+	overflow-y: auto;
+	background: #f7f7f7;
+	display: flex;
+	flex-direction: column;
+}
+
+.message-row {
+	display: flex;
+	margin-bottom: 10px;
+	align-items: flex-end;
+}
+
+.message-row.sent {
+	justify-content: flex-end;
+}
+
+.message-row.received {
+	justify-content: flex-start;
+}
+
+.profile-placeholder {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background-color: #ccc;
+	margin-right: 10px;
+	align-self: flex-start;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+.message-content-wrapper {
+	display: flex;
+	flex-direction: column;
+	max-width: 70%;
+}
+
+.message-row.sent .message-content-wrapper {
+	align-items: flex-end;
+}
+
+.message-row.received .message-content-wrapper {
+	align-items: flex-start;
+}
+
+.user-nickname {
+	font-size: 12px;
+	color: #555;
+	margin-bottom: 4px;
+	cursor: pointer;
+}
+
+.message-row.sent .user-nickname {
+	display: none;
+}
+
+.message {
+	padding: 8px 12px;
+	border-radius: 18px;
+	max-width: 100%;
+	word-wrap: break-word;
+	position: relative;
+}
+
+.sent .message {
+	background: #dcf8c6;
+}
+
+.received .message {
+	background: #fff;
+}
+
+.message-time {
+	font-size: 10px;
+	color: #555;
+	margin-top: 2px;
+	align-self: flex-end;
+	white-space: nowrap;
+}
+
+.message-row.received .message-time {
+	align-self: flex-start;
+}
+
+.care-request {
+	background: #FFFACD;
+	padding: 6px 10px;
+	border-radius: 12px;
+	margin-top: 4px;
+}
+
+.care-confirmed {
+	background: #8FBC8F;
+	padding: 6px 10px;
+	border-radius: 12px;
+	margin-top: 4px;
+}
+
+#input-area {
+	display: flex;
+	padding: 10px;
+	border-top: 1px solid #ddd;
+	gap: 10px;
+}
+
+#message-input {
+	flex-grow: 1;
+	padding: 8px;
+	border-radius: 20px;
+	border: 1px solid #ccc;
+	outline: none;
+}
+
+ #send-button, #care-toggle {
+	background-color: #D2B48C;
+	color: #fff;
+	border-radius: 20px;
+	padding: 6px 16px;
+	border: none;
+	font-weight: 500;
 } 
-#message-area { flex-grow:1; padding:10px; overflow-y:auto; background:#f7f7f7; display:flex; flex-direction:column; }
-.message-row { display: flex; margin-bottom: 10px; align-items: flex-end; }
-.message-row.sent { justify-content: flex-end; }
-.message-row.received { justify-content: flex-start; }
-.profile-placeholder { 
-    width: 40px; 
-    height: 40px; 
-    border-radius: 50%; 
-    background-color: #ccc; 
-    margin-right: 10px; 
-    align-self: flex-start; 
-    flex-shrink: 0;
-    cursor: pointer; 
+
+
+#send-button:hover, #care-toggle:hover {
+	background-color: #a38b6a; /* hover 시 조금 진하게 */
+	color: #fff;
+} 
+
+#care-form {
+	display: none;
+	flex-direction: column;
+	gap: 5px;
+	padding: 10px;
+	background: #fafafa;
+	border-top: 1px solid #ddd;
 }
-.message-content-wrapper { 
-    display: flex; 
-    flex-direction: column; 
-    max-width: 70%; 
+
+#care-form input, #care-form select, #care-form textarea {
+	width: 100%;
 }
-.message-row.sent .message-content-wrapper { align-items: flex-end; }
-.message-row.received .message-content-wrapper { align-items: flex-start; }
-.user-nickname { 
-    font-size: 12px; color: #555; margin-bottom: 4px; 
-    cursor: pointer; 
+
+#confirm-care {
+	background-color: #D2B48C;
+	color: #fff;
+	border-radius: 20px;
+	padding: 6px 16px;
+	border: none;
+	font-weight: 500;
 }
-.message-row.sent .user-nickname { display: none; }
-.message { padding:8px 12px; border-radius:18px; max-width:100%; word-wrap:break-word; position: relative; } 
-.sent .message { background:#dcf8c6; }
-.received .message { background:#fff; }
-.message-time { font-size: 10px; color: #555; margin-top: 2px; align-self: flex-end; white-space: nowrap; }
-.message-row.received .message-time { align-self: flex-start; }
-.care-request { background:#FFFACD; padding:6px 10px; border-radius:12px; margin-top:4px; }
-.care-confirmed { background:#8FBC8F; padding:6px 10px; border-radius:12px; margin-top:4px; }
-#input-area { display:flex; padding:10px; border-top:1px solid #ddd; gap:10px; }
-#message-input { flex-grow:1; padding:8px; border-radius:20px; border:1px solid #ccc; outline:none; }
-#send-button, #care-toggle { padding:8px 16px; border:none; background:#CD853F; color:white; border-radius:20px; cursor:pointer; }
-#care-form { display:none; flex-direction:column; gap:5px; padding:10px; background:#fafafa; border-top:1px solid #ddd; }
-#care-form input, #care-form select, #care-form textarea { width:100%; }
-#confirm-care { background:#8FBC8F; color:white; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; }
+
+#confirm-care:hover {
+	background-color: #a38b6a; /* hover 시 조금 진하게 */
+	color: #fff;
+}
 
 /* ---------------------------------------------------------------------------------- */
 /* 2. 리뷰 팝업 스타일 */
 /* ---------------------------------------------------------------------------------- */
-
 #review-popup {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 350px;
-    height: 100%;
-    background: white;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    z-index: 100;
-    transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    box-sizing: border-box;
-    border-left: 1px solid #ddd;
-    overflow-y: auto;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 350px;
+	height: 100%;
+	background: white;
+	box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+	z-index: 100;
+	transform: translateX(100%);
+	transition: transform 0.3s ease-in-out;
+	display: flex;
+	flex-direction: column;
+	padding: 15px;
+	box-sizing: border-box;
+	border-left: 1px solid #ddd;
+	overflow-y: auto;
 }
+
 #review-popup.show {
-    transform: translateX(0);
+	transform: translateX(0);
 }
+
 .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
 }
+
 .popup-header button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
+	background: none;
+	border: none;
+	font-size: 20px;
+	cursor: pointer;
 }
+
 #review-rating-summary {
-    text-align: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
+	text-align: center;
+	padding: 10px 0;
+	border-bottom: 1px solid #eee;
+	margin-bottom: 15px;
 }
-#review-rating-summary h3 { margin: 0; font-size: 1.5em; }
-#review-rating-summary p { margin: 5px 0 0; color: #666; }
-.star-rating { color: gold; font-size: 1.2em; }
+
+#review-rating-summary h3 {
+	margin: 0;
+	font-size: 1.5em;
+}
+
+#review-rating-summary p {
+	margin: 5px 0 0;
+	color: #666;
+}
+
+.star-rating {
+	color: gold;
+	font-size: 1.2em;
+}
 
 /* 리뷰 목록 스타일 */
 #review-list {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 5px; 
+	flex-grow: 1;
+	overflow-y: auto;
+	padding-right: 5px;
 }
+
 .review-item {
-    padding: 10px 0;
-    border-bottom: 1px dotted #ddd;
-    position: relative; 
+	padding: 10px 0;
+	border-bottom: 1px dotted #ddd;
+	position: relative;
 }
 /* 리뷰 내용 래퍼는 항상 표시 (내용 유지 요청에 따라) */
 .review-content-wrapper {
-    display: block;
+	display: block;
 }
+
 .review-item:last-child {
-    border-bottom: none;
+	border-bottom: none;
 }
+
 .review-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9em;
-    color: #444;
-    margin-bottom: 5px;
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.9em;
+	color: #444;
+	margin-bottom: 5px;
 }
+
 .review-body {
-    font-size: 0.95em;
-    color: #333;
-    word-break: break-all; 
+	font-size: 0.95em;
+	color: #333;
+	word-break: break-all;
 }
+
 .review-date {
-    font-size: 0.8em;
-    color: #999;
-    margin-top: 5px;
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
+	font-size: 0.8em;
+	color: #999;
+	margin-top: 5px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 /* 수정/삭제 버튼 스타일 */
 .review-actions button {
-    font-size: 0.75em;
-    padding: 3px 6px;
-    margin-left: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    background: #fff;
+	font-size: 0.75em;
+	padding: 3px 6px;
+	margin-left: 5px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
+	background: #fff;
 }
+
 .review-actions button.edit {
-    color: #007bff;
-    border-color: #007bff;
+	color: #007bff;
+	border-color: #007bff;
 }
+
 .review-actions button.delete {
-    color: #dc3545;
-    border-color: #dc3545;
+	color: #dc3545;
+	border-color: #dc3545;
 }
 
 /* 리뷰 등록 폼 스타일 */
 #review-form-area {
-    padding-top: 15px;
-    border-top: 1px solid #eee;
+	padding-top: 15px;
+	border-top: 1px solid #eee;
 }
-#review-form-area h4 { margin-top: 0; }
+
+#review-form-area h4 {
+	margin-top: 0;
+}
+
 #review-form-area textarea {
-    width: 100%;
-    margin-bottom: 10px;
-    box-sizing: border-box;
+	width: 100%;
+	margin-bottom: 10px;
+	box-sizing: border-box;
 }
+
 .rating-input {
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 }
+
 .rating-input span {
-    font-size: 1.5em;
-    cursor: pointer;
-    color: #ccc; 
+	font-size: 1.5em;
+	cursor: pointer;
+	color: #ccc;
 }
+
 .rating-input span.active {
-    color: gold; 
+	color: gold;
 }
+
 #submit-review-btn {
-    width: 100%;
-    padding: 8px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+	width: 100%;
+	padding: 8px;
+	background: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
 }
 
 /* ---------------------------------------------------------------------------------- */
 /* 3. 인라인 리뷰 수정 폼 스타일 (이미지 레이아웃에 맞게 조정) */
 /* ---------------------------------------------------------------------------------- */
 .edit-inline-form {
-    padding: 10px 0 0 0; 
-    margin-top: 0px; 
-    margin-bottom: 5px; 
-    width: 100%; 
-    box-sizing: border-box;
-    display: block; 
+	padding: 10px 0 0 0;
+	margin-top: 0px;
+	margin-bottom: 5px;
+	width: 100%;
+	box-sizing: border-box;
+	display: block;
 }
 /* 수정 폼 내부의 경계선 스타일 */
-.edit-inline-form > div {
-    margin-top: 10px; 
-    padding-top: 10px; 
-    border-top: 1px dashed #ccc; 
+.edit-inline-form>div {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px dashed #ccc;
 }
-.edit-inline-form h4 { 
-    margin: 5px 0 5px 0; 
-    font-size: 0.9em; 
+
+.edit-inline-form h4 {
+	margin: 5px 0 5px 0;
+	font-size: 0.9em;
 }
-.edit-review-textarea { 
-    width: 100%;
-    box-sizing: border-box; 
-    margin-bottom: 10px;
-    border: 1px solid #ccc; /* 테두리 추가 */
-    padding: 5px;
+
+.edit-review-textarea {
+	width: 100%;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+	border: 1px solid #ccc; /* 테두리 추가 */
+	padding: 5px;
 }
-.edit-inline-rating { 
-    margin-bottom: 5px; 
+
+.edit-inline-rating {
+	margin-bottom: 5px;
 }
+
 .edit-inline-rating span {
-    font-size: 1.5em;
-    cursor: pointer;
-    color: #ccc; 
+	font-size: 1.5em;
+	cursor: pointer;
+	color: #ccc;
 }
+
 .edit-inline-rating span.active {
-    color: gold; 
+	color: gold;
 }
+
 .edit-actions button {
-    font-size: 0.8em !important; 
-    padding: 5px 10px !important; 
+	font-size: 0.8em !important;
+	padding: 5px 10px !important;
 }
+
 .edit-actions button.save {
-    background: #28a745; 
-    color: white;
-    border: none;
-    border-radius: 5px;
+	background: #28a745;
+	color: white;
+	border: none;
+	border-radius: 5px;
 }
+
 .edit-actions button.cancel {
-    background: #dc3545; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    margin-left: 5px;
+	background: #dc3545;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	margin-left: 5px;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
 
-<div id="user-select">
-    <label>보내는 사람:
-        <select id="sender-select">
-            <option value="">선택하세요</option>
-            <option value="1" data-username="김유정">User 1</option>
-            <option value="2" data-username="유정">User 2</option>
-            <option value="3" data-username="관리왕">User 3</option>
-        </select>
-    </label>
-    <label>받는 사람:
-        <select id="receiver-select">
-            <option value="">선택하세요</option>
-            <option value="1" data-username="김유정">User 1</option>
-            <option value="2" data-username="유정">User 2</option>
-            <option value="3" data-username="관리왕">User 3</option>
-        </select>
-    </label>
-</div>
+	<div id="user-select">
+		<label>보내는 사람: <select id="sender-select">
+				<option value="">선택하세요</option>
+				<option value="1" data-username="김유정">User 1</option>
+				<option value="2" data-username="유정">User 2</option>
+				<option value="3" data-username="관리왕">User 3</option>
+		</select>
+		</label> <label>받는 사람: <select id="receiver-select">
+				<option value="">선택하세요</option>
+				<option value="1" data-username="김유정">User 1</option>
+				<option value="2" data-username="유정">User 2</option>
+				<option value="3" data-username="관리왕">User 3</option>
+		</select>
+		</label>
+	</div>
 
-<div id="chat-container">
-    <div id="message-area"></div>
-    <div id="input-area">
-        <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
-        <button id="send-button">전송</button>
-        <button id="care-toggle">돌봄 예약</button>
-    </div>
-    <div id="care-form">
-        시작일: <input type="datetime-local" id="start-date">
-        종료일: <input type="datetime-local" id="end-date">
-        상태:
-        <select id="session-status">
-            <option value="REQUESTED">요청</option>
-            <option value="CONFIRMED">확정</option>
-            <option value="CANCELLED">취소</option>
-        </select>
-        메모: <textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
-        <button id="confirm-care">예약 전송</button>
-    </div>
-    
-    <div id="review-popup">
-        <div class="popup-header">
-            <h2 id="review-target-name"></h2>
-            <button onclick="closeReviewPopup()">×</button>
-        </div>
-        
-        <div id="review-rating-summary">
-            <h3 id="avg-rating"></h3>
-            <p id="total-reviews"></p>
-        </div>
+	<div id="chat-container">
+		<div id="message-area"></div>
+		<div id="input-area">
+			<input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+			<button id="send-button" class="btn btn-fatcat" >전송</button>
+			<button id="care-toggle" class="btn btn-fatcat">돌봄 예약</button>
+		</div>
+		<div id="care-form">
+			시작일: <input type="datetime-local" id="start-date"> 종료일: <input
+				type="datetime-local" id="end-date"> 상태: <select
+				id="session-status">
+				<option value="REQUESTED">요청</option>
+				<option value="CONFIRMED">확정</option>
+				<option value="CANCELLED">취소</option>
+			</select> 메모:
+			<textarea id="session-note" rows="2" placeholder="메모를 입력하세요"></textarea>
+			<button id="confirm-care" class="btn btn-fatcat">예약 전송</button>
+		</div>
 
-        <div id="review-form-area">
-            <h4>리뷰 등록</h4>
-            <div class="rating-input" id="new-rating">
-                <span data-rating="1">★</span>
-                <span data-rating="2">★</span>
-                <span data-rating="3">★</span>
-                <span data-rating="4">★</span>
-                <span data-rating="5">★</span>
-            </div>
-            <textarea id="new-review-text" rows="3" placeholder="리뷰 내용을 입력하세요."></textarea>
-            <button id="submit-review-btn">리뷰 작성</button>
-        </div>
+		<div id="review-popup">
+			<div class="popup-header">
+				<h2 id="review-target-name"></h2>
+				<button onclick="closeReviewPopup()">×</button>
+			</div>
 
-        <h4>리뷰 목록</h4>
-        <div id="review-list">
-        </div>
-    </div>
-</div>
+			<div id="review-rating-summary">
+				<h3 id="avg-rating"></h3>
+				<p id="total-reviews"></p>
+			</div>
 
-<script>
+			<div id="review-form-area">
+				<h4>리뷰 등록</h4>
+				<div class="rating-input" id="new-rating">
+					<span data-rating="1">★</span> <span data-rating="2">★</span> <span
+						data-rating="3">★</span> <span data-rating="4">★</span> <span
+						data-rating="5">★</span>
+				</div>
+				<textarea id="new-review-text" rows="3" placeholder="리뷰 내용을 입력하세요."></textarea>
+				<button id="submit-review-btn">리뷰 작성</button>
+			</div>
+
+			<h4>리뷰 목록</h4>
+			<div id="review-list"></div>
+		</div>
+	</div>
+
+	<script>
 let senderId = null;
 let receiverId = null;
 let chatRoomId = null;
