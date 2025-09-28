@@ -219,6 +219,7 @@
 		<script>
 			let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7;
 			let openedPlaceId = null, originalCenter = null;
+			let userLocationMarker = null;
 
 			const markers = [];
 			const $sido = document.getElementById('sido');
@@ -236,6 +237,8 @@
 			});
 			
 			const infowindow = new kakao.maps.InfoWindow({zIndex:1});
+			
+			
 
 			window.addEventListener('DOMContentLoaded', () => {
 				fetch('/data/korea_map_info.txt')
@@ -248,6 +251,8 @@
 					    		(position) => {
 					    			const lat = position.coords.latitude;
 					    			const lon = position.coords.longitude;
+					    			
+					    			displayUserLocation(lat, lon);
 					    			reverseGeocode(lat, lon);
 					    		},
 					    		(error) => {
@@ -262,6 +267,35 @@
 				    })
 				    .catch(err => console.error('CSV 읽기 실패', err));
 			});
+			
+			// ✨ 현재 위치 마커 표시 함수: 인포윈도우 자동 표시 제거 및 마우스 이벤트 연결 ✨
+			function displayUserLocation(lat, lon) {
+				const pos = new kakao.maps.LatLng(lat, lon);
+				
+				// 기존 마커가 있다면 제거
+				if (userLocationMarker) {
+					userLocationMarker.setMap(null);
+				}
+
+				// 카카오맵 기본 마커 생성
+				userLocationMarker = new kakao.maps.Marker({
+					position: pos,
+					map: map,
+				});
+
+				// 지도 중심 이동
+				map.setCenter(pos);
+				
+				// 마커에 마우스 이벤트 연결 (마우스 오버시에만 인포윈도우가 열리도록)
+				kakao.maps.event.addListener(userLocationMarker, 'mouseover', function() {
+					infowindow.setContent('<div style="padding:5px;font-size:13px;">현재 내 위치</div>');
+					infowindow.open(map, userLocationMarker);
+				});
+
+				kakao.maps.event.addListener(userLocationMarker, 'mouseout', function() {
+					infowindow.close();
+				});
+			}
 
 			function parseCSV(csvText) {
 				REGION_DATA = {};
@@ -300,7 +334,8 @@
 			$sigungu.addEventListener('change', fillDong);
 
 			function clearMarkers() {
-				markers.forEach(m => m.marker.setMap(null));
+				// CustomOverlay 객체의 경우 setMap(null) 호출
+				markers.forEach(m => m.overlay.setMap(null));
 				markers.length = 0;
 			}
 			function clearList() {
@@ -310,9 +345,17 @@
 				return [ $sido.value, $sigungu.value, $dong.value ].filter(Boolean).join(' ');
 			}
 			
+			// ✨ reverseGeocode 함수 수정: geocoder 유효성 검사 추가 ✨
 			function reverseGeocode(lat, lon) {
 				const coord = new kakao.maps.LatLng(lat, lon);
 				
+				// Geocoder 객체가 유효한지 먼저 확인하여 b.v is not a function 에러 방지
+				if (!geocoder) { 
+					console.error("Geocoder 객체가 초기화되지 않았습니다.");
+					fetchCareList(); // 지오코딩 없이 목록을 불러옵니다.
+					return;
+				}
+
 				geocoder.coord2RegionCode(coord.getLng(), coord.getLat(), (result, status) => {
 					if (status === kakao.maps.services.Status.OK) {
 						const regionInfo = result.find(item => item.region_type === 'H');
@@ -340,7 +383,7 @@
 							fetchCareList();
 						}
 					} else {
-						console.error("주소 변환에 실패했습니다.");
+						console.error("주소 변환에 실패했습니다. Status:", status);
 						fetchCareList();
 					}
 				});
@@ -366,27 +409,59 @@
 			}
 			$searchBtn.addEventListener('click', fetchCareList);
 
+			// 수정된 addMarker 함수 (투명 마커를 추가했습니다)
 			function addMarker(pos, idx) {
-				const marker = new kakao.maps.Marker({
-					position : pos,
-					map : map,
-					image : new kakao.maps.MarkerImage('/images/map_marker.png', new kakao.maps.Size(39, 46))
-				});
-				const overlay = new kakao.maps.CustomOverlay({
-					position : pos,
-					content : `<div style="width:20px;height:18px;color:white;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:15px;font-weight:bold;">${idx + 1}</div>`,
-					yAnchor : 2.4
-				});
-				overlay.setMap(map);
-				markers.push({
-					marker,
-					overlay
-				});
-				return {
-					marker,
-					overlay
-				};
+			    // 1. CustomOverlay (보이는 핀) 생성 (기존과 동일)
+			    const content = `
+			        <div class="custom-marker-wrap" style="position: relative; width: 50px; height: 50px; cursor: pointer;">
+			            <img src="/images/map_marker.png" style="width: 50px; height: 50px; display: block;">
+			            <div style="
+			                position: absolute;
+			                top: 50%;
+			                left: 50%;
+			                transform: translate(-66%, 0%);
+			                font-size: 20px;
+			                font-weight: bold;
+			                color: #422701;
+			                width: 25px;
+			                text-align: center;
+			            ">${idx + 1}</div>
+			        </div>
+			    `;
+
+			    const overlay = new kakao.maps.CustomOverlay({
+			        position: pos,
+			        content: content,
+			        yAnchor: 1.0,
+			        xAnchor: 0.5
+			    });
+			    overlay.setMap(map);
+
+
+			    // 2. 인포윈도우 처리를 위한 투명 마커 생성 (추가)
+			    const marker = new kakao.maps.Marker({
+			        position: pos,
+			        map: map,
+			        opacity: 0.0 // 인포윈도우용으로 사용하고 눈에 보이지 않도록 투명하게 처리
+			    });
+
+			    // 3. 마커 배열에 CustomOverlay와 투명 마커 모두 저장
+			    markers.push({ overlay, pos, marker });
+
+			    // Custom Overlay에 이벤트 연결 (마우스 오버 시 투명 마커를 인포윈도우에 전달)
+			    const overlayElement = overlay.getContent();
+			    overlayElement.onmouseover = function() {
+			        const place = allPlaces[idx];
+			        // showInfo에 투명 마커 객체를 전달
+			        showInfo(marker, place.careTitle); 
+			    };
+			    overlayElement.onmouseout = function() {
+			        infowindow.close();
+			    };
+
+			    return { overlay, pos, marker };
 			}
+
 
 			function renderList() {
 				clearMarkers();
@@ -396,15 +471,19 @@
 				const pagePlaces = allPlaces.slice(start, end);
 
 				if(pagePlaces.length === 0){
-					$placesList.innerHTML = `<li style="text-align:center; padding: 20px;">검색 결과가 없습니다.</li>`;
+					$placesList.innerHTML = `<li style="text-align:center; padding: 20px; font-size : 20px;">검색 결과가 없습니다.</li>`;
 					$pagination.innerHTML = '';
 					return;
 				}
 
 				pagePlaces.forEach((place, i) => {
 					const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
-					const { marker } = addMarker(pos, i + start);
+				    // marker 객체를 반환값에 추가
+				    const { overlay, marker } = addMarker(pos, i + start);
 
+
+					// ⭐ 목록 리스트 항목 생성
+					 
 					const li = document.createElement('li');
 					li.className = 'item';
 					li.innerHTML = `
@@ -415,11 +494,12 @@
 							<p class="price">${place.price}원</p>
 						</div>
 					`;
-
+					
 					li.addEventListener('mouseover', () => {
-						showInfo(marker, place.careTitle);
-						map.panTo(pos);
-					});
+        				// LatLng(pos) 대신 마커 객체(marker)를 전달
+       				 showInfo(marker, place.careTitle); 
+        				map.panTo(pos);
+    					});
 					
 					li.addEventListener('mouseout', () => infowindow.close());
 
@@ -489,9 +569,12 @@
 				}
 			}
 
+			// 수정된 showInfo 함수 (첫 번째 인수로 마커 객체를 받음)
 			function showInfo(marker, title) {
-				infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
-				infowindow.open(map, marker);
+			    if (!map) return;
+			    infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
+			    // LatLng 대신 마커 객체를 전달합니다.
+			    infowindow.open(map, marker); 
 			}
 			
 			function toggleListView() {
