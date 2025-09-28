@@ -9,11 +9,11 @@ import com.project.fatcat.shopping.dto.CartSummaryDTO;
 public interface CartService {
 	
 	ShoppingCart findById(Integer cartSeq);
-	void add(Integer userSeq, String productCode, int qty);
-    void updateQty(Integer userSeq, String productCode, int qty);
-    void remove(Integer userSeq, String productCode);
-    void clear(Integer userSeq);
-    CartSummaryDTO summarize(Integer userSeq);
-    List<CartItemDTO> getCartItems(Integer userSeq);
+	void add(String productCode, int qty);
+    void updateQty(String productCode, int qty);
+    void remove(String productCode);
+    void clear();
+    CartSummaryDTO summarize();
+    List<CartItemDTO> getCartItems();
     
 }

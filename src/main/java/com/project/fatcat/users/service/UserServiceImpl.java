@@ -2,9 +2,6 @@ package com.project.fatcat.users.service;
 
 import java.io.IOException;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService, UserDetailsService{
+public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -55,12 +52,7 @@ public class UserServiceImpl implements UserService, UserDetailsService{
         return userRepository.save(user);
     }
 
-    // 🔹 로그인 처리 (Spring Security에서 호출)
-    @Override
-    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-        return userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다: " + userEmail));
-    }
+   
     
 //    private String saveFile(MultipartFile file, String folder) throws IOException {
 //        if (file != null && !file.isEmpty()) {

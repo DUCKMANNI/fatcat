@@ -92,6 +92,12 @@ public class User implements UserDetails{
 	        columnDefinition = "BOOLEAN DEFAULT 0")
 	private Boolean isDeleted;
 	
+	// 👉 UserDetails 필수 메서드
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return List.of(new SimpleGrantedAuthority(userRole.name()));
+//    }
+	
 	@Builder.Default
 	@OneToMany(mappedBy = "user")
     private List<OauthAccount> oauthAccountsList = new ArrayList<>();
