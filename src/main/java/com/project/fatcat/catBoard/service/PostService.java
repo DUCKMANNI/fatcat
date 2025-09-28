@@ -98,7 +98,7 @@ public class PostService {
 	            .orElseThrow(() -> new IllegalArgumentException("해당 게시판이 없습니다"));
 
 //	    User user = new User();
-	    Optional<User> ou = this.userRepository.findById(2);
+	    Optional<User> ou = this.userRepository.findById(1);
 	    if(ou.isPresent());
 	    User u = ou.get();
 	    
