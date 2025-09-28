@@ -2,6 +2,8 @@ package com.project.fatcat.shopping.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.project.fatcat.entity.CartItem;
@@ -13,6 +15,7 @@ import com.project.fatcat.shopping.dto.CartItemDTO;
 import com.project.fatcat.shopping.dto.CartSummaryDTO;
 import com.project.fatcat.shopping.repository.ProductRepository;
 import com.project.fatcat.shopping.repository.ShoppingCartRepository;
+import com.project.fatcat.users.service.CustomUserDetails;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +34,24 @@ public class CartServiceImpl implements CartService{
                 .orElseThrow(() -> new RuntimeException("장바구니 없음"));
     }
     
-    private ShoppingCart getOrCreateOpenCart(Integer userSeq) {
+    private ShoppingCart getOrCreateOpenCart() {
     	
-    	User user = new User();
-        user.setUserSeq(1);   
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new IllegalStateException("로그인 필요");
+        }
+
+        Object principal = auth.getPrincipal();
+        Integer userSeq; 
+        
+        if (principal instanceof CustomUserDetails userDetails) {
+        	userSeq = userDetails.getUser().getUserSeq();
+        } else {
+            throw new IllegalStateException("인증된 사용자 정보 없음");
+        }
+
+        User user = new User();
+        user.setUserSeq(userSeq);
     	
         return shoppingCartRepository.findFirstByUser_UserSeqAndIsCompletedFalseOrderByCartSeqDesc(userSeq)
                 .orElseGet(() -> {
@@ -46,8 +63,9 @@ public class CartServiceImpl implements CartService{
     }
   
     @Override
-    public void add(Integer userSeq, String productCode, int qty) {
-        ShoppingCart cart = getOrCreateOpenCart(userSeq);
+    public void add(String productCode, int qty) {
+    	
+        ShoppingCart cart = getOrCreateOpenCart();
         Product product = productRepository.findById(productCode)
                 .orElseThrow(() -> new IllegalArgumentException("상품 없음: " + productCode));
         int q = Math.max(1, Math.min(qty, 99));
@@ -74,8 +92,8 @@ public class CartServiceImpl implements CartService{
     }
     
     @Override
-    public void updateQty(Integer userSeq, String productCode, int qty) {
-        ShoppingCart cart = getOrCreateOpenCart(userSeq);
+    public void updateQty(String productCode, int qty) {
+        ShoppingCart cart = getOrCreateOpenCart();
         cart.getCartItemList().stream()
                 .filter(ci -> ci.getProduct().getProductCode().equals(productCode))
                 .findFirst()
@@ -83,77 +101,22 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public void remove(Integer userSeq, String productCode) {
-        ShoppingCart cart = getOrCreateOpenCart(userSeq);
+    public void remove(String productCode) {
+        ShoppingCart cart = getOrCreateOpenCart();
         cart.getCartItemList().removeIf(ci -> ci.getProduct().getProductCode().equals(productCode));
         // orphanRemoval=true 라면 DB에서 자동 삭제
     }
 
     @Override
-    public void clear(Integer userSeq) {
-        ShoppingCart cart = getOrCreateOpenCart(userSeq);
+    public void clear() {
+        ShoppingCart cart = getOrCreateOpenCart();
         cart.getCartItemList().clear();
     }
 
-   // @Transactional(readOnly = true)
-//    @Override
-//    public CartSummaryDTO summarize(Integer userSeq) {
-//    	
-//    	User user = new User();
-//    	user.setUserSeq(1);
-//    	
-//        ShoppingCart cart = shoppingCartRepository.findFirstByUser_UserSeqAndIsCompletedFalseOrderByCartSeqDesc(userSeq)
-//                .orElseGet(() -> {
-//                    // 비어있는 요약 반환
-//                    return ShoppingCart.builder()
-//                    		.user(user)
-//                            .isCompleted(false)
-//                            .cartItemList(new ArrayList<>())
-//                            .build();
-//                });
-//        
-//        
-//
-//        List<CartItemDTO> items = cart.getCartItemList().stream()
-//        	    .map(ci -> {
-//        	        CartItemDTO dto = new CartItemDTO();
-//        	        dto.setProductName(ci.getProduct().getProductName());
-//        	        dto.setPrice(ci.getProduct().getProductPrice());
-//        	        dto.setQuantity(ci.getProductQuantity());
-//        	        String imageUrl = ci.getProduct().getProductImageList().stream()
-//        	                .filter(img -> "m".equals(img.getImageTypeCode())) 
-//        	                .findFirst()
-//        	                .map(ProductImage::getFileName)
-//        	                .orElse("/images/no-image.png"); // 없으면 기본 이미지
-//        	        dto.setImageUrl(imageUrl); // 이미지 경로 필드 있으면 매핑
-//        	        return dto;
-//        	    })
-//        	    .toList();
-//
-//
-//        int total = items.stream()
-//                .mapToInt(dto -> dto.getPrice() * dto.getQuantity())
-//                .sum();
-//
-////        int totalQty = items.stream()
-////                .mapToInt(CartItemDTO::getQuantity)
-////                .sum();
-//        
-//        CartSummaryDTO summary = new CartSummaryDTO();
-//        summary.setTotalPrice(total);
-//        summary.setDiscount(0);
-//        summary.setDeliveryFee(3000);
-//        summary.setFinalPrice(total - summary.getDiscount() + summary.getDeliveryFee());
-//
-//        return summary;
-//    }
     
     @Override
-    public List<CartItemDTO> getCartItems(Integer userSeq) {
-        ShoppingCart cart = shoppingCartRepository
-            .findFirstByUser_UserSeqAndIsCompletedFalseOrderByCartSeqDesc(userSeq)
-            .orElseThrow(() -> new RuntimeException("장바구니 없음"));
-
+    public List<CartItemDTO> getCartItems() {
+        ShoppingCart cart = getOrCreateOpenCart();
         return cart.getCartItemList().stream()
                 .map(ci -> CartItemDTO.builder()
                         .productName(ci.getProduct().getProductName())
@@ -161,7 +124,7 @@ public class CartServiceImpl implements CartService{
                         .price(ci.getProduct().getProductPrice() * ci.getProductQuantity())
                         .imageUrl(
                             ci.getProduct().getProductImageList().stream()
-                              .filter(img -> "m".equals(img.getImageTypeCode())) // 대표 이미지
+                              .filter(img -> "m".equals(img.getImageTypeCode()))
                               .map(ProductImage::getFileName)
                               .findFirst().orElse("/images/no-image.png")
                         )
@@ -170,8 +133,23 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public CartSummaryDTO summarize(Integer userSeq) {
-        List<CartItemDTO> items = getCartItems(userSeq);
+    public CartSummaryDTO summarize() {
+    	
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new IllegalStateException("로그인 필요");
+        }
+    	
+    	Object principal = auth.getPrincipal();
+        Integer userSeq; 
+        
+        if (principal instanceof CustomUserDetails userDetails) {
+        	userSeq = userDetails.getUser().getUserSeq();
+        } else {
+            throw new IllegalStateException("인증된 사용자 정보 없음");
+        }
+    	
+        List<CartItemDTO> items = getCartItems();
         int totalPrice = items.stream().mapToInt(CartItemDTO::getPrice).sum();
         int discount = 0; // 쿠폰/할인 아직 없음
         int deliveryFee = totalPrice >= 30000 ? 0 : 3000; // 3만원 이상 무료배송 예시
@@ -183,5 +161,9 @@ public class CartServiceImpl implements CartService{
                 .deliveryFee(deliveryFee)
                 .finalPrice(finalPrice)
                 .build();
+    }
+    
+    public ShoppingCart getCurrentCart() {
+        return getOrCreateOpenCart();
     }
 }
