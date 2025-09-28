@@ -132,7 +132,7 @@ public class FaqController {
         Optional<Faq> optionalFaq = faqService.getFaqById(faqSeq);
         if (optionalFaq.isPresent()) {
             model.addAttribute("faq", optionalFaq.get());
-            return "faq/answer_form";
+            return "redirect:faq/list";
         } else {
             return "redirect:/faq/list";
         }

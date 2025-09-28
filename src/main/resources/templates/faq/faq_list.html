@@ -1,7 +1,6 @@
- 
-  <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{shared/layout}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 
 <body>
 <div layout:fragment="content">
@@ -70,7 +69,7 @@ body {
     padding: 10px;
     border: 1px solid var(--tan-medium);
     border-radius: 5px 0 0 5px;
-    font-size: 16px;
+    font-size: 20px;
     color: var(--tan-text); /* 입력 텍스트 탄색 */
 }
 
@@ -87,7 +86,7 @@ body {
     background-color: var(--tan-medium);
     color: white;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px;
     transition: background-color 0.3s;
 }
 
@@ -128,6 +127,33 @@ body {
 .faq-answer.show {
     display: block;
 }
+
+/* 인라인 답변 폼 스타일 */
+.faq-answer .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--tan-medium);
+    border-radius: 5px;
+    resize: vertical;
+    color: var(--tan-text);
+    font-size: 16px;
+}
+
+.faq-answer .btn-warning {
+    background-color: var(--tan-medium);
+    border: 1px solid var(--tan-medium);
+    color: var(--white-background);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.faq-answer .btn-warning:hover {
+    background-color: var(--tan-dark);
+}
+
 
 /* ✅ 페이지네이션 */
 .pagination {
@@ -177,12 +203,12 @@ body {
 
     <!-- ✅ 메뉴 -->
     <div class="menu-links">
-        <a th:href="@{/chat}">1:1 채팅 상담하기</a>
-        <a th:href="@{/faq/ask}">질문하기</a>
+        <a style="font-size:25px;" th:href="@{/chat}">1:1 채팅 상담하기</a>
+        <a style="font-size:25px;" th:href="@{/faq/ask}">질문하기</a>
     </div>
 
     <!-- ✅ 검색창 (FAQ 바로 위로 이동, 오른쪽 정렬) -->
-    <div class="search-container">
+    <div class="search-container" style="font-size:20px;">
         <form th:action="@{/faq/list}" method="get" class="search-form">
             <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어를 입력하세요">
             <button type="submit">검색</button>
@@ -190,16 +216,26 @@ body {
     </div>
 
     <!-- ✅ FAQ -->
-    <div class="faq-container">
+    <div class="faq-container" style="font-size:20px;">
         <div class="faq-item" th:each="faq : ${paging}">
             <div class="faq-question">
                 <b>질문: <span th:text="${faq.question}"></span></b>
                 <span>▶</span>
             </div>
+            
+            <!-- 답변 영역 수정 -->
             <div class="faq-answer">
                 <div th:if="${faq.answer == '답변 대기 중'}">
                     <p><b>답변:</b> <span th:text="${faq.answer}"></span></p>
-                    <a th:if="${isAdmin}" th:href="@{|/faq/answer/${faq.faqSeq}|}">답변하기</a>
+                    
+                    <!-- 관리자일 경우 인라인 답변 폼 표시 -->
+                    <div th:if="${isAdmin}" class="mt-3">
+                        <form th:action="@{|/faq/answer/${faq.faqSeq}|}" method="post">
+                            <!-- ✅ name="answerContent"를 name="answer"로 수정하여 컨트롤러의 @RequestParam("answer")와 일치시킴 -->
+                            <textarea name="answer" class="form-control" rows="3" placeholder="답변 내용을 입력하세요"></textarea>
+                            <button type="submit" class="btn btn-warning mt-2">답변 등록</button>
+                        </form>
+                    </div>
                 </div>
                 <div th:unless="${faq.answer == '답변 대기 중'}">
                     <p><b>답변:</b> <span th:text="${faq.answer}"></span></p>
@@ -207,6 +243,8 @@ body {
             </div>
         </div>
     </div>
+    
+    
 
     <!-- ✅ 페이지네이션 -->
     <div th:if="${!paging.isEmpty()}">
@@ -241,4 +279,4 @@ body {
 </div>
 </body>
 </html>
-  
+ 

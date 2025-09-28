@@ -1,4 +1,5 @@
-<html xmlns:th="http://www.thymeleaf.org"
+
+    <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
 
@@ -7,16 +8,25 @@
 		<style>
 			/* 따뜻한 탄(tan) 색상 팔레트 */
 			:root {
-				--tan-lighter: #F8F4EE; /* 카드 배경 및 호버 */
+				--tan-lightest: #F5F5DC; /* 배경색 */
+				--tan-lighter: #E6D2B5; /* 카드 배경 및 호버 */
 				--tan-medium: #C3997A; /* 주요 요소 (버튼, 구분선) */
 				--tan-darker: #7E5F4D; /* 텍스트, 아이콘 */
 				--tan-darkest: #4C3C30; /* 제목, 진한 텍스트 */
 				--white: #FFFFFF;
 				--light-gray: #E0E0E0;
+				--comment-edit-bg: #FAF8F6; /* 수정 폼 배경색 (선택적) */
 			}
 
 			body {
 				color: var(--tan-darker);
+			}
+
+			/* 상세 페이지 콘텐츠 컨테이너 (여백 확장) */
+			.detail-container {
+				max-width: 1200px; /* 최대 너비를 1200px로 확장 */
+				margin: 0 auto; /* 중앙 정렬 */
+				padding: 20px; /* 여백 */
 			}
 
 			h2.border-bottom {
@@ -25,12 +35,13 @@
 			}
 
 			.card {
-				border-color: var(--tan-medium);
-				background-color: var(--tan-lighter);
+				border: 1px solid var(--tan-medium); /* 테두리만 탄 색상 유지 */
+				background-color: var(--white); /* 배경색을 흰색으로 변경 */
+				border-radius: 8px; /* 둥근 모서리 */
 			}
 			
 			.card-body {
-				background-color: var(--white);
+				/* 기존 스타일 유지 */ 
 			}
 
 			.card-text {
@@ -38,8 +49,11 @@
 			}
 
 			.badge {
-				background-color: var(--tan-lighter) !important;
+				background-color: var(--tan-lighter) !important; 
 				color: var(--tan-darkest) !important;
+				border: 1px solid var(--tan-medium);
+				border-radius: 4px;
+				font-weight: 500;
 			}
 
 			h5.border-bottom {
@@ -47,8 +61,11 @@
 				border-color: var(--light-gray) !important;
 			}
 
+			/* 버튼 스타일 */
 			.btn {
 				transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+				border-radius: 4px;
+				font-weight: 500;
 			}
 
 			.btn-warning {
@@ -74,315 +91,158 @@
 				color: var(--white);
 			}
 			
+			/* 폼 컨트롤 스타일 개선 */
 			.form-control {
 				border: 1px solid var(--tan-medium);
 				color: var(--tan-darker);
+				border-radius: 4px;
+				/* ✨ 수정: 인라인 수정 폼에 깔끔한 패딩 적용 */
+				padding: 0.75rem 1rem; 
+				resize: vertical;
 			}
 
 			.form-control:focus {
-				border-color: var(--tan-darker);
-				box-shadow: 0 0 5px rgba(126, 95, 77, 0.5);
+				border-color: var(--tan-darkest);
+				/* box-shadow: 0 0 5px rgba(76, 60, 48, 0.5); */
+				box-shadow: 0 0 0 2px rgba(195, 153, 122, 0.3); /* 포커스 섀도우를 탄색으로 부드럽게 */
+			}
+			
+			/* 인라인 수정 폼 관련 스타일 */
+			.comment-content-display, .comment-content-edit {
+				/* padding: 1rem; */ /* 개별 패딩은 내부에서 관리 */
+			}
+			
+			.comment-content-display .card-body {
+				padding-bottom: 0; /* 수정 버튼과 겹치지 않도록 */
+			}
+			
+			.comment-content-edit {
+				display: none; /* 기본적으로 숨김 */
+				background-color: var(--comment-edit-bg); /* 수정 폼 영역에 연한 배경색 */
+				border-top: 1px solid var(--tan-medium);
+			}
+			
+			/* ✨ 추가: 답변 수정 폼의 입력 영역 컨테이너 */
+			.comment-edit-area {
+			    padding: 1rem;
+			}
+			/* ✨ 추가: 버튼 영역 컨테이너 */
+			.comment-edit-actions {
+			    padding: 0 1rem 1rem; 
+			    display: flex;
+			    justify-content: flex-end;
 			}
 			
 		</style>
 		
-		<h2 class="border-bottom py-2" th:text="${post.postTitle}"></h2>
-		<div class="card my-3">
-			<div class="card-body">
-				<div class="card-text">
-					<div th:text="${post.postContent}"></div>
-				</div>
-			</div>
-			<div class="d-flex justify-content-end">
-				<div class="badge bg-light text-dark p-2 text-start">
-					<p>작성자:</p>
-					<div class="mb-2">
-						<span th:if="${post.user != null}" th:text="${post.user.userName}"></span>
+		<div class="detail-container">
+			<h2 class="border-bottom py-2" th:text="${post.postTitle}"></h2>
+			<div class="card my-3">
+				<div class="card-body">
+					<div class="card-text">
+						<div th:text="${post.postContent}"></div>
 					</div>
-					<div th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
 				</div>
-			</div>
-			<div class="my-2">
-				<a th:href="@{|/post/modify/${post.postSeq}|}" class="btn btn-sm btn-warning" th:if="${post.user != null ? post.user.userName : '익명'}" th:text="수정"></a>
-				<a href="javascript:void(0)" th:data-uri="@{|/post/delete/${post.postSeq}|}" class="delete btn btn-sm btn-primary" th:if="${post.user != null ? post.user.userName : '익명'}" th:text="삭제"></a>
-			</div>
-		</div>
-
-		<h5 class="border-bottom my-3 py-3" th:text="|${#lists.size(post.knowledgeCommentList)}개의 답변이 있습니다!!|"></h5>
-		
-		<div class="card my-3" th:each=" comment : ${post.knowledgeCommentList}">
-			<div class="card-body">
-				<div class="card-text" style="white-space: pre-line;" th:text="${comment.commentContent}"></div>
-			</div>
-			<div class="d-flex justify-content-end">
-				<div class="badge bg-light text-dark p-2 text-start">
-					<div class="mb-2">
-						<span th:if="${comment.user != null}" th:text="${comment.user.userName}"></span>
+				<div class="d-flex justify-content-end p-3">
+					<div class="badge p-2 text-start">
+						<p class="mb-1" style="font-weight: 600;">작성자: <span th:if="${post.user != null}" th:text="${post.user.nickname}"></span></p>
+						<div th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
 					</div>
-					<div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
+				<div class="my-2 p-3">
+					<a th:href="@{|/post/modify/${post.postSeq}|}" class="btn btn-sm btn-warning" th:if="${post.user != null ? post.user.nickname : '익명'}" th:text="수정"></a>
+					<a href="javascript:void(0)" th:data-uri="@{|/post/delete/${post.postSeq}|}" class="delete btn btn-sm btn-primary" th:if="${post.user != null ? post.user.nickname : '익명'}" th:text="삭제"></a>
 				</div>
 			</div>
-			<div class="my-2">
-				<a th:href="@{|/comment/modify/${comment.commentSeq}|}" class="btn btn-sm btn-warning" th:if="${comment.user != null ? comment.user.userName : '익명'}" th:text="수정"></a>
-				<a href="javascript:void(0)" th:data-uri="@{|/comment/delete/${comment.commentSeq}|}" class="delete btn btn-sm btn-primary" th:if="${comment.user != null ? comment.user.userName : '익명'}" th:text="삭제"></a>
-			</div>
-		</div>
 
-		<form th:action="@{|/comment/create/${post.postSeq}|}" th:object="${commentForm}" method="post">
-			<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
-			<textarea sec:authorize="isAuthenticated()" class="form-control" rows="10" th:field="*{commentContent}"></textarea>
-			<input class="btn btn-warning my-3" type="submit" value="답변 등록하기">
-		</form>
-		
-		<script type='text/javascript' layout:fragment="script">
-			const delete_elements = document.getElementsByClassName("delete");
-			Array.from(delete_elements).forEach(function(element) {
-				element.addEventListener('click', function() {
-					if (confirm("정말 삭제하시겠습니까??")) {
-						location.href = this.dataset.uri;
-					}
+			<h5 class="border-bottom my-3 py-3" th:text="|${#lists.size(post.knowledgeCommentList)}개의 답변이 있습니다!!|"></h5>
+			
+			답변 목록
+			<div class="card my-3" th:each=" comment : ${post.knowledgeCommentList}" th:id="'comment-' + ${comment.commentSeq}">
+			  
+				<div class="comment-content-display">
+					<div class="card-body">
+						<div class="card-text" style="white-space: pre-line;" th:text="${comment.commentContent}"></div>
+					</div>
+					<div class="d-flex justify-content-end p-3">
+						<div class="badge p-2 text-start">
+							<div class="mb-1" style="font-weight: 600;"><span th:if="${comment.user != null}" th:text="${comment.user.userName}"></span></div>
+							<div th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
+						</div>
+					</div>
+					<div class="my-2 p-3">
+						<a href="javascript:void(0)" th:data-comment-seq="${comment.commentSeq}" class="btn btn-sm btn-warning comment-modify-toggle" th:if="${comment.user != null ? comment.user.userName : '익명'}" th:text="수정"></a>
+						<a href="javascript:void(0)" th:data-uri="@{|/comment/delete/${comment.commentSeq}|}" class="delete btn btn-sm btn-primary" th:if="${comment.user != null ? comment.user.userName : '익명'}" th:text="삭제"></a>
+					</div>
+				</div>
+
+				<div class="comment-content-edit">
+				    <form th:action="@{|/comment/modify/${comment.commentSeq}|}" method="post">
+				        <div class="comment-edit-area">
+				            <textarea class="form-control" rows="5" name="commentContent" th:text="${comment.commentContent}"></textarea>
+				        </div>
+				        <div class="comment-edit-actions">
+				            <input class="btn btn-warning" type="submit" value="저장">
+				            <a href="javascript:void(0)" th:data-comment-seq="${comment.commentSeq}" class="btn btn-primary ms-2 comment-modify-cancel" th:text="취소"></a>
+				        </div>
+				    </form>
+				</div>
+			</div>
+
+			<form th:action="@{|/comment/create/${post.postSeq}|}" th:object="${commentForm}" method="post">
+				<h5 class="my-3 py-3 border-bottom" style="color: var(--tan-darkest) !important; border-color: var(--tan-medium) !important;">답변 작성</h5>
+				<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+				
+				<th:block>
+					<textarea class="form-control" rows="5" th:field="*{commentContent}" placeholder="답변 내용을 입력해주세요."></textarea>
+					<input class="btn btn-fatcat my-3" type="submit" value="답변 등록하기">
+				</th:block>
+				
+				<!-- <th:block sec:authorize="!isAuthenticated()">
+					<div class="alert alert-info my-3 text-center" style="background-color: var(--tan-lighter); border-color: var(--tan-medium); color: var(--tan-darkest); font-weight: 500;">
+						답변을 작성하려면 먼저 로그인해주세요.
+					</div>
+				</th:block> -->
+			</form>
+			
+			<script type='text/javascript' layout:fragment="script">
+				// 삭제 기능 스크립트 (기존 유지)
+				const delete_elements = document.getElementsByClassName("delete");
+				Array.from(delete_elements).forEach(function(element) {
+					element.addEventListener('click', function() {
+						if (confirm("정말 삭제하시겠습니까?")) {
+							location.href = this.dataset.uri;
+						}
+					});
 				});
-			});
-		</script>
+				
+				// 인라인 답변 수정 폼 토글 기능 추가
+				document.querySelectorAll('.comment-modify-toggle, .comment-modify-cancel').forEach(function(element) {
+				    element.addEventListener('click', function(event) {
+				        event.preventDefault();
+				        const commentSeq = this.getAttribute('data-comment-seq');
+				        const commentCard = document.getElementById('comment-' + commentSeq);
+				        
+				        if (commentCard) {
+				            const displayArea = commentCard.querySelector('.comment-content-display');
+				            const editArea = commentCard.querySelector('.comment-content-edit');
+				            
+				            // 수정 폼을 보여주거나 숨깁니다.
+				            if (displayArea.style.display !== 'none') {
+				                // '수정' 버튼 클릭 시: 표시 영역 숨기고, 수정 폼 표시
+				                displayArea.style.display = 'none';
+				                editArea.style.display = 'block';
+				            } else {
+				                // '취소' 버튼 클릭 시: 수정 폼 숨기고, 표시 영역 표시
+				                editArea.style.display = 'none';
+				                displayArea.style.display = 'block';
+				            }
+				        }
+				    });
+				});
+			</script>
+		</div>
 	</div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{shared/layout}">
-
-   
-<body>
-        <div layout:fragment="content">
-
-	질문
-	<h2 class="border-bottom py-2" th:text="${post.postTitle}"></h2>
-
-	내용
-	<div class="card my-3">
-		<div class="card-body">
-			<div class="card-text">
-				<div th:text="${post.postContent}"></div>
-			</div>
-		</div>
-
-
-
-		<div class="d-flex justify-content-end">
-			<div class="badge bg-light text-dark p-2 text-start">
-
-				 수정 버튼 
-				<div class="my-2">
-					<a th:href="@{|/post/modify/${post.postSeq}|}"
-						class="btn btn-sm btn-outline-secondary"
-						sec:authorize="isAuthenticated()"
-						th:if="${post.user != null and
-                        #authentication.getPrincipal().getUsername() 
-                        == post.user.username}"
-						th:text="수정"></a>
-				</div>
-                
-
-				작성자 이름 나타내기
-				<p>작성자: 
-
-				<div class="mb-2">
-					<span th:if="${post.user != null}"
-						th:text="${post.user.userName}"></span>
-				</div>
-				 
-				 
-				작성시간 나타내기
-				<div
-					th:text="${#temporals.format(post.createDate, 'yyyy-MM-dd HH:mm')}"></div>
-
-			</div>
-		</div>
-
-
-
-
-
-		<div class="my-2">
-
-			수정 버튼
-			
-			<span th:text="${post.user != null ? post.user.username : '익명'}"></span>
-			
-			 
-			<a th:href="@{|/post/modify/${post.postSeq}|}"
-				class="btn btn-sm btn-warning"
-				th:if="${post.user != null ? post.user.userName : '익명'}"
-				th:text="수정"></a>
-				
-
-			삭제 버튼
-			
-			<a href="javascript:void(0)"
-				th:data-uri="@{|/post/delete/${post.postSeq}|}"
-				class="delete btn btn-sm btn-primary"
-				th:if="${post.user != null ? post.user.userName : '익명'}"
-				
-				th:text="삭제"></a>
-				
-				
-				
-				
-				
-				sec:authorize="isAuthenticated()"
-				th:if="${post.user != null and
-                        #authentication.getPrincipal().getUsername() 
-                        == post.user.username}"
-				
-				
-				
-
-		</div>
-		
-
-
-
-
-
-	</div>
-
-
-
-	답변 갯수
-
-	<h5 class="border-bottom my-3 py-3"
-		th:text="|${#lists.size(post.knowledgeCommentList)}개의 답변이 있습니다!!|"></h5>
-
-
-	답변 목록
- 
-	<div class="card my-3" th:each=" comment : ${post.knowledgeCommentList}">
-		<div class="card-body">
-			<div class="card-text" style="white-space: pre-line;"
-				th:text="${comment.commentContent}"></div>
-		</div>
-
-
-
-		답변 날짜!
-		 
-		<div class="d-flex justify-content-end">
-			<div class="badge bg-light text-dark p-2 text-start">
-
-				<div class="mb-2">
-					<span th:if="${comment.user != null}"
-						th:text="${comment.user.userName}"></span>
-				</div>
-				<div
-					th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}"></div>
-			</div>
-		</div>
-
-
-
-		<div class="my-2">
-
-			수정 버튼
-			
-			
-			<a th:href="@{|/comment/modify/${comment.commentSeq}|}"
-				class="btn btn-sm btn-warning"
-				th:if="${comment.user != null ? comment.user.userName : '익명'}"
-				th:text="수정"></a>
-				
-			
-			
-			
-			<a th:href="@{|/comment/modify/${comment.commentSeq}|}"
-				class="btn btn-sm btn-warning" sec:authorize="isAuthenticated()"
-				th:if="${comment.user != null and
-                        #authentication.getPrincipal().getUsername() 
-                        == comment.user.username}"
-				th:text="수정"></a>
-
-
-			삭제 버튼
-			
-			
-			<a href="javascript:void(0)"
-				th:data-uri="@{|/comment/delete/${comment.commentSeq}|}"
-				class="delete btn btn-sm btn-primary"
-				th:if="${comment.user != null ? comment.user.userName : '익명'}"
-				th:text="삭제"></a>
-			
-			
-			
-			
-			<a href="javascript:void(0)"
-				th:data-uri="@{|/comment/delete/${comment.commentSeq}|}"
-				class="delete btn btn-sm btn-primary"
-				sec:authorize="isAuthenticated()"
-				th:if="${comment.user != null and
-                        #authentication.getPrincipal().getUsername() 
-                        == comment.user.username}"
-				th:text="삭제"></a>
-
-		</div>
-
-
-
-
-	</div>
-
-
-	답변 등록
-	
-	<form th:action="@{|/comment/create/${post.postSeq}|}"
-		th:object="${commentForm}" method="post">
-
- 
-		 <div th:replace="~{shared/form_errors :: formErrorsFragment}"></div> 
-
-		
-		<textarea sec:authorize="isAuthenticated()" class="form-control"
-			rows="10" th:field=*{commentContent}></textarea>
-		<input class="btn btn-warning my-3" type="submit" value="답변 등록하기">
-	</form>
-	
-	
-	
-	<form th:action="@{|/post/list/${boardCode}|}" th:object="${postForm}" method="post">
-	<input value="목록으로 돌아가기" type="submit" class="btn btn-warning my-3" >
- </form>
- 
- 
- 
-delete
-<script type='text/javascript' layout:fragment="script">
-
-const delete_elements = document.getElementsByClassName("delete");
-Array.from(delete_elements).forEach(function(element){
-	
-	element.addEventListener('click', function(){
-		
-		if(confirm("정말 삭제하시겠습니까??")){
-			location.href = this.dataset.uri;
-		}
-	});
-	
-});
-
-</script>
-</div>
-</body>
-</html>
- -->
+     
