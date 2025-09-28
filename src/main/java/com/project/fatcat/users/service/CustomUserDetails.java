@@ -34,6 +34,10 @@ public class CustomUserDetails implements UserDetails{
     public String getUsername() {
         return user.getUserEmail(); // 이메일을 로그인 아이디로 사용
     }
+    
+    public String getUserName() {
+        return user.getUserName(); // 이메일을 로그인 아이디로 사용
+    }
 
     @Override
     public boolean isAccountNonExpired() { return true; }
