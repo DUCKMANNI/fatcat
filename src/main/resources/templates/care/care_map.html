@@ -19,21 +19,21 @@
 	width: fit-content;
 }
 
-#controls select, #controls button {
+#controls select {
 	height: 36px;
-	font-size: 14px;
+	font-size: 20px;
 	border-radius: 8px;
 	border: 1px solid #ccc;
 	padding: 0 10px;
 }
 
-#controls button {
+/* #controls button {
 	cursor: pointer;
 	border: none;
 	background: #CD853F;
 	color: #fff;
 	font-weight: 600;
-}
+} */
 
 #mapListContainer {
 	display: flex;
@@ -94,9 +94,9 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #CD853F;
+	background: #D2B48C;
 	color: white;
-	border-radius: 20%;
+	border-radius: 20px;
 	font-size: 13px;
 	font-weight: bold;
 	margin-right: 10px;
@@ -109,13 +109,13 @@
 
 #placesList .info h5 {
 	margin: 0 0 4px;
-	font-size: 15px;
+	font-size: 20px;
 	font-weight: bold;
 }
 
 #placesList .info p {
 	margin: 2px 0;
-	font-size: 13px;
+	font-size: 18px;
 	color: #555;
 }
 
@@ -128,19 +128,19 @@
 	display: inline-block;
 	margin: 0 6px;
 	text-decoration: none;
-	color: #2b74e4;
+	color: #666;
 }
 
 #pagination .on {
 	font-weight: 700;
-	color: #444;
+	color: #6C3C30;
 	pointer-events: none;
 }
 
 
-.fixed-element button {
+/* .fixed-element button {
 	display: block !important;
-}
+} */
 /* 상세창 */
 #detailPanel {
 	flex: 0;
@@ -167,10 +167,10 @@
 	color: #CD853F;
 }
 
-.btn-group .btn {
+/* .btn-group .btn {
     border-radius: 5px;
     padding: 8px 12px;
-}
+} */
 
 .btn-warning {
     background-color: #ffc107;
@@ -184,24 +184,29 @@
     border: 1px solid #dc3545;
 }
 </style>
+
 </head>
 <body>
 	<div layout:fragment="content">
 		<script
 			src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
 
-		<div id="controls">
-			<label>시/도<select id="sido"></select></label> <label>시/군/구<select
-				id="sigungu"></select></label> <label>동<select id="dong"></select></label>
-			<button id="searchBtn">검색</button>
-			<button id="btn" onclick='toggleListView()'>리스트만보기</button>
-			<a th:href="@{/care/create}"><button id="btn">돌봄글 등록</button></a>
+		<label class="container my-3 d-flex flex-column align-items-center"
+			style="font-family: 'BagelFat', sans-serif; font-size: 50px; /* (80-&gt;50px) */ color: #CD853F;">돌봄서비스 찾기</label>
+		
+		<div id="controls" style="font-size: 20px;">
+			<label>시/도<select id="sido" class="m-1" style="font-size: 18px;"></select></label> 
+			<label>시/군/구<select id="sigungu" class="m-1" style="font-size: 18px;"></select></label>
+			<label>동<select id="dong" class="m-1" style="font-size: 18px;"></select></label>
+			<button id="searchBtn" class="btn btn-fatcat" style="font-size: 20px;">검색</button>
+			<button id="btn" class="btn btn-fatcat"  style="font-size: 20px;" onclick='toggleListView()'>리스트만보기</button>
+			<a th:href="@{/care/create}"><button id="btn" class="btn btn-fatcat" style="font-size: 20px;">돌봄글 등록</button></a>
 		</div>
 
 		<div id="mapListContainer">
 			<div id="map"></div>
 			<div id="menu_wrap">
-				<h3>돌봄서비스 구인 목록</h3>
+				<h3 style="font-size: 25px">돌봄서비스 구인 목록</h3>
 				<ul id="placesList"></ul>
 				<div id="pagination"></div>
 			</div>
@@ -424,32 +429,21 @@
 						
 						detailContent.innerHTML = `
 						<button id="closeDetail" class="btn-close" aria-label="Close"></button>
-						<h4>${place.careTitle}</h4>
-						<p><strong>작성자:</strong> ${place.authorNickname}</p>
-						<p><strong>주소:</strong> ${place.address1} ${place.address2}</p>
-						<p><strong>가격:</strong> ${place.price}원</p>
-						<p><strong>내용:</strong> ${place.careContent}</p>
+						<strong style="font-size : 25px">${place.careTitle}</strong>
+						<p style="font-size : 20px"><strong>작성자:</strong> ${place.authorNickname}</p>
+						<p style="font-size : 20px"><strong>주소:</strong> ${place.address1} ${place.address2}</p>
+						<p style="font-size : 20px"><strong>가격:</strong> ${place.price}원</p>
+						<p style="font-size : 20px"><strong>내용:</strong> ${place.careContent}</p>
 						
 						<div style="margin-top: 20px; text-align: right;">
-							<a href="/care/modify/${place.careSeq}" class="btn btn-warning">수정</a>
+							<a href="/care/modify/${place.careSeq}" class="btn btn-fatcat" style="font-size : 20px">수정</a>
 							<form action="/care/delete/${place.careSeq}" method="post" style="display:inline;">
-								<button type="submit" class="btn btn-danger mx-1" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
+								<button type="submit" class="btn btn-fatcat" style="font-size : 20px" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
 							</form>
-							<button class="btn btn-warning" onclick="openChatPopup(${place.authorUserSeq})">채팅하기</button>
+							<button class="btn btn-fatcat" style="font-size : 20px" onclick="openChatPopup(${place.authorUserSeq})">채팅하기</button>
 						</div>
 						`;
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
+					
 						
 						
 						detailPanel.classList.add('show');

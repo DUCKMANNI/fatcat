@@ -45,6 +45,8 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 	//implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	
+	implementation 'com.jcraft:jsch:0.1.55'
 }
 
 tasks.named('test') {
