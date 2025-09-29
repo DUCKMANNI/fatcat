@@ -321,15 +321,12 @@
             let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7, maxItems = 45;
             let openedPlaceId = null, originalCenter = null;
             const markers = [];
-            const geocoder = new kakao.maps.services.Geocoder();
-
             const $sido = document.getElementById('sido');
             const $sigungu = document.getElementById('sigungu');
             const $dong = document.getElementById('dong');
             const $searchBtn = document.getElementById('searchBtn');
             const $placesList = document.getElementById('placesList');
             const $pagination = document.getElementById('pagination');
-            
 
             const map = new kakao.maps.Map(document.getElementById('map'), {
                 center: new kakao.maps.LatLng(37.566826, 126.9786567),
@@ -388,24 +385,6 @@
                 });
                 markers.length = 0;
             }
-            
-         // 현재 위치 마커 표시 함수
-			function displayUserLocation(lat, lon) {
-				const pos = new kakao.maps.LatLng(lat, lon);
-				
-				if (userLocationMarker) {
-					userLocationMarker.setMap(null);
-				}
-
-				userLocationMarker = new kakao.maps.Marker({
-					position: pos,
-					map: map,
-				});
-
-				map.setCenter(pos);
-				
-				
-			}
 
             function clearList() {
                 $placesList.innerHTML = '';
@@ -416,52 +395,16 @@
             }
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        const lat = pos.coords.latitude;
-                        const lon = pos.coords.longitude;
-                        const loc = new kakao.maps.LatLng(lat, lon);
-
-                        // 지도 마커 찍기
-                        new kakao.maps.Marker({ map: map, position: loc });
-
-                        // 📌 드롭다운 자동 채우기
-                        reverseGeocode(lat, lon);
-
-                        // 📌 현재 위치 기준 병원 검색 실행
-                        searchNearbyHospitals(loc);
-                    },
-                    err => console.warn("위치 가져오기 실패", err)
-                );
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const loc = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                    new kakao.maps.Marker({
+                        map: map,
+                        position: loc,
+                        image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(36, 46))
+                    });
+                    searchNearbyHospitals(loc);
+                }, err => console.warn("위치 가져오기 실패", err));
             }
-
-            function reverseGeocode(lat, lon) {
-                geocoder.coord2RegionCode(lon, lat, (result, status) => {
-                    if (status === kakao.maps.services.Status.OK) {
-                        const region = result.find(r => r.region_type === "H"); // 행정동 단위
-
-                        if (region) {
-                            const sido = region.region_1depth_name;
-                            const sigungu = region.region_2depth_name;
-                            const dong = region.region_3depth_name;
-
-                            // 1) 시/도 선택
-                            $sido.value = sido;
-                            fillSigungu();
-
-                            // 2) 시/군/구 선택
-                            $sigungu.value = sigungu;
-                            fillDong();
-
-                            // 3) 동 선택
-                            if ([...$dong.options].some(opt => opt.value === dong)) {
-                                $dong.value = dong;
-                            }
-                        }
-                    }
-                });
-            }
-
 
             function searchHospitals() {
                 if (!$sido.value || !$sigungu.value) {
@@ -517,37 +460,18 @@
                 });
             }
 
-            function addMarker(pos, idx,  title = "이름 없음") {
+            function addMarker(pos, idx) {
                 const marker = new kakao.maps.Marker({
                     position: pos,
                     map: map,
-                    image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(50, 50))
+                    image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(39, 46))
                 });
                 const overlay = new kakao.maps.CustomOverlay({
                     position: pos,
-                    content: `<div style="
-		                position: absolute;
-		                top: 50%;
-		                left: 50%;
-		                transform: translate(-64%, -80%);
-		                font-size: 20px;
-		                font-weight: bold;
-		                color: #422701;
-		                width: 25px;
-		                text-align: center;
-		            ">${idx + 1}</div>`,
-      
+                    content: `<div style="width:20px;height:18px;color:white;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:15px;font-weight:bold;">${idx + 1}</div>`,
+                    yAnchor: 2.4
                 });
                 overlay.setMap(map);
-                
-                // 📌 마커에 마우스 올렸을 때 infoWindow 보이게
-                kakao.maps.event.addListener(marker, "mouseover", () => {
-                    showInfo(marker, title);
-                });
-                kakao.maps.event.addListener(marker, "mouseout", () => {
-                    infowindow.close();
-                });
-                
                 markers.push({
                     marker,
                     overlay
@@ -569,7 +493,7 @@
                     const pos = new kakao.maps.LatLng(place.y, place.x);
                     const {
                         marker
-                    } = addMarker(pos, i + start, place.place_name);
+                    } = addMarker(pos, i + start);
 
                     const li = document.createElement('li');
                     li.className = 'item';
@@ -760,7 +684,6 @@
             }
 
             async function deleteReview(vetReviewSeq) {
-
                 if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) return;
                 try {
                     const response = await fetch(`/api/vet-clinics/reviews/${vetReviewSeq}`, { method: 'DELETE' });
@@ -778,24 +701,13 @@
                     const data = await response.json();
 
                     const avgRatingEl = document.getElementById('avgRating');
-                    const reviewListEl = document.getElementById('reviewList');
-                    
-                    // 💡 평균 평점 별표 표시 로직 추가
                     if (data.ratingAvg !== null) {
-                        const avgRating = data.ratingAvg.toFixed(1); // 소수점 첫째 자리까지 표시
-                        const starCount = Math.round(data.ratingAvg); // 반올림하여 별 개수 결정
-                        
-                        // 별표 문자열 생성 (채워진 별 + 빈 별)
-                        const filledStars = '★'.repeat(starCount);
-                        const emptyStars = '★'.repeat(5 - starCount);
-                        const starDisplay = `<span style="color:#FFD700;">${filledStars}</span><span style="color:#CCCCCC;">${emptyStars}</span>`;
-                        
-                        // 평점 정보 업데이트
-                        avgRatingEl.innerHTML = `${avgRating}점 ${starDisplay} (${data.ratingCount}명 참여)`;
+                        avgRatingEl.textContent = `${data.ratingAvg.toFixed(2)} (${data.ratingCount}명 참여)`;
                     } else {
                         avgRatingEl.textContent = "아직 평점이 없습니다.";
                     }
 
+                    const reviewListEl = document.getElementById('reviewList');
                     reviewListEl.innerHTML = `<strong style="font-size : 25px;">등록된 리뷰</strong>`;
 
                     if (data.reviews && data.reviews.length > 0) {
