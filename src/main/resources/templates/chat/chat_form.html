@@ -4,6 +4,55 @@
 <meta charset="utf-8">
 <title>최종 수정본: 1:1 채팅 + CareSession + 리뷰 + UI 개선 (날짜 구분선 포함)</title>
 <style>
+
+
+
+.sent .message.tail::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* 메시지 박스 하단에 위치 */
+    right: -6px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
+    width: 0;
+    height: 0;
+    z-index: 1;
+    
+    /* 꼬리 삼각형 모양 만들기 */
+    border: 9px solid transparent; /* 꼬리 크기 조절 */
+    border-left-color: #ebdecd; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+    border-bottom-color: #ebdecd;
+    
+    /* 꼬리가 뾰족한 삼각형이 되도록 불필요한 테두리를 투명하게 설정 */
+    border-top-color: transparent; 
+    border-right-color: transparent;
+    
+    /* 귀여운 둥근 꼬리처럼 보이도록 둥근 모양 추가 (선택 사항) */
+    border-bottom-right-radius: 8px; 
+}
+
+
+/* ---------------------------------------------------------------------------------- */
+/* 2. 받은 메시지 (왼쪽 아래 꼬리) */
+/* ---------------------------------------------------------------------------------- */
+.received .message.tail::after {
+    content: '';
+    position: absolute;
+    bottom: 0; /* 메시지 박스 하단에 위치 */
+    left: -7px; /* 메시지 박스 바깥쪽 왼쪽으로 빼냅니다. */
+    width: 0;
+    height: 0;
+    
+    /* 꼬리 삼각형 모양 만들기 */
+    border: 5px solid transparent; 
+    border-right-color: #fff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+    border-bottom-color: #fff;
+    
+    /* 꼬리가 뾰족한 삼각형이 되도록 불필요한 테두리를 투명하게 설정 */
+    border-top-color: transparent; 
+    border-left-color: transparent;
+
+    /* 귀여운 둥근 꼬리처럼 보이도록 둥근 모양 추가 (선택 사항) */
+    border-bottom-left-radius: 5px; 
+}
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
 /* ---------------------------------------------------------------------------------- */
@@ -88,6 +137,7 @@ textarea::placeholder {
 	background: #f7f7f7;
 	display: flex;
 	flex-direction: column;
+	
 }
 
 /* ✨ 날짜 구분선 스타일 ✨ */
@@ -190,10 +240,101 @@ textarea::placeholder {
 }
 
 .care-request {
-	background: #FFFACD;
-	padding: 6px 10px;
-	border-radius: 12px;
-	margin-top: 4px;
+	padding: 0;
+}
+
+.care-request-card {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eeeeee; /* 구분선 */
+}
+
+.header-icon {
+    font-size: 1.2em;
+    margin-right: 6px;
+}
+
+.header-title {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #333333;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 6px; /* 줄 간격 */
+    align-items: flex-start;
+}
+
+.detail-icon {
+    color: #888; /* 아이콘 색상 */
+    margin-right: 8px;
+    padding-top: 2px;
+}
+
+.label {
+    font-weight: 600;
+    color: #555;
+    display: inline-block;
+    min-width: 40px; /* 라벨 너비 고정으로 정렬 맞춤 */
+}
+
+/* -----------------------------------
+   3. Footer 및 상태/버튼 스타일
+   ----------------------------------- */
+.card-footer {
+    display: flex;
+    justify-content: space-between; /* 상태 표시와 버튼을 양 끝으로 분리 */
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eeeeee;
+}
+
+/* 상태 표시 뱃지 스타일 */
+.care-status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px; /* 둥근 뱃지 모양 */
+    font-weight: 600 !important;
+    font-size: 0.85em !important;
+    white-space: nowrap;
+}
+
+/* 확정 상태 */
+.care-status[style*="green"] { 
+    background-color: #e6f7e6;
+    color: #38761d !important; 
+}
+
+/* 취소 상태 */
+.care-status[style*="red"] { 
+    background-color: #fceceb;
+    color: #cc0000 !important;
+}
+
+/* 버튼 스타일 (확정 버튼) */
+.confirm-btn {
+    background-color: #4c8cff; /* 깔끔한 파란색 */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.confirm-btn:hover {
+    background-color: #3a75e0;
 }
 
 .care-confirmed {
@@ -593,15 +734,14 @@ textarea::placeholder {
 	<div id="user-select">
 		<label>보내는 사람: <select id="sender-select">
 				<option value="">선택하세요</option>
-				<option value="1" data-username="김유정">User 1</option>
-				<option value="2" data-username="유정">User 2</option>
-				<option value="3" data-username="관리왕">User 3</option>
+				<option value="10" data-username="황미진">User 10</option>
+				<option value="11" data-username="채지민">User 11</option>
+				
 		</select>
 		</label> <label>받는 사람: <select id="receiver-select">
 				<option value="">선택하세요</option>
-				<option value="1" data-username="김유정">User 1</option>
-				<option value="2" data-username="유정">User 2</option>
-				<option value="3" data-username="관리왕">User 3</option>
+				<option value="10" data-username="황미진">User 10</option>
+				<option value="11" data-username="채지민">User 11</option>
 		</select>
 		</label>
 	</div>
@@ -758,11 +898,15 @@ window.onload = function() {
 function sendCareRequest() {
     const start = startDateInput.value;
     const end = endDateInput.value;
-    if (!start || !end) return alert("날짜를 선택하세요.");
-
-    const startWithSeconds = start + ':00';
-    const endWithSeconds = end + ':00';
-
+    if (!start || !end) return console.error("날짜를 선택하세요."); 
+    
+    const startIsoFormat = start.replace(' ', 'T');
+    const endIsoFormat = end.replace(' ', 'T');
+    
+    // 초(':00')를 추가하여 백엔드 포맷(yyyy-MM-dd'T'HH:mm:ss)을 완성합니다.
+    const startWithSeconds = startIsoFormat + ':00';
+    const endWithSeconds = endIsoFormat + ':00';
+    
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
@@ -909,17 +1053,41 @@ function getDateString(dateString) {
 }
 
 
+/**
+ * ISO 형식의 날짜 문자열(예: YYYY-MM-DDTHH:mm:ss)을 
+ * 한국어 로케일로 포맷팅합니다.
+ */
 function formatDateTime(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString.replace(' ', 'T'));
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-}
+    // 값이 null, undefined, 또는 빈 문자열일 경우 처리
+    if (!dateString) {
+        return '날짜 정보 없음'; 
+    }
+    
+    // 백엔드에서 YYYY-MM-DDTHH:mm:ss 형식으로 오기 때문에 
+    // 문자열을 그대로 사용하여 Date 객체를 생성합니다.
+    const date = new Date(dateString);
 
+    // Date 객체 유효성 검사
+    if (isNaN(date.getTime())) { // getTime()으로 Invalid Date 체크를 더 확실하게 합니다.
+        // DTO 필드가 String 타입이지만, 서버에서 데이터가 깨져서 올 경우 대비
+        console.error("날짜 파싱 오류 발생. 원본 문자열:", dateString);
+        return '날짜 형식 오류'; 
+    }
+
+    // 한국어 로케일과 옵션을 사용하여 포맷팅
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true, // 오전/오후 사용
+        timeZone: 'Asia/Seoul' 
+    };
+
+    // 결과: "2025. 09. 28. 오후 07:25"
+    return date.toLocaleString('ko-KR', options);
+}
 
 function displayMessage(chatMessage) {
     // ✨ 날짜 구분선 로직 추가 시작 ✨
@@ -981,8 +1149,15 @@ function displayMessage(chatMessage) {
 
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
+    messageDiv.classList.add('tail'); // 꼬리 스타일을 적용합니다.
 
     if (chatMessage.type === "CARE_REQUEST") {
+    	
+   	 	console.log("DEBUG: CARE_REQUEST chatMessage Object:", chatMessage);
+        console.log("DEBUG: Start Date Value:", chatMessage.startDate, "End Date Value:", chatMessage.endDate);
+    	
+    		const formattedStartDate = formatDateTime(chatMessage.startDate);
+        const formattedEndDate = formatDateTime(chatMessage.endDate);
         const careDiv = document.createElement('div');
         careDiv.setAttribute('data-session-id', chatMessage.sessionId || -1); 
         careDiv.classList.add('care-request');
@@ -1005,17 +1180,43 @@ function displayMessage(chatMessage) {
             statusDisplay = `<span class="care-status" style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
         }
         
-        const formattedStartDate = formatDateTime(chatMessage.startDate);
-        const formattedEndDate = formatDateTime(chatMessage.endDate);
+        
 
 
-        careDiv.innerHTML = `
-            <div style="font-weight: bold;">${chatMessage.content}</div>
-            <div style="font-size: 0.9em;">기간: ${formattedStartDate} ~ ${formattedEndDate}</div>
-            <div style="font-size: 0.9em;">메모: ${chatMessage.note || '없음'}</div>
-            ${statusDisplay}
-            ${confirmButtonHtml}
-        `;
+        careDiv.innerHTML =  `
+            <div class="care-request-card">
+            <div class="card-header">
+                <span class="header-icon">📌</span>
+                <span class="header-title">돌봄 요청 상세</span>
+            </div>
+            
+            <div class="card-body">
+                <div class="detail-row time-detail">
+                    <span class="detail-icon">📅</span>
+                    <div class="detail-text">
+                        <span class="label">시작:</span> ${formattedStartDate} 
+                    </div>
+                </div>
+                <div class="detail-row time-detail">
+                    <span class="detail-icon">🗓️</span>
+                    <div class="detail-text">
+                        <span class="label">종료:</span> ${formattedEndDate} 
+                    </div>
+                </div>
+                <div class="detail-row memo-detail">
+                    <span class="detail-icon">📝</span>
+                    <div class="detail-text">
+                        <span class="label">메모:</span> ${chatMessage.note || '없음'}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                ${statusDisplay ? `<div class="status-box">${statusDisplay}</div>` : ''}
+                ${confirmButtonHtml ? `<div class="action-box">${confirmButtonHtml}</div>` : ''}
+            </div>
+        </div>
+    `;
         messageDiv.appendChild(careDiv);
 
         if (status === 'REQUESTED' && isReceiver) {
