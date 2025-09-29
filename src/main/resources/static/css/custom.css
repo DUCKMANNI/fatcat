@@ -302,3 +302,27 @@ body {
   height: 100%;
   object-fit: cover;
 }
+
+/* .nav-link.active,
+.dropdown-item.active {
+  color: #CD853F !important;   고양이 테마 탄색
+  font-weight: bold;
+  border-bottom: 2px solid #CD853F;
+} */
+
+/* 드롭다운 항목 선택 시 파란색 배경 제거 */
+.dropdown-item:focus,
+.dropdown-item:active {
+  background-color: transparent !important;
+  color: inherit !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* active로 내가 준 색상만 표시 */
+.nav-link.active,
+.dropdown-item.active {
+  background-color: transparent !important;
+  color: #CD853F !important;   /* 네가 쓰는 포인트 색상 */
+  font-weight: bold;
+}
