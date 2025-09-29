@@ -24,6 +24,8 @@ public class GlobalControllerAdvice {
 	private String mapPathToTitle(String path) {
         if (path.startsWith("/mypage")) {
             return "마이페이지";
+        } else if (path.startsWith("/products")) {
+            return "고양이 전용 쇼핑몰";
         } else if (path.startsWith("/shopping")) {
             return "고양이 전용 쇼핑몰";
         } else if (path.startsWith("/vetclinic")) {
