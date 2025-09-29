@@ -11,22 +11,26 @@
     content: '';
     position: absolute;
     bottom: 0; /* 메시지 박스 하단에 위치 */
-    right: -6px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
+    right: -7px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
     width: 0;
     height: 0;
     z-index: 1;
     
     /* 꼬리 삼각형 모양 만들기 */
     border: 9px solid transparent; /* 꼬리 크기 조절 */
+    border-radius : 2px;
     border-left-color: #ebdecd; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
     border-bottom-color: #ebdecd;
     
-    /* 꼬리가 뾰족한 삼각형이 되도록 불필요한 테두리를 투명하게 설정 */
-    border-top-color: transparent; 
-    border-right-color: transparent;
+      
+    /* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
+    border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
+    border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
     
-    /* 귀여운 둥근 꼬리처럼 보이도록 둥근 모양 추가 (선택 사항) */
-    border-bottom-right-radius: 8px; 
+    /* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
+    transform: rotate(6deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
+    
+   
 }
 
 
@@ -37,21 +41,25 @@
     content: '';
     position: absolute;
     bottom: 0; /* 메시지 박스 하단에 위치 */
-    left: -7px; /* 메시지 박스 바깥쪽 왼쪽으로 빼냅니다. */
+    left: -10px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
     width: 0;
     height: 0;
+    z-index: 1;
     
     /* 꼬리 삼각형 모양 만들기 */
-    border: 5px solid transparent; 
-    border-right-color: #fff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
-    border-bottom-color: #fff;
+    border: 9px solid transparent; /* 꼬리 크기 조절 */
+    border-radius : 2px;
+    border-left-color: #ffffff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+    border-bottom-color: #ffffff;
     
-    /* 꼬리가 뾰족한 삼각형이 되도록 불필요한 테두리를 투명하게 설정 */
-    border-top-color: transparent; 
-    border-left-color: transparent;
-
-    /* 귀여운 둥근 꼬리처럼 보이도록 둥근 모양 추가 (선택 사항) */
-    border-bottom-left-radius: 5px; 
+      
+    /* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
+    border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
+    border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
+    
+    /* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
+    transform:rotateY(186deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
+    
 }
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
@@ -68,8 +76,9 @@
 
 
 body {
-	font-family: 'Juache', sans-serif; 
 	
+	font-family: 'Juache', sans-serif; 
+	font-size:16px;
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -89,6 +98,7 @@ body {
 /* 기본 입력 필드 스타일 및 폰트 적용 */
 select, input, textarea {
 	font-family: 'Juache', sans-serif;
+	font-size:16px;
 	padding: 5px 10px;
 	border-radius: 6px;
 	border: 1px solid #ccc;
@@ -147,7 +157,7 @@ textarea::placeholder {
 }
 
 .date-separator span {
-    font-size: 12px;
+    font-size: 16px;
     color: #888;
     background: #e9e9e9; /* 연한 회색 배경 */
     padding: 4px 10px;
@@ -174,14 +184,16 @@ textarea::placeholder {
 }
 
 .profile-placeholder {
-	width: 40px;
-	height: 40px;
+	margin-top: 15px;
+	width: 50px;
+	height: 50px;
 	border-radius: 50%;
 	background-color: #ccc;
 	margin-right: 10px;
 	align-self: flex-start;
 	flex-shrink: 0;
 	cursor: pointer;
+	
 }
 
 .message-content-wrapper {
@@ -199,7 +211,7 @@ textarea::placeholder {
 }
 
 .user-nickname {
-	font-size: 12px;
+	font-size: 15px;
 	color: #555;
 	margin-bottom: 4px;
 	cursor: pointer;
@@ -228,7 +240,7 @@ textarea::placeholder {
 }
 
 .message-time {
-	font-size: 10px;
+	font-size: 13px;
 	color: #555;
 	margin-top: 2px;
 	align-self: flex-end;
@@ -244,8 +256,11 @@ textarea::placeholder {
 }
 
 .care-request-card {
-    font-size: 14px;
+	border-radius:20px;
+	background-color:#fff3b0;
+    font-size: 16px;
     line-height: 1.4;
+    padding : 15px 10px;
 }
 
 .card-header {
@@ -295,7 +310,8 @@ textarea::placeholder {
     align-items: center;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid #eeeeee;
+    border-top: 1px solid #555;
+    
 }
 
 /* 상태 표시 뱃지 스타일 */
@@ -304,19 +320,19 @@ textarea::placeholder {
     padding: 3px 8px;
     border-radius: 12px; /* 둥근 뱃지 모양 */
     font-weight: 600 !important;
-    font-size: 0.85em !important;
+    font-size: 18px !important;
     white-space: nowrap;
 }
 
 /* 확정 상태 */
 .care-status[style*="green"] { 
-    background-color: #e6f7e6;
+   /*  background-color: #e6f7e6; */
     color: #38761d !important; 
 }
 
 /* 취소 상태 */
 .care-status[style*="red"] { 
-    background-color: #fceceb;
+    /* background-color: #fceceb; */
     color: #cc0000 !important;
 }
 
@@ -344,6 +360,24 @@ textarea::placeholder {
 	margin-top: 4px;
 }
 
+.btn-darkbrown {
+	font-size : 16px;
+	font-family: 'Juache', sans-serif;
+	padding: 6px 16px;
+	border-radius: 999px;
+	border: none;  
+    color: white; 
+    background-color: #9a7f5a;
+    transition: all 0.3s ease;
+    cursor : pointer;
+}
+
+.btn-darkbrown:hover {
+    background-color: #524538;
+	color: #fff;  
+	border: none;  
+}
+
 #input-area {
 	display: flex;
 	padding: 10px;
@@ -360,7 +394,7 @@ textarea::placeholder {
 }
 
 /* 버튼에도 폰트, 커서 포인터 적용 */
- #send-button, #care-toggle {
+ #send-button{
  	font-family: 'Juache', sans-serif;
 	background-color: #D2B48C;
 	color: #fff;
@@ -372,7 +406,7 @@ textarea::placeholder {
 } 
 
 
-#send-button:hover, #care-toggle:hover {
+#send-button:hover{
 	background-color: #a38b6a; /* hover 시 조금 진하게 */
 	color: #fff;
 } 
@@ -383,7 +417,7 @@ textarea::placeholder {
 
 #care-form {
     display: none; /* 기본은 숨김 */
-    padding: 15px; 
+    padding: 18px; 
     border: 1px solid #e0e0e0; 
     border-radius: 12px; 
     margin: 10px; 
@@ -391,7 +425,7 @@ textarea::placeholder {
     flex-wrap: wrap; 
     gap: 10px; 
     flex-direction: row; 
-    font-size: 14px; 
+    font-size: 16px; 
     line-height: 1.4;
     border-top: 1px solid #ddd; 
 }
@@ -430,7 +464,7 @@ textarea::placeholder {
     box-sizing: border-box; 
     margin-top: 4px; 
     width: 100%; 
-    font-size: 14px;
+    font-size: 16px;
     background-color: white; 
 }
 
@@ -521,7 +555,7 @@ textarea::placeholder {
 }
 
 .star-rating {
-	color: gold;
+	color: black;
 	font-size: 1.2em;
 }
 
@@ -536,6 +570,7 @@ textarea::placeholder {
 
 #review-form-area h4 {
 	font-family: 'Juache', sans-serif;
+	font-size:20px;
 	margin-top: 0;
 	margin-bottom: 15px; /* 제목 아래 간격 추가 */
 }
@@ -582,6 +617,7 @@ textarea::placeholder {
 
 /* 리뷰 목록 스타일 */
 #review-list {
+	font-size:20px;
 	flex-grow: 1;
 	overflow-y: auto;
 	padding-right: 5px;
@@ -590,6 +626,7 @@ textarea::placeholder {
 .review-item {
 	/* 리뷰 내용에도 폰트 적용 */
 	font-family: 'Juache', sans-serif;
+	font-size:18px;
 	padding: 10px 0;
 	border-bottom: 1px dotted #ddd;
 	position: relative;
@@ -606,7 +643,6 @@ textarea::placeholder {
 .review-header {
 	display: flex;
 	justify-content: space-between;
-	font-size: 0.9em;
 	color: #444;
 	margin-bottom: 5px;
 }
@@ -626,19 +662,21 @@ textarea::placeholder {
 	align-items: center;
 }
 
-/* 수정/삭제 버튼 스타일 */
+/* 
 .review-actions button {
 	font-size: 0.75em;
 	padding: 3px 6px;
 	margin-left: 5px;
 	border: 1px solid #ccc;
-	border-radius: 4px;
-	cursor: pointer; /* 커서 포인터 추가 */
+	border-radius: 999px;
+	cursor: pointer; 
 	background: #fff;
 	font-family: 'Juache', sans-serif;
 }
+ 
+*/
 
-.review-actions button.edit {
+/* .review-actions button.edit {
 	color: #007bff;
 	border-color: #007bff;
 }
@@ -646,7 +684,7 @@ textarea::placeholder {
 .review-actions button.delete {
 	color: #dc3545;
 	border-color: #dc3545;
-}
+} */
 
 /* ---------------------------------------------------------------------------------- */
 /* 4. 인라인 리뷰 수정 폼 스타일 (이미지 레이아웃에 맞게 조정) */
@@ -723,6 +761,46 @@ textarea::placeholder {
 	border-radius: 4px;
 	margin-left: 5px;
 }
+
+
+.btn-outline-danger {
+	font-family: 'Juache', sans-serif;
+	font-size : 14px;
+    border-radius:999px;
+    background-color: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    transition: all 0.3s ease;
+    padding: 6px 10px;
+     cursor: pointer;
+} 
+
+.btn-outline-danger:hover {
+	
+    color: white; 
+    background-color: #dc3545; 
+    border-color: #dc3545;
+}
+
+
+.btn-outline-brown {
+	font-family: 'Juache', sans-serif;
+	font-size : 14px;
+	border: 2px solid #8B4513;
+	border-radius:999px;
+    color: #8B4513; /* 글자색: 새들 브라운 */
+    border-color: #8B4513; /* 테두리색 */
+    background-color: transparent; /* 배경 투명 */
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: all 0.3s ease; /* 부드러운 전환 효과 */
+}
+
+.btn-outline-brown:hover {
+    color: white;
+    background-color: #8B4513;
+    
+}
 </style>
 <script
 	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
@@ -750,8 +828,8 @@ textarea::placeholder {
 		<div id="message-area"></div>
 		<div id="input-area">
 			<input type="text" id="message-input" placeholder="메시지를 입력하세요...">
-			<button id="send-button" class="btn btn-fatcat" >전송</button>
-			<button id="care-toggle" class="btn btn-fatcat">돌봄 예약</button>
+			<button id="send-button" class="btn btn-fatcat" style="font-size:16px;" >전송</button>
+			<button id="care-toggle" class="btn btn-darkbrown" style="font-size:16px;">돌봄 예약</button>
 		</div>
         
 		<div id="care-form">
@@ -795,10 +873,10 @@ textarea::placeholder {
 						data-rating="5">★</span>
 				</div>
 				<textarea id="new-review-text" rows="3" placeholder="리뷰 내용을 입력하세요."></textarea>
-				<button id="submit-review-btn">리뷰 작성</button>
+				<button id="submit-review-btn" style="font-size : 16px;">리뷰 작성</button>
 			</div>
-
-			<h4>리뷰 목록</h4>
+			<hr style="width:100%;height:1px;border:none;background-color:#cccccc;">
+			<h4 style="font-size : 20px;">등록된 리뷰</h4>
 			<div id="review-list"></div>
 		</div>
 	</div>
@@ -1175,22 +1253,22 @@ function displayMessage(chatMessage) {
             const formattedConfirmTime = chatMessage.confirmedTime ? 
                 formatDateTime(chatMessage.confirmedTime) : 
                 '시간 정보 없음';
-            statusDisplay = `<span class="care-status" style="color: green; font-weight: bold;">[✅ 확정됨 - ${formattedConfirmTime}]</span>`;
+            statusDisplay = `<span class="care-status" style="color: green; font-weight: bold; font-size:20px;">[✅ 확정됨 - ${formattedConfirmTime}]</span>`;
         } else if (status === 'CANCELLED') {
-            statusDisplay = `<span class="care-status" style="color: red; font-weight: bold;">[❌ 취소됨]</span>`;
+            statusDisplay = `<span class="care-status" style="color: red; font-weight: bold; font-size:20px;">[❌ 취소됨]</span>`;
         }
         
         
 
 
         careDiv.innerHTML =  `
-            <div class="care-request-card">
+            <div class="care-request-card" style="font-size:16px;">
             <div class="card-header">
                 <span class="header-icon">📌</span>
                 <span class="header-title">돌봄 요청 상세</span>
             </div>
             
-            <div class="card-body">
+            <div class="card-body" style="font-size:16px;">
                 <div class="detail-row time-detail">
                     <span class="detail-icon">📅</span>
                     <div class="detail-text">
@@ -1331,7 +1409,7 @@ async function fetchReviews(targetSeq) {
         const average = (totalRating / reviews.length).toFixed(1);
         const starHtml = '★'.repeat(Math.round(average)) + '☆'.repeat(5 - Math.round(average));
         
-        avgRatingElem.innerHTML = `평점: <span class="star-rating">${average}</span> (${starHtml})`;
+        avgRatingElem.innerHTML = `평점: <span class="star-rating">${average}</span> <span style="color:gold">${starHtml}</span>`;
         totalReviewsElem.innerText = `총 ${reviews.length}개의 리뷰`;
 
     } catch (error) {
@@ -1358,8 +1436,8 @@ function createReviewItem(review) {
     if (review.authorUserSeq === senderId) { 
         actionButtons = `
             <div class="review-actions">
-                <button class="edit" onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
-                <button class="delete" onclick="deleteReview(${review.reviewSeq})">삭제</button>
+                <button class="btn btn-outline-brown"onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
+                <button class="btn btn-outline-danger" onclick="deleteReview(${review.reviewSeq})">삭제</button>
             </div>
         `;
     }

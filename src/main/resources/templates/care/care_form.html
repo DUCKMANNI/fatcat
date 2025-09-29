@@ -8,7 +8,7 @@
 <style>
 
 .form-label {
-    /* Bootstrap 기본값인 mb-1(margin-bottom: 0.25rem)을 0으로 재정의합니다. */
+   
     margin-bottom: 0;
 }
 
@@ -27,9 +27,8 @@
 	gap: 15px; 
 	align-items: center;
 	margin: 2px auto; 
-    /* width: 100%; */
 	display: flex;
-	/* ⭐️ 이 부분을 flex-start로 변경합니다. */
+
 	justify-content: flex-start;
 }
 
@@ -299,7 +298,7 @@
         const centerMarker = new kakao.maps.Marker({
             map: map,
             position: position,
-            image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(36, 46))
+            image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(50, 50))
         });
         markers.push(centerMarker);
 
