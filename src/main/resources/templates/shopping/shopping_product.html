@@ -11,6 +11,26 @@
 	<div layout:fragment="shopContent"
 		class="container-fluid my-3 d-flex flex-column align-items-center">
 
+		<!-- 🔍 검색창 -->
+		<div class="d-flex justify-content-end w-100 mb-3 pe-5 me-5">
+		    <form th:action="@{/products}" method="get"
+		          class="row align-items-center g-2"  style="max-width: 800px;">
+		
+		        <div class="col-9">
+		            <input type="text" name="keyword" class="form-control"
+		                   placeholder="상품명을 입력하세요"
+		                   th:value="${param.keyword}">
+		        </div>
+		
+		        <div class="col-3">
+		            <button type="submit" class="btn btn-fatcat w-100">검색</button>
+		        </div>
+		
+		    </form>
+		</div>
+
+
+
 		<!-- 상품목록 시작 -->
 		<div class="product-grid">
 			<div class="product-card me-5" th:each="product : ${products}">

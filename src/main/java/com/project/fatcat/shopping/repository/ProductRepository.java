@@ -32,5 +32,9 @@ public interface ProductRepository extends JpaRepository<Product, String>{
 	// 상세 조회
     @EntityGraph(attributePaths = "productImageList")
     Optional<Product> findByProductCode(String productCode);
+    
+    Page<Product> findByProductNameContaining(String keyword, Pageable pageable);
+
+
 	
 }

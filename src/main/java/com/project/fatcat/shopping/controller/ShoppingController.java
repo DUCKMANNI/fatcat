@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.project.fatcat.entity.Product;
 import com.project.fatcat.entity.ShoppingCart;
 import com.project.fatcat.shopping.dto.CartItemDTO;
 import com.project.fatcat.shopping.dto.CartSummaryDTO;
 import com.project.fatcat.shopping.service.CartServiceImpl;
+import com.project.fatcat.shopping.service.ProductServiceImpl;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,7 @@ public class ShoppingController {
 		return "redirect:/shopping/cart";
 	}
 
-    @PostMapping("/remove")
+    @PostMapping("/cart/remove")
     public String remove(@RequestParam("productCode") String productCode, HttpSession session) {
     	cartServiceImpl.remove(productCode);
     	return "redirect:/shopping/cart";
