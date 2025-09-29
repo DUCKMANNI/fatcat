@@ -50,11 +50,13 @@ body {
 
 .btn-outline-danger {
 	font-size : 16px;
-    border-radius:999px;
+   	border-radius: 999px;
+   	padding: 6px 16px;
     background-color: transparent;
     color: #dc3545;
     border: 2px solid #dc3545;
     transition: all 0.3s ease;
+    cursor:pointer;
 } 
 
 .btn-outline-danger:hover {
@@ -68,22 +70,24 @@ body {
 .btn-outline-brown {
 	font-size : 16px;
 	border: 2px solid #8B4513;
-	border-radius:999px;
+	padding: 6px 16px;
+	border-radius: 999px;
     color: #8B4513; /* 글자색: 새들 브라운 */
-    border-color: #8B4513; /* 테두리색 */
     background-color: transparent; /* 배경 투명 */
     transition: all 0.3s ease; /* 부드러운 전환 효과 */
+    cursor:pointer;
 }
 
 .btn-outline-brown:hover {
-    color: white;
+    color: white; 
     background-color: #8B4513;
+     border-color: #8B4513;
     
 }
 
 .btn-darkbrown {
 	font-size : 16px;
-	border-radius:999px;
+	border-radius: 999px;
 	border: none;  
     color: white; 
     background-color: #9a7f5a;
