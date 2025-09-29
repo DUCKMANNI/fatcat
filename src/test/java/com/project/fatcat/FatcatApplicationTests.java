@@ -123,11 +123,11 @@ class FatcatApplicationTests {
 //		
 //		// board
 //		KnowledgeBoard board = new KnowledgeBoard();
-//        board.setBoard_code("1");  // 1번 게시판 (수의사에게 질문)
+//        board.setBoardCode("2");  // 1번 게시판 (수의사에게 질문)
 //
 //        KnowledgeBoard saved = boardRepository.save(board);
 //
-//        System.out.println("저장된 board_seq = " + saved.getBoard_seq());
+//        System.out.println("저장된 board_seq = " + saved.getBoardSeq());
 //		
 //		
 //		
