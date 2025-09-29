@@ -33,12 +33,17 @@ public class ChatController {
     @MessageMapping("/private-chat")
     public void processMessage(@Payload ChatMessageDto chatMessageDto) {
         
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        // 클라이언트에서 넘어온 T가 포함된 ISO 형식의 문자열을 파싱하는 포맷터
+        DateTimeFormatter isoParserFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        
+        // DTO의 String 필드에 저장할 때 사용하며, DTO의 @JsonFormat과 일치해야 합니다.
+        DateTimeFormatter isoOutputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         switch (chatMessageDto.getType()) {
             case "CARE_REQUEST":
-                LocalDateTime startDate = LocalDateTime.parse(chatMessageDto.getStartDate(), formatter);
-                LocalDateTime endDate = LocalDateTime.parse(chatMessageDto.getEndDate(), formatter);
+                // 1. DTO에서 String을 LocalDateTime으로 파싱
+                LocalDateTime startDate = LocalDateTime.parse(chatMessageDto.getStartDate(), isoParserFormatter);
+                LocalDateTime endDate = LocalDateTime.parse(chatMessageDto.getEndDate(), isoParserFormatter);
 
                 CareSessionDto request = CareSessionDto.builder()
                         .ownerUserId(chatMessageDto.getSenderId())
@@ -51,6 +56,7 @@ public class ChatController {
 
                 CareSessionDto savedRequest = careSessionService.createSession(request);
 
+                // 2. Content에 표시할 사용자 친화적 포맷터
                 DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 String formattedStartDate = savedRequest.getStartDate().format(displayFormatter);
                 String formattedEndDate = savedRequest.getEndDate().format(displayFormatter);
@@ -58,22 +64,27 @@ public class ChatController {
                 chatMessageDto.setSessionId(savedRequest.getId());
                 chatMessageDto.setStatus("REQUESTED");
                 
-                chatMessageDto.setStartDate(savedRequest.getStartDate().toString()); 
-                chatMessageDto.setEndDate(savedRequest.getEndDate().toString());
+                // ⭐ 수정된 부분: LocalDateTime.toString() 대신 명시적 포맷터 사용 ⭐
+                // DTO의 @JsonFormat 패턴(yyyy-MM-dd'T'HH:mm:ss)에 정확히 맞춥니다.
+                chatMessageDto.setStartDate(savedRequest.getStartDate().format(isoOutputFormatter)); 
+                chatMessageDto.setEndDate(savedRequest.getEndDate().format(isoOutputFormatter));
+                
                 chatMessageDto.setContent("📌 돌봄 요청: " + formattedStartDate + " ~ " + formattedEndDate);
                 break;
                 
             case "CARE_CONFIRM":
-                // ⭐ 수정: confirmSession이 CareSessionDto를 반환한다고 가정하고 확정 시간을 얻어옵니다.
                 CareSessionDto confirmedSession = careSessionService.confirmSession(chatMessageDto.getSessionId());
 
                 chatMessageDto.setStatus("CONFIRMED");
                 chatMessageDto.setContent("✅ 돌봄 예약이 확정되었습니다.");
                 
-                // ⭐ ⭐ ⭐ 추가: 확정 시간을 DTO에 설정 ⭐ ⭐ ⭐
+                // DTO의 timestamp와 confirmedTime은 'yyyy-MM-dd HH:mm:ss' 형식이므로,
+                // 이 역시 명시적 포맷터로 처리하는 것이 좋습니다.
+                DateTimeFormatter confirmOutputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
                 if (confirmedSession.getConfirmedDate() != null) {
-                    // DTO의 confirmedTime은 String 타입이므로 toString() 사용
-                    chatMessageDto.setConfirmedTime(confirmedSession.getConfirmedDate().toString()); 
+                    // DTO의 confirmedTime은 String 타입이므로 format() 사용
+                    chatMessageDto.setConfirmedTime(confirmedSession.getConfirmedDate().format(confirmOutputFormatter)); 
                 }
                 break;
 
