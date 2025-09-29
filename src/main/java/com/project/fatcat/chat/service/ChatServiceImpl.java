@@ -75,6 +75,7 @@ public class ChatServiceImpl implements ChatService {
             // 컨트롤러에서 설정한 값이 JSON 직렬화 시 포함되었거나, DB에서 다시 조회 (안전성 확보)
             CareSessionDto confirmedSession = careSessionService.getSessionById(savedDto.getSessionId()); 
             if (confirmedSession != null && confirmedSession.getConfirmedDate() != null) {
+                // 이 부분을 직접 포맷할 필요는 없습니다. Jackson이 DTO의 @JsonFormat에 따라 처리합니다.
                 savedDto.setConfirmedTime(confirmedSession.getConfirmedDate().toString());
             }
         }
@@ -100,7 +101,7 @@ public class ChatServiceImpl implements ChatService {
         return dto;
     }
 
-    // --- DTO → 엔티티 변환 (Data Truncation 방지 로직 추가) ---
+    // --- DTO → 엔티티 변환 (Data Truncation 방지 로직 수정) ---
     private CareChatHistory convertToEntity(ChatMessageDto dto) {
         CareChatHistory entity = new CareChatHistory();
         CareChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow();
@@ -119,12 +120,9 @@ public class ChatServiceImpl implements ChatService {
             entity.setCareStatus(dto.getStatus()); 
         }
 
-        // ⭐ ⭐ ⭐ Data Truncation 방지 로직: 불필요한 필드를 null로 설정하여 JSON 길이 축소 ⭐ ⭐ ⭐
+        // ⭐ ⭐ ⭐ 수정됨: startDate, endDate를 null 처리하는 로직을 제거했습니다. ⭐ ⭐ ⭐
+        // 이 정보를 DB의 chatMessage JSON 필드에 그대로 저장하여 히스토리 조회 시 사용할 수 있도록 합니다.
         if ("CARE_REQUEST".equals(dto.getType())) {
-            // chatMessage 컬럼에 저장할 JSON 길이를 줄이기 위해
-            // 내용(Content)에 이미 포함되거나 History 조회 시 CareSessionService에서 조회할 정보는 제거합니다.
-            dto.setStartDate(null); 
-            dto.setEndDate(null);
             dto.setConfirmedTime(null);
             // dto.setNote(null); // NOTE가 길다면 이것도 null 처리 고려
         }

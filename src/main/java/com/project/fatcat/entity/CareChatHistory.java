@@ -38,7 +38,7 @@ public class CareChatHistory {
 	@JoinColumn(name = "user_seq", nullable = true)
 	private User user;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String chatMessage;
 	
 	@Column(nullable = false)
