@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-//@RequestMapping("/mypage")
+@RequestMapping("/mypage")
 public class MyPageController {
     
 
