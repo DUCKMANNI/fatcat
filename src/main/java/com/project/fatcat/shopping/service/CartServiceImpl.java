@@ -98,19 +98,25 @@ public class CartServiceImpl implements CartService{
                 .filter(ci -> ci.getProduct().getProductCode().equals(productCode))
                 .findFirst()
                 .ifPresent(ci -> ci.setProductQuantity(Math.max(1, Math.min(qty, 99))));
+
+        shoppingCartRepository.save(cart);
     }
+
 
     @Override
     public void remove(String productCode) {
         ShoppingCart cart = getOrCreateOpenCart();
         cart.getCartItemList().removeIf(ci -> ci.getProduct().getProductCode().equals(productCode));
-        // orphanRemoval=true 라면 DB에서 자동 삭제
+        
+        shoppingCartRepository.save(cart);
     }
 
     @Override
     public void clear() {
         ShoppingCart cart = getOrCreateOpenCart();
-        cart.getCartItemList().clear();
+        //cart.getCartItemList().clear();
+        
+        shoppingCartRepository.delete(cart);
     }
 
     
@@ -119,6 +125,7 @@ public class CartServiceImpl implements CartService{
         ShoppingCart cart = getOrCreateOpenCart();
         return cart.getCartItemList().stream()
                 .map(ci -> CartItemDTO.builder()
+                		.productCode(ci.getProduct().getProductCode())
                         .productName(ci.getProduct().getProductName())
                         .quantity(ci.getProductQuantity())
                         .price(ci.getProduct().getProductPrice() * ci.getProductQuantity())

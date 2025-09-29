@@ -36,7 +36,7 @@
 								</td>
 								<td class="text-center" th:text="${item.quantity}"></td>
 								<td class="text-end fw-bold"
-									th:text="${#numbers.formatInteger(item.price, 0)} + '원'"></td>
+									th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')} + '원'"></td>
 							</tr>
 						</tbody>
 					</table>
@@ -67,8 +67,8 @@
 				<div class="card-body">
 					<h5 class="card-title">받는 사람 정보</h5>
 
-					<div class="d-flex justify-content-between mb-3">
-						<div class="form-check">
+					<div class="mb-3">
+						<div class="form-check  ps-0">
 							<input type="checkbox" id="sameAsBuyer"
 								onchange="toggleReceiverInfo(this)"> <label
 								class="form-check-label" for="sameAsBuyer"> 구매자 정보 동일 </label>
@@ -89,14 +89,16 @@
 
 					<div class="mb-2 row">
 						<div class="col-6">
-							<label class="form-label">우편번호</label> <input type="text"
-								class="form-control" id="receiverZipcode"
+							<label class="form-label">우편번호</label> 
+							<input type="text" class="form-control" id="receiverZipcode" name="receiverZipcode"
 								th:field="*{receiverZipcode}" placeholder="우편번호">
 						</div>
 						<div class="col-6 d-flex align-items-end">
-							<button type="button" class="btn btn-outline-secondary w-100">우편번호
-								찾기</button>
+							<button type="button" onclick="execDaumPostcode()" class="btn btn-outline-brown w-100">우편번호 찾기</button>
 						</div>
+						
+						<input type="hidden" id="latitude" name="latitude">
+		      			<input type="hidden" id="longitude" name="longitude">
 					</div>
 
 					<div class="mb-2">
@@ -137,32 +139,35 @@
 				<div class="card-body">
 					<h5 class="card-title">결제 정보</h5>
 					<p>
-						상품금액: <span th:text="${cartSummary.totalPrice}"></span>원
+						상품금액: <span th:text="${#numbers.formatInteger(cartSummary.totalPrice, 3, 'COMMA')} + '원'"></span>
 					</p>
 					<p>
-						할인금액: <span th:text="${cartSummary.discount}"></span>원
+						할인금액: <span th:text="${cartSummary.discount == 0 ? '0원' : #numbers.formatInteger(cartSummary.discount, 3, 'COMMA') + '원'}"></span>
 					</p>
 					<p>
-						배송비: <span th:text="${cartSummary.deliveryFee}"></span>원
+						배송비: <span th:text="${cartSummary.deliveryFee == 0 ? '0원' : #numbers.formatInteger(cartSummary.deliveryFee, 3, 'COMMA') + '원'}"></span>
 					</p>
 					<hr>
 					<p class="fw-bold fs-5">
 						총 결제금액: <span class="text-danger"
-							th:text="${cartSummary.finalPrice}"></span>원
+							th:text="${#numbers.formatInteger(cartSummary.finalPrice, 3, 'COMMA')} + '원'"></span>
 					</p>
 				</div>
 			</div>
 
 			<!-- 결제 버튼 -->
 			<div class="text-center">
-				<button type="submit" class="btn btn-danger btn-lg px-5">결제하기</button>
+				<button type="submit" class="btn btn-danger btn-lg px-5" style="border-radius:999px;">결제하기</button>
 			</div>
 
 		</form>
 	</div>
 
 	<th:block layout:fragment="script">
-		<script th:inline="javascript">
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<!-- 카카오 지도 API (좌표 변환용) -->
+	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=94d1c331dbd40471d2fb9d113ba5d78b&libraries=services"></script>
+	<script th:inline="javascript">
 /*<![CDATA[*/
 const buyerInfo = {
     name: /*[[${orderDTO.userName}]]*/ '',
@@ -193,16 +198,39 @@ function toggleReceiverInfo(checkbox) {
   }
 }
 
-/* function openPayment() {
-  window.open(
-      '/orders/payment',   // 컨트롤러 매핑 URL에 맞게 절대경로로
-      'paymentPopup',
-      'width=600,height=800,scrollbars=yes,resizable=no'
-  );
-} */
+function execDaumPostcode() {
+	console.log("execDaumPostcode 실행됨 ✅");
+	  new daum.Postcode({
+
+	    oncomplete: function(data) {
+	    	
+	    	console.log("oncomplete 실행됨 ✅", data);
+	      // ✅ 기본주소 & 우편번호 채우기
+	      document.getElementById('receiverAddress').value = data.roadAddress;
+	      document.getElementById('receiverZipcode').value = data.zonecode;
+	      
+	      console.log("도로명주소:", data.roadAddress);
+
+	      try {
+	        // ✅ 좌표 변환 (에러 나도 팝업은 닫히게)
+	        var geocoder = new kakao.maps.services.Geocoder();
+	        geocoder.addressSearch(data.roadAddress, function(result, status) {
+	        	console.log("status:", status, "result:", result);
+	          if (status === kakao.maps.services.Status.OK) {
+	        	  console.log("변환 성공:", result[0]);
+	            document.getElementById('latitude').value = result[0].y;
+	            document.getElementById('longitude').value = result[0].x;
+	          }
+	        });
+	      } catch (e) {
+	        console.error("Geocoder 에러:", e);
+	      }
+	    } 
+	  }).open(); // 👉 팝업으로 열기
+	}
 /*]]>*/
 </script>
-	</th:block>
+</th:block>
 
 
 </body>

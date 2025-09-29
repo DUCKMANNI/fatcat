@@ -47,7 +47,8 @@ public class ShoppingCart {
 	private LocalDateTime updateDate;
 	
 	@Builder.Default
-	@OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CartItem> cartItemList = new ArrayList<>();
+
 
 }

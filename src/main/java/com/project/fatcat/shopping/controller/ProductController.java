@@ -29,6 +29,7 @@ public class ProductController {
             @RequestParam(name = "category", defaultValue = "all") String main,
             @RequestParam(name = "sub", required = false) String sub,
             @RequestParam(name = "detail", required = false) String detail,
+            @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "page", defaultValue = "0") int page,   // 0-base
             @RequestParam(name = "size", defaultValue = "12") int size,
             Model model) {
@@ -36,12 +37,13 @@ public class ProductController {
         String m = (main == null || main.isBlank()) ? "all" : main.trim();   // main 필수
         String s = (sub == null || sub.isBlank()) ? null : sub.trim();
         String d = (detail == null || detail.isBlank()) ? null : detail.trim();
+        String k = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
 
         int p = Math.max(0, page);
         int sz = Math.max(1, size);
 
         Pageable pageable = PageRequest.of(p, sz, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<Product> productPage = productServiceImpl.getProducts(m, s, d, pageable);
+        Page<Product> productPage = productServiceImpl.getProducts(m, s, d, k, pageable);
 
         // 뷰로 전달
         model.addAttribute("productPage", productPage);           // 페이지 정보
@@ -49,9 +51,10 @@ public class ProductController {
         model.addAttribute("main", m);
         model.addAttribute("sub", s);       // null이면 Thymeleaf URL에서 자동 제거
         model.addAttribute("detail", d);    // null이면 Thymeleaf URL에서 자동 제거
+        model.addAttribute("keyword", k);
         model.addAttribute("selectedCategory", main);
         model.addAttribute("selectedSub", sub);
-        model.addAttribute("selectedDetail", detail);
+        model.addAttribute("selectedDetail", detail); 
 
         return "shopping/shopping_product"; // 뷰 이름
     }
@@ -66,4 +69,5 @@ public class ProductController {
 
 	    return "shopping/shopping_detail"; // 상세 페이지 템플릿
 	}
+	
 }

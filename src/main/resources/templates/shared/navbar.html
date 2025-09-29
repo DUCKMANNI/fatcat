@@ -6,11 +6,17 @@
 		<nav class="navbar navbar-light bg-light border-bottom">
 		  <div class="container-fluid">
 		    <!-- 로고 + 브랜드 -->
-		    <a class="navbar-brand d-flex align-items-center" href="/">
-		      <img th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100" class="me-2">
-		      <img th:src="@{/images/logo.png}" alt="로고" width="70" height="100">
-		    </a>
-		
+		    <div class="d-flex align-items-center">
+		        <a class="navbar-brand d-flex align-items-center" href="/">
+		          <img th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100" class="me-2">
+		          <img th:src="@{/images/logo.png}" alt="로고" width="70" height="100">
+		        </a>
+				<label class="ms-3 mb-2" 
+				style="font-family: 'BagelFat', sans-serif; font-size: 50px; color: #CD853F;"
+				th:text="(${pageTitle} ?: '')">
+				</label>
+		    </div> 
+			
 		    <!-- 오른쪽 영역 -->
 		    <div class="d-flex align-items-center">
 		
