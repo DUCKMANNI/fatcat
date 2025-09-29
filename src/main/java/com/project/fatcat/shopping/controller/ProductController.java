@@ -33,7 +33,6 @@ public class ProductController {
             @RequestParam(name = "size", defaultValue = "12") int size,
             Model model) {
 
-        // ✅ 파라미터 정규화 (빈 문자열 → 기본값/NULL)
         String m = (main == null || main.isBlank()) ? "all" : main.trim();   // main 필수
         String s = (sub == null || sub.isBlank()) ? null : sub.trim();
         String d = (detail == null || detail.isBlank()) ? null : detail.trim();
@@ -50,6 +49,9 @@ public class ProductController {
         model.addAttribute("main", m);
         model.addAttribute("sub", s);       // null이면 Thymeleaf URL에서 자동 제거
         model.addAttribute("detail", d);    // null이면 Thymeleaf URL에서 자동 제거
+        model.addAttribute("selectedCategory", main);
+        model.addAttribute("selectedSub", sub);
+        model.addAttribute("selectedDetail", detail);
 
         return "shopping/shopping_product"; // 뷰 이름
     }

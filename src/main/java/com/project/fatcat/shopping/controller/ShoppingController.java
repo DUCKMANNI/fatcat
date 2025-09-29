@@ -27,7 +27,7 @@ public class ShoppingController {
 	// 쇼핑몰 메인
 	@GetMapping
 	public String shoppingMain() {
-	    return "shopping/shopping_main";
+	    return "redirect:/products?category=10";
 	}
 	@PostMapping("/cart/add")
 	public String add(@RequestParam("productCode") String productCode,
