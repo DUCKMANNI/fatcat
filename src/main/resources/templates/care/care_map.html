@@ -138,10 +138,9 @@
 }
 
 
-.fixed-element button {
+/* .fixed-element button {
 	display: block !important;
-} 
-
+} */
 /* 상세창 */
 #detailPanel {
 	flex: 0;
@@ -168,63 +167,21 @@
 	color: #CD853F;
 }
 
-.btn-group .btn {
+/* .btn-group .btn {
     border-radius: 5px;
     padding: 8px 12px;
-    }
+} */
 
-/* .btn-warning {
+.btn-warning {
     background-color: #ffc107;
     color: #212529;
     border: 1px solid #ffc107;
-}*/
-
-.btn-outline-danger {
-	font-size : 16px;
-    border-radius:999px;
-    background-color: transparent;
-    color: #dc3545;
-    border: 2px solid #dc3545;
-    transition: all 0.3s ease;
-} 
-
-.btn-outline-danger:hover {
-	
-    color: white; 
-    background-color: #dc3545; 
-    border-color: #dc3545;
 }
 
-
-.btn-outline-brown {
-	font-size : 16px;
-	border: 2px solid #8B4513;
-	border-radius:999px;
-    color: #8B4513; /* 글자색: 새들 브라운 */
-    border-color: #8B4513; /* 테두리색 */
-    background-color: transparent; /* 배경 투명 */
-    transition: all 0.3s ease; /* 부드러운 전환 효과 */
-}
-
-.btn-outline-brown:hover {
-    color: white;
-    background-color: #8B4513;
-    
-}
-
-.btn-darkbrown {
-	font-size : 16px;
-	border-radius:999px;
-	border: none;  
-    color: white; 
-    background-color: #9a7f5a;
-    transition: all 0.3s ease;
-}
-
-.btn-darkbrown:hover {
-    background-color: #524538;
-	color: #fff;  
-	border: none;  
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: 1px solid #dc3545;
 }
 </style>
 
@@ -243,10 +200,7 @@
 			<label>동<select id="dong" class="m-1" style="font-size: 18px;"></select></label>
 			<button id="searchBtn" class="btn btn-fatcat" style="font-size: 20px;">검색</button>
 			<button id="btn" class="btn btn-fatcat"  style="font-size: 20px;" onclick='toggleListView()'>리스트만보기</button>
-			<button id="btn" 
-            class="btn btn-darkbrown" 
-            style="font-size: 20px;" 
-            onclick="location.href='/care/create'">돌봄글 등록</button>
+			<a th:href="@{/care/create}"><button id="btn" class="btn btn-fatcat" style="font-size: 20px;">돌봄글 등록</button></a>
 		</div>
 
 		<div id="mapListContainer">
@@ -314,22 +268,33 @@
 				    .catch(err => console.error('CSV 읽기 실패', err));
 			});
 			
-			// 현재 위치 마커 표시 함수
+			// ✨ 현재 위치 마커 표시 함수: 인포윈도우 자동 표시 제거 및 마우스 이벤트 연결 ✨
 			function displayUserLocation(lat, lon) {
 				const pos = new kakao.maps.LatLng(lat, lon);
 				
+				// 기존 마커가 있다면 제거
 				if (userLocationMarker) {
 					userLocationMarker.setMap(null);
 				}
 
+				// 카카오맵 기본 마커 생성
 				userLocationMarker = new kakao.maps.Marker({
 					position: pos,
 					map: map,
 				});
 
+				// 지도 중심 이동
 				map.setCenter(pos);
 				
-				
+				// 마커에 마우스 이벤트 연결 (마우스 오버시에만 인포윈도우가 열리도록)
+				kakao.maps.event.addListener(userLocationMarker, 'mouseover', function() {
+					infowindow.setContent('<div style="padding:5px;font-size:13px;">현재 내 위치</div>');
+					infowindow.open(map, userLocationMarker);
+				});
+
+				kakao.maps.event.addListener(userLocationMarker, 'mouseout', function() {
+					infowindow.close();
+				});
 			}
 
 			function parseCSV(csvText) {
@@ -369,11 +334,8 @@
 			$sigungu.addEventListener('change', fillDong);
 
 			function clearMarkers() {
-				// CustomOverlay와 마커 모두 제거
-				markers.forEach(m => {
-					m.overlay.setMap(null); // CustomOverlay (핀 이미지+번호) 제거
-					m.marker.setMap(null);  // 투명 마커 제거
-				});
+				// CustomOverlay 객체의 경우 setMap(null) 호출
+				markers.forEach(m => m.overlay.setMap(null));
 				markers.length = 0;
 			}
 			function clearList() {
@@ -383,13 +345,14 @@
 				return [ $sido.value, $sigungu.value, $dong.value ].filter(Boolean).join(' ');
 			}
 			
-			// reverseGeocode 함수
+			// ✨ reverseGeocode 함수 수정: geocoder 유효성 검사 추가 ✨
 			function reverseGeocode(lat, lon) {
 				const coord = new kakao.maps.LatLng(lat, lon);
 				
+				// Geocoder 객체가 유효한지 먼저 확인하여 b.v is not a function 에러 방지
 				if (!geocoder) { 
 					console.error("Geocoder 객체가 초기화되지 않았습니다.");
-					fetchCareList();
+					fetchCareList(); // 지오코딩 없이 목록을 불러옵니다.
 					return;
 				}
 
@@ -446,10 +409,10 @@
 			}
 			$searchBtn.addEventListener('click', fetchCareList);
 
+			// 수정된 addMarker 함수 (투명 마커를 추가했습니다)
 			function addMarker(pos, idx) {
-				
-			    // 1. 시각적으로 보이는 Custom Overlay (핀 이미지 + 번호)
-			    const visualContent = `
+			    // 1. CustomOverlay (보이는 핀) 생성 (기존과 동일)
+			    const content = `
 			        <div class="custom-marker-wrap" style="position: relative; width: 50px; height: 50px; cursor: pointer;">
 			            <img src="/images/map_marker.png" style="width: 50px; height: 50px; display: block;">
 			            <div style="
@@ -468,45 +431,33 @@
 
 			    const overlay = new kakao.maps.CustomOverlay({
 			        position: pos,
-			        content: visualContent,
+			        content: content,
 			        yAnchor: 1.0,
-			        xAnchor: 0.5,
-			        zIndex: 2 // Custom Overlay를 상단에 표시
+			        xAnchor: 0.5
 			    });
 			    overlay.setMap(map);
 
 
-			    // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
-			    const transparentImage = new kakao.maps.MarkerImage(
-			        'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
-			        new kakao.maps.Size(1, 1), // 사이즈 최소화
-			        { offset: new kakao.maps.Point(0, 0) }
-			    );
-			    
-			    const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
-
-			    
+			    // 2. 인포윈도우 처리를 위한 투명 마커 생성 (추가)
 			    const marker = new kakao.maps.Marker({
-			        position: infowindowPos,
+			        position: pos,
 			        map: map,
-			        image: transparentImage, // 1x1 투명 이미지 적용
-			        opacity: 0.0, // 완전히 투명하게 설정 (안전성 확보)
-			        zIndex: 1 // Custom Overlay 뒤로 숨김
+			        opacity: 0.0 // 인포윈도우용으로 사용하고 눈에 보이지 않도록 투명하게 처리
 			    });
-			    
-			    // 3. Custom Overlay에 마우스 이벤트 연결
+
+			    // 3. 마커 배열에 CustomOverlay와 투명 마커 모두 저장
+			    markers.push({ overlay, pos, marker });
+
+			    // Custom Overlay에 이벤트 연결 (마우스 오버 시 투명 마커를 인포윈도우에 전달)
 			    const overlayElement = overlay.getContent();
 			    overlayElement.onmouseover = function() {
 			        const place = allPlaces[idx];
-			        // 인포윈도우는 투명 마커 객체(marker)에 연결
+			        // showInfo에 투명 마커 객체를 전달
 			        showInfo(marker, place.careTitle); 
 			    };
 			    overlayElement.onmouseout = function() {
 			        infowindow.close();
 			    };
-
-			    // 4. markers 배열에 저장 (제거 시 CustomOverlay와 투명 마커 모두 제거)
-			    markers.push({ overlay, marker, pos });
 
 			    return { overlay, pos, marker };
 			}
@@ -527,7 +478,8 @@
 
 				pagePlaces.forEach((place, i) => {
 					const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
-				    const { marker } = addMarker(pos, i + start);
+				    // marker 객체를 반환값에 추가
+				    const { overlay, marker } = addMarker(pos, i + start);
 
 
 					// ⭐ 목록 리스트 항목 생성
@@ -543,12 +495,11 @@
 						</div>
 					`;
 					
-					// 마우스 오버 시 지도에서 정보 창을 표시
 					li.addEventListener('mouseover', () => {
         				// LatLng(pos) 대신 마커 객체(marker)를 전달
-       				 	showInfo(marker, place.careTitle); 
+       				 showInfo(marker, place.careTitle); 
         				map.panTo(pos);
-    				});
+    					});
 					
 					li.addEventListener('mouseout', () => infowindow.close());
 
@@ -556,40 +507,35 @@
 						const detailPanel = document.getElementById('detailPanel');
 						const detailContent = document.getElementById('detailContent');
 						
-						if (openedPlaceId === place.careSeq) {
-					        // 1. 이미 열려있는 항목을 다시 클릭한 경우: 닫기
-					        detailPanel.classList.remove('show');
-					        openedPlaceId = null;
-					    } else {
-					        // 2. 다른 항목을 클릭했거나 닫혀있는 상태에서 클릭한 경우: 열기/업데이트
+						detailContent.innerHTML = `
+						<button id="closeDetail" class="btn-close" aria-label="Close"></button>
+						<strong style="font-size : 25px">${place.careTitle}</strong>
+						<p style="font-size : 20px"><strong>작성자:</strong> ${place.authorNickname}</p>
+						<p style="font-size : 20px"><strong>주소:</strong> ${place.address1} ${place.address2}</p>
+						<p style="font-size : 20px"><strong>가격:</strong> ${place.price}원</p>
+						<p style="font-size : 20px"><strong>내용:</strong> ${place.careContent}</p>
+						
+						<div style="margin-top: 20px; text-align: right;">
+							<a href="/care/modify/${place.careSeq}" class="btn btn-fatcat" style="font-size : 20px">수정</a>
+							<form action="/care/delete/${place.careSeq}" method="post" style="display:inline;">
+								<button type="submit" class="btn btn-fatcat" style="font-size : 20px" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
+							</form>
+							<button class="btn btn-fatcat" style="font-size : 20px" onclick="openChatPopup(${place.authorUserSeq})">채팅하기</button>
+						</div>
+						`;
+					
+						
+						
+						detailPanel.classList.add('show');
 
-					        // 상세 내용 구성
-					        detailContent.innerHTML = `
-					            <button id="closeDetail" class="btn-close" aria-label="Close"></button>
-					            <strong style="font-size : 25px">${place.careTitle}</strong>
-					            <p style="font-size : 20px"><strong>작성자:</strong> ${place.authorNickname}</p>
-					            <p style="font-size : 20px"><strong>주소:</strong> ${place.address1} ${place.address2}</p>
-					            <p style="font-size : 20px"><strong>가격:</strong> ${place.price}원</p>
-					            <p style="font-size : 20px"><strong>내용:</strong> ${place.careContent}</p>
-					            
-					            <div style="margin-top: 20px; text-align: right;">
-					                <a href="/care/modify/${place.careSeq}" class=" btn btn-outline-brown" style="font-size : 16px">수정</a>
-					                <form action="/care/delete/${place.careSeq}" method="post" style="display:inline;">
-					                    <button type="submit" class="btn btn-outline-danger" style="font-size : 16px" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
-					                </form>
-					                <button class="btn btn-outline-brown" style="font-size : 16px" onclick="openChatPopup(${place.authorUserSeq})">채팅하기</button>
-					            </div>
-					        `;
-					        
-					        detailPanel.classList.add('show');
-					        openedPlaceId = place.careSeq; // 💡 현재 열린 ID 업데이트
+						if (!originalCenter) originalCenter = map.getCenter();
+						map.panBy(-detailPanel.offsetWidth / 2, 0);
 
-					        // 'X' 버튼 클릭 시 닫기
-					        document.getElementById('closeDetail').onclick = () => {
-					            detailPanel.classList.remove('show');
-					            openedPlaceId = null;
-					        };
-					    }
+						document.getElementById('closeDetail').onclick = () => {
+							detailPanel.classList.remove('show');
+							map.panTo(originalCenter || map.getCenter());
+							openedPlaceId = null;
+						};
 					});
 					
 					$placesList.appendChild(li);
@@ -623,11 +569,11 @@
 				}
 			}
 
-			// showInfo 함수 (첫 번째 인수로 마커 객체를 받음)
+			// 수정된 showInfo 함수 (첫 번째 인수로 마커 객체를 받음)
 			function showInfo(marker, title) {
 			    if (!map) return;
 			    infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
-			    // 마커 객체를 전달하여 b.v is not a function 오류 해결
+			    // LatLng 대신 마커 객체를 전달합니다.
 			    infowindow.open(map, marker); 
 			}
 			
