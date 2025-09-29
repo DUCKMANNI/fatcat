@@ -47,6 +47,55 @@ body {
 	color: #fff;
 }
 
+
+.btn-outline-danger {
+	font-size : 16px;
+    border-radius:999px;
+    background-color: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    transition: all 0.3s ease;
+} 
+
+.btn-outline-danger:hover {
+	
+    color: white; 
+    background-color: #dc3545; 
+    border-color: #dc3545;
+}
+
+
+.btn-outline-brown {
+	font-size : 16px;
+	border: 2px solid #8B4513;
+	border-radius:999px;
+    color: #8B4513; /* 글자색: 새들 브라운 */
+    border-color: #8B4513; /* 테두리색 */
+    background-color: transparent; /* 배경 투명 */
+    transition: all 0.3s ease; /* 부드러운 전환 효과 */
+}
+
+.btn-outline-brown:hover {
+    color: white;
+    background-color: #8B4513;
+    
+}
+
+.btn-darkbrown {
+	font-size : 16px;
+	border-radius:999px;
+	border: none;  
+    color: white; 
+    background-color: #9a7f5a;
+    transition: all 0.3s ease;
+}
+
+.btn-darkbrown:hover {
+    background-color: #524538;
+	color: #fff;  
+	border: none;  
+}
+
 /* ◀ ▶ 화살표 아이콘 */
 .carousel-control-prev-icon, .carousel-control-next-icon {
 	filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg)
@@ -301,28 +350,4 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-/* .nav-link.active,
-.dropdown-item.active {
-  color: #CD853F !important;   고양이 테마 탄색
-  font-weight: bold;
-  border-bottom: 2px solid #CD853F;
-} */
-
-/* 드롭다운 항목 선택 시 파란색 배경 제거 */
-.dropdown-item:focus,
-.dropdown-item:active {
-  background-color: transparent !important;
-  color: inherit !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* active로 내가 준 색상만 표시 */
-.nav-link.active,
-.dropdown-item.active {
-  background-color: transparent !important;
-  color: #CD853F !important;   /* 네가 쓰는 포인트 색상 */
-  font-weight: bold;
 }
