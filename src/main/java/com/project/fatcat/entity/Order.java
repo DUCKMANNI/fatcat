@@ -66,7 +66,8 @@ public class Order {
 	
 	private String orderRequest;
 	
-	@Column( nullable = false, columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
+	@Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime orderDate;
 	
 	@Column(nullable = false)

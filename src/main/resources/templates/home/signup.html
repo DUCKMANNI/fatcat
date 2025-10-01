@@ -14,10 +14,10 @@
 		<!-- 제목 -->
 		<h1
 			style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;">
-			고양이 지식방 - 수의사에게 질문</h1>
+			회원가입</h1>
 
 		<!-- 입력 폼 -->
-		<form th:action="@{/users/signup}" method="post" style="max-width: 600px; margin: 0 auto;">
+		<form th:action="@{/users/signup}" method="post" th:object="${userSignupDTO}" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
 
 			<!-- 🔹 기본 정보 -->
 		      <input type="email" name="userEmail" class="login-input" placeholder="E-mail (아이디)" required>
@@ -47,7 +47,7 @@
 			    <label for="profileImage" class="custom-file-label">파일 선택</label>
 			    <span id="fileName" class="file-name">선택된 파일 없음</span>
 			    <div id="profileThumb" class="profile-thumb"></div>
-			    <input type="file" id="profileImage" name="profileImageUrl" accept="image/*" onchange="previewInline(this)">
+			    <input type="file" id="profileImage" name="profileImageFile" accept="image/*" onchange="previewInline(this)">
 			  </div>
 			</div>
 
@@ -58,7 +58,7 @@
 			  <div class="file-input-wrapper">
 			    <label for="vetLicenseImage" class="custom-file-label">파일 선택</label>
 			    <span id="vetFileName" class="file-name">선택된 파일 없음</span>
-			    <input type="file" id="vetLicenseImage" name="vetLicenseImage" accept="image/*" onchange="showFileName(this, 'vetFileName')">
+			    <input type="file" id="vetLicenseImage" name="vetLicenseImageFile" accept="image/*" onchange="showFileName(this, 'vetFileName')">
 			  </div>
 			</div>
 

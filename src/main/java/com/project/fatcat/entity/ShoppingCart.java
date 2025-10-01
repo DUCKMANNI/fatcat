@@ -41,7 +41,8 @@ public class ShoppingCart {
 	@Column(columnDefinition = "BOOLEAN DEFAULT 0")
 	private Boolean isCompleted;
 	
-	@Column(columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
+	@Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime createDate;
 	
 	private LocalDateTime updateDate;

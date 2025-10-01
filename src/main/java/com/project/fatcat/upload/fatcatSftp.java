@@ -196,5 +196,31 @@ public class fatcatSftp {
 			}
 		}
 	}
+	
+	/**
+	 * SFTP 서버 파일 업로드 (MultipartFile + 원하는 파일명)
+	 */
+	public void sftpFileUpload(MultipartFile mpf, String uploadDir, String uploadFileNm) throws Exception {
+	    InputStream is = null;
+	    try {
+	        sftpInit("ivisus.iptime.org", 2202, "red", "Red13@$", null);
+
+	        // 디렉토리 이동
+	        channelSftp.cd(uploadDir);
+
+	        // 업로드 (UUID 붙인 파일명으로)
+	        is = mpf.getInputStream();
+	        channelSftp.put(is, uploadFileNm);
+
+	        System.out.println("sftpFileUpload success.. ");
+	    } catch (Exception e) {
+	        System.out.println("Upload failed: " + e.getMessage());
+	        throw e;
+	    } finally {
+	        if (is != null) try { is.close(); } catch (IOException ignored) {}
+	        try { disconnect(); } catch (Exception ignored) {}
+	    }
+	}
+
 
 }

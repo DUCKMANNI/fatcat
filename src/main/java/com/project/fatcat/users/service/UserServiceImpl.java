@@ -1,12 +1,15 @@
 package com.project.fatcat.users.service;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.fatcat.entity.User;
 import com.project.fatcat.entity.enums.UserRole;
+import com.project.fatcat.upload.fatcatSftp;
 import com.project.fatcat.users.dto.SignupDTO;
 import com.project.fatcat.users.repository.UserRepository;
 
@@ -18,16 +21,19 @@ public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    private static final String UPLOAD_DIR_PROFILE = "/fatcat/upload/userImage/";
+    private static final String UPLOAD_DIR_LICENSE = "/fatcat/upload/vetLicense/";
 
-    // 🔹 회원가입
+ // 🔹 회원가입
     public User register(SignupDTO dto) throws IOException {
         // 비밀번호 확인
         if (!dto.getUserPassword().equals(dto.getPasswordConfirm())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-
-        String profilePath = ""; // TODO: 파일 업로드 구현 시 변경
-        String vetLicensePath = "";
+        
+        String profilePath = saveFile(dto.getProfileImageFile(), UPLOAD_DIR_PROFILE);
+        String vetLicensePath = saveFile(dto.getVetLicenseImageFile(), UPLOAD_DIR_LICENSE);
 
         System.out.println("getLatitude : " + dto.getLatitude());
         System.out.println("getLongitude : " + dto.getLongitude());
@@ -46,7 +52,8 @@ public class UserServiceImpl implements UserService{
                 .longitude(dto.getLongitude())
                 .role(UserRole.ROLE_USER) 
                 .userType("A")
-                //.vetLicenseImage(vetLicensePath)
+                .vetLicenseImage(vetLicensePath)
+                .profileImage(profilePath)
                 .build();
 
         return userRepository.save(user);
@@ -54,18 +61,20 @@ public class UserServiceImpl implements UserService{
 
    
     
-//    private String saveFile(MultipartFile file, String folder) throws IOException {
-//        if (file != null && !file.isEmpty()) {
-//            String uploadDir = "uploads/" + folder + "/";
-//            File dir = new File(uploadDir);
-//            if (!dir.exists()) dir.mkdirs();
-//
-//            String filePath = uploadDir + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-//            file.transferTo(new File(filePath));
-//            return filePath;
-//        }
-//        return null;
-//    }
+    private String saveFile(MultipartFile file, String uploadDir) {
+        if (file == null || file.isEmpty()) return null;
+
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        try {
+            fatcatSftp fatcatSftp = new fatcatSftp();
+            fatcatSftp.sftpFileUpload(file, uploadDir, fileName);
+            // 웹에서 접근 가능한 경로 리턴
+            return "https://ivisus.duckdns.org:9443" + uploadDir + fileName;
+
+        } catch (Exception e) {
+            throw new RuntimeException("파일 업로드 실패", e);
+        }
+    }
     
   //----------------------------------------------------------아래 미진 추가-------------------------------------------------------- 
    

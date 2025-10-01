@@ -379,19 +379,33 @@ body {
   border-radius: 10px;
 }
 
-/* 네비게이션 버튼 색상 */
+.mySwiper {
+  position: relative;
+  overflow: visible; /* 버튼이 잘리지 않게 */
+}
+
 .swiper-button-next,
 .swiper-button-prev {
-  color: #ff6600; /* 예: 주황색 */
-  font-weight: bold;
+  color: #ff6600;       /* 👉 브랜드 컬러 */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 30px;
+  z-index: 10;
 }
 
-/* 페이지네이션 (동그라미) 색상 */
+.swiper-button-prev { left: -40px; }
+.swiper-button-next { right: -40px; }
+
 .swiper-pagination-bullet {
-  background: #ccc; /* 기본 회색 */
+  background: #ccc;
   opacity: 1;
 }
-
 .swiper-pagination-bullet-active {
-  background: #ff6600; /* 활성화 시 주황색 */
+  background: #ff6600;
 }
+
+.mySwiper .swiper-slide {
+  width: 33.33% !important;
+}
+

@@ -9,15 +9,15 @@
 
 
 	<div layout:fragment="content"
-		class="container my-3 d-flex align-items-center justify-content-center"
-		style="min-height: calc(85vh - 50px);">
+		class="my-3 mt-5 d-flex align-items-center justify-content-center">
+		<!-- style="min-height: calc(85vh - 50px);"> -->
 
 		<!-- Swiper CSS -->
 		<link rel="stylesheet"
 			href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 		<!-- Swiper Container -->
-		<div class="swiper mySwiper" style="width: 100%; max-width: 1200px;">
+		<div class="swiper mySwiper" style="width: 100%; max-width: 1600px;">
 		  <div class="swiper-wrapper">
 		    <div class="swiper-slide">
 		      <img th:src="@{/images/banner1.jpeg}" 
@@ -58,25 +58,31 @@
 		<script
 			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 		<script>
-		  var swiper = new Swiper(".mySwiper", {
-		    slidesPerView: 3,      // 한 화면에 3개 정확히
-		    spaceBetween: 30,      // 슬라이드 간격 주기
+		var swiper = new Swiper(".mySwiper", {
 		    loop: true,
-		    autoplay: { delay: 3000 },
-		    pagination: {
-		      el: ".swiper-pagination",
-		      clickable: true,
+		    effect: 'coverflow',
+		    centeredSlides: false, 
+		    spaceBetween: 0,
+		    slidesPerView: 3,
+		    coverflowEffect: {
+		      rotate: 0,
+		      stretch: 0,
+		      depth: 100,
+		      modifier: 1,
+		      slideShadows: true
+		    },
+		    autoplay: {
+		        delay: 3000
 		    },
 		    navigation: {
-		      nextEl: ".swiper-button-next",
-		      prevEl: ".swiper-button-prev",
+		        nextEl: ".swiper-button-next",
+		        prevEl: ".swiper-button-prev",
 		    },
-		    breakpoints: {
-		      992: { slidesPerView: 3 }, // PC
-		      768: { slidesPerView: 2 }, // 태블릿
-		      480: { slidesPerView: 1 }  // 모바일
+		    pagination: {
+		        el: ".swiper-pagination",
+		        clickable: true,
 		    }
-		  });
+		});
 		</script>
 	</div>
 </body>

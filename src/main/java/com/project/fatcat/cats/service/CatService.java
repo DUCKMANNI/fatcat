@@ -39,10 +39,6 @@ public class CatService {
 
     
     
- // application.properties에서 파일 업로드 경로를 주입받습니다.
-    @Value("${file.upload.dir}")
-    private String uploadDir;
-    
     
     @Transactional
     public void updateCat(Integer catSeq, CatUpdateDTO catUpdateDTO) {
@@ -166,6 +162,58 @@ public class CatService {
         return catRepository.save(cat);
     }
     
+    public void createCat(CatAddDTO dto) {
+    	
+    	String imageUrl = saveFile(dto.getCatImageFile());
+
+        Cat cat = Cat.builder()
+                .catName(dto.getCatName())
+                .catBirtthday(dto.getCatBirtthday())
+                .catGender(dto.getCatGender())
+                .isNeutered(dto.getIsNeutered())
+                .catBreed(dto.getCatBreed())
+                .hasDisease(dto.getHasDisease())
+                .hasAllergy(dto.getHasAllergy())
+                .catImageUrl(imageUrl)
+                .build();
+
+        catRepository.save(cat);
+    }
+    
+    public List<String> getAllBreeds() {
+        // 실제로는 DB에서 가져오거나 ENUM으로 관리 가능
+        return List.of( "코리안 숏헤어", "페르시안", "샴", "러시안 블루", 
+                "아메리칸 숏헤어", "스코티시 폴드", "벵갈", "노르웨이 숲 고양이",
+                "메인 쿤", "아비시니안", "터키시 앙고라", "스핑크스",
+                "렉돌", "브리티시 숏헤어", "먼치킨", "시베리안",
+                "뱅갈", "데본 렉스", "아메리칸 컬");
+    }
+    
+    private String saveFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String uploadDir = "/fatcat/upload/catImage/";
+
+        try {
+            fatcatSftp fatcatSftp = new fatcatSftp();
+            
+            // NAS에 업로드 (UUID 붙인 파일명으로 업로드해야 DB 경로랑 일치)
+            fatcatSftp.sftpFileUpload(file,uploadDir , fileName);
+
+            // DB에는 NAS 접근 가능한 URL을 저장
+            return uploadDir + fileName;
+
+        } catch (IOException e) {
+            log.error("Failed to upload image file", e);
+            throw new RuntimeException("이미지 업로드 실패", e);
+        } catch (Exception e) {
+            log.error("Unexpected error during file upload", e);
+            throw new RuntimeException("파일 업로드 중 알 수 없는 오류 발생", e);
+        }
+    }
  
 
     /**
