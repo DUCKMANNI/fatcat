@@ -6,65 +6,51 @@
 <style>
 
 
-
 .sent .message.tail::after {
-    content: '';
-    position: absolute;
-    bottom: 0; /* 메시지 박스 하단에 위치 */
-    right: -7px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
-    width: 0;
-    height: 0;
-    z-index: 1;
-    
-    /* 꼬리 삼각형 모양 만들기 */
-    border: 9px solid transparent; /* 꼬리 크기 조절 */
-    border-radius : 2px;
-    border-left-color: #ebdecd; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
-    border-bottom-color: #ebdecd;
-    
-      
-    /* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
-    border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
-    border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
-    
-    /* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
-    transform: rotate(6deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
-    
-   
+	content: '';
+	position: absolute;
+	bottom: 0; /* 메시지 박스 하단에 위치 */
+	right: -7px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
+	width: 0;
+	height: 0;
+	z-index: 1;
+	/* 꼬리 삼각형 모양 만들기 */
+	border: 9px solid transparent; /* 꼬리 크기 조절 */
+	border-radius: 2px;
+	border-left-color: #ebdecd; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+	border-bottom-color: #ebdecd;
+	/* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
+	border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
+	border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
+	/* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
+	transform: rotate(6deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
 }
-
 
 /* ---------------------------------------------------------------------------------- */
 /* 2. 받은 메시지 (왼쪽 아래 꼬리) */
 /* ---------------------------------------------------------------------------------- */
 .received .message.tail::after {
-    content: '';
-    position: absolute;
-    bottom: 0; /* 메시지 박스 하단에 위치 */
-    left: -10px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
-    width: 0;
-    height: 0;
-    z-index: 1;
-    
-    /* 꼬리 삼각형 모양 만들기 */
-    border: 9px solid transparent; /* 꼬리 크기 조절 */
-    border-radius : 2px;
-    border-left-color: #ffffff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
-    border-bottom-color: #ffffff;
-    
-      
-    /* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
-    border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
-    border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
-    
-    /* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
-    transform:rotateY(186deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
-    
+	content: '';
+	position: absolute;
+	bottom: 0; /* 메시지 박스 하단에 위치 */
+	left: -10px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
+	width: 0;
+	height: 0;
+	z-index: 1;
+	/* 꼬리 삼각형 모양 만들기 */
+	border: 9px solid transparent; /* 꼬리 크기 조절 */
+	border-radius: 2px;
+	border-left-color: #ffffff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+	border-bottom-color: #ffffff;
+	/* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
+	border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
+	border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
+	/* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
+	transform: rotateY(186deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
 }
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
 /* ---------------------------------------------------------------------------------- */
-
 @font-face {
 	font-family: 'Juache';
 	src:
@@ -74,11 +60,9 @@
 	font-display: swap;
 }
 
-
 body {
-	
-	font-family: 'Juache', sans-serif; 
-	font-size:16px;
+	font-family: 'Juache', sans-serif;
+	font-size: 16px;
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -98,7 +82,7 @@ body {
 /* 기본 입력 필드 스타일 및 폰트 적용 */
 select, input, textarea {
 	font-family: 'Juache', sans-serif;
-	font-size:16px;
+	font-size: 16px;
 	padding: 5px 10px;
 	border-radius: 6px;
 	border: 1px solid #ccc;
@@ -107,28 +91,27 @@ select, input, textarea {
 /* ---------------------------------------------------------------------------------- */
 /* 플레이스홀더 폰트 적용 */
 /* ---------------------------------------------------------------------------------- */
-#message-input::placeholder,
-#session-note::placeholder,
-input::placeholder,
-textarea::placeholder {
-    font-family: 'Juache', sans-serif !important;
+#message-input::placeholder, #session-note::placeholder, input::placeholder,
+	textarea::placeholder {
+	font-family: 'Juache', sans-serif !important;
 }
 
 ::-webkit-input-placeholder { /* Chrome, Safari */
-    font-family: 'Juache', sans-serif !important;
+	font-family: 'Juache', sans-serif !important;
 }
+
 :-moz-placeholder { /* Firefox 18- */
-    font-family: 'Juache', sans-serif !important;
+	font-family: 'Juache', sans-serif !important;
 }
+
 ::-moz-placeholder { /* Firefox 19+ */
-    font-family: 'Juache', sans-serif !important;
+	font-family: 'Juache', sans-serif !important;
 }
+
 :-ms-input-placeholder { /* IE */
-    font-family: 'Juache', sans-serif !important;
+	font-family: 'Juache', sans-serif !important;
 }
 /* ---------------------------------------------------------------------------------- */
-
-
 #chat-container {
 	flex-grow: 1;
 	display: flex;
@@ -147,28 +130,25 @@ textarea::placeholder {
 	background: #f7f7f7;
 	display: flex;
 	flex-direction: column;
-	
 }
 
 /* ✨ 날짜 구분선 스타일 ✨ */
 .date-separator {
-    text-align: center;
-    margin: 15px 0; /* 위아래 간격 */
+	text-align: center;
+	margin: 15px 0; /* 위아래 간격 */
 }
 
 .date-separator span {
-    font-size: 16px;
-    color: #888;
-    background: #e9e9e9; /* 연한 회색 배경 */
-    padding: 4px 10px;
-    border-radius: 12px; /* 둥근 모양 */
-    font-weight: 500;
-    font-family: 'Juache', sans-serif;
-    display: inline-block; /* 배경이 텍스트 크기만큼만 채워지도록 */
+	font-size: 16px;
+	color: #888;
+	background: #e9e9e9; /* 연한 회색 배경 */
+	padding: 4px 10px;
+	border-radius: 12px; /* 둥근 모양 */
+	font-weight: 500;
+	font-family: 'Juache', sans-serif;
+	display: inline-block; /* 배경이 텍스트 크기만큼만 채워지도록 */
 }
 /* ✨ 날짜 구분선 스타일 끝 ✨ */
-
-
 .message-row {
 	display: flex;
 	margin-bottom: 10px;
@@ -193,7 +173,6 @@ textarea::placeholder {
 	align-self: flex-start;
 	flex-shrink: 0;
 	cursor: pointer;
-	
 }
 
 .message-content-wrapper {
@@ -223,8 +202,8 @@ textarea::placeholder {
 
 .sent .message {
 	background: #ebdecd;
-	
 }
+
 .message {
 	padding: 8px 12px;
 	border-radius: 18px;
@@ -232,8 +211,6 @@ textarea::placeholder {
 	word-wrap: break-word;
 	position: relative;
 }
-
-
 
 .received .message {
 	background: #fff;
@@ -256,101 +233,100 @@ textarea::placeholder {
 }
 
 .care-request-card {
-	border-radius:20px;
-	background-color:#fff3b0;
-    font-size: 16px;
-    line-height: 1.4;
-    padding : 15px 10px;
+	border-radius: 20px;
+	background-color: #fff3b0;
+	font-size: 16px;
+	line-height: 1.4;
+	padding: 15px 10px;
 }
 
 .card-header {
-    display: flex;
-    align-items: center;
-    padding-bottom: 8px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #eeeeee; /* 구분선 */
+	display: flex;
+	align-items: center;
+	padding-bottom: 8px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #eeeeee; /* 구분선 */
 }
 
 .header-icon {
-    font-size: 1.2em;
-    margin-right: 6px;
+	font-size: 1.2em;
+	margin-right: 6px;
 }
 
 .header-title {
-    font-weight: 700;
-    font-size: 1.1em;
-    color: #333333;
+	font-weight: 700;
+	font-size: 1.1em;
+	color: #333333;
 }
 
 .detail-row {
-    display: flex;
-    margin-bottom: 6px; /* 줄 간격 */
-    align-items: flex-start;
+	display: flex;
+	margin-bottom: 6px; /* 줄 간격 */
+	align-items: flex-start;
 }
 
 .detail-icon {
-    color: #888; /* 아이콘 색상 */
-    margin-right: 8px;
-    padding-top: 2px;
+	color: #888; /* 아이콘 색상 */
+	margin-right: 8px;
+	padding-top: 2px;
 }
 
 .label {
-    font-weight: 600;
-    color: #555;
-    display: inline-block;
-    min-width: 40px; /* 라벨 너비 고정으로 정렬 맞춤 */
+	font-weight: 600;
+	color: #555;
+	display: inline-block;
+	min-width: 40px; /* 라벨 너비 고정으로 정렬 맞춤 */
 }
 
 /* -----------------------------------
    3. Footer 및 상태/버튼 스타일
    ----------------------------------- */
 .card-footer {
-    display: flex;
-    justify-content: space-between; /* 상태 표시와 버튼을 양 끝으로 분리 */
-    align-items: center;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #555;
-    
+	display: flex;
+	justify-content: space-between; /* 상태 표시와 버튼을 양 끝으로 분리 */
+	align-items: center;
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #555;
 }
 
 /* 상태 표시 뱃지 스타일 */
 .care-status {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px; /* 둥근 뱃지 모양 */
-    font-weight: 600 !important;
-    font-size: 18px !important;
-    white-space: nowrap;
+	display: inline-block;
+	padding: 3px 8px;
+	border-radius: 12px; /* 둥근 뱃지 모양 */
+	font-weight: 600 !important;
+	font-size: 18px !important;
+	white-space: nowrap;
 }
 
 /* 확정 상태 */
-.care-status[style*="green"] { 
-   /*  background-color: #e6f7e6; */
-    color: #38761d !important; 
+.care-status[style*="green"] {
+	/*  background-color: #e6f7e6; */
+	color: #38761d !important;
 }
 
 /* 취소 상태 */
-.care-status[style*="red"] { 
-    /* background-color: #fceceb; */
-    color: #cc0000 !important;
+.care-status[style*="red"] {
+	/* background-color: #fceceb; */
+	color: #cc0000 !important;
 }
 
 /* 버튼 스타일 (확정 버튼) */
 .confirm-btn {
-    background-color: #4c8cff; /* 깔끔한 파란색 */
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9em;
-    transition: background-color 0.2s;
+	background-color: #4c8cff; /* 깔끔한 파란색 */
+	color: white;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 999px;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 0.9em;
+	transition: background-color 0.2s;
 }
 
 .confirm-btn:hover {
-    background-color: #3a75e0;
+	background-color: #3a75e0;
 }
 
 .care-confirmed {
@@ -361,21 +337,21 @@ textarea::placeholder {
 }
 
 .btn-darkbrown {
-	font-size : 16px;
+	font-size: 16px;
 	font-family: 'Juache', sans-serif;
 	padding: 6px 16px;
 	border-radius: 999px;
-	border: none;  
-    color: white; 
-    background-color: #9a7f5a;
-    transition: all 0.3s ease;
-    cursor : pointer;
+	border: none;
+	color: white;
+	background-color: #9a7f5a;
+	transition: all 0.3s ease;
+	cursor: pointer;
 }
 
 .btn-darkbrown:hover {
-    background-color: #524538;
-	color: #fff;  
-	border: none;  
+	background-color: #524538;
+	color: #fff;
+	border: none;
 }
 
 #input-area {
@@ -394,98 +370,101 @@ textarea::placeholder {
 }
 
 /* 버튼에도 폰트, 커서 포인터 적용 */
- #send-button{
- 	font-family: 'Juache', sans-serif;
+#send-button {
+	font-family: 'Juache', sans-serif;
 	background-color: #D2B48C;
 	color: #fff;
 	border-radius: 20px;
 	padding: 6px 16px;
 	border: none;
 	font-weight: 500;
-    cursor: pointer; /* 커서 포인터 추가 */
-} 
+	cursor: pointer; /* 커서 포인터 추가 */
+}
 
-
-#send-button:hover{
+#send-button:hover {
 	background-color: #a38b6a; /* hover 시 조금 진하게 */
 	color: #fff;
-} 
+}
 
 /* ---------------------------------------------------------------------------------- */
 /* 2. 돌봄 요청 폼 (CARE FORM) 스타일: 디자인 개선 및 라운드 값 적용 */
 /* ---------------------------------------------------------------------------------- */
-
 #care-form {
-    display: none; /* 기본은 숨김 */
-    padding: 18px; 
-    border: 1px solid #e0e0e0; 
-    border-radius: 12px; 
-    margin: 10px; 
-    background-color: #f7f9fb; /* 배경 박스 */
-    flex-wrap: wrap; 
-    gap: 10px; 
-    flex-direction: row; 
-    font-size: 16px; 
-    line-height: 1.4;
-    border-top: 1px solid #ddd; 
+	opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.4s ease;
+    padding: 0 18px; /* 닫힐 때는 패딩 제거 */
+    margin: 0 10px;
+    border: 1px solid transparent; /* 기본은 테두리 안 보이게 */
+    border-radius: 12px;
+    background-color: #f7f9fb;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-direction: row;
+    font-size: 16px;
+    line-height: 2;
 }
 
 /* JS로 .active 클래스가 붙으면 폼이 보입니다. */
 #care-form.active {
-    display: flex;
+	opacity: 1;
+    max-height: 600px; /* 폼 높이보다 살짝 크게 */
+    transform: translateY(0);
+    padding: 0 18px; /* 닫힐 때는 패딩 제거 */
+    margin: 0 10px;
+    border: 1px solid #e0e0e0;
 }
 
 /* 개별 입력 그룹 스타일 */
 .care-form-group {
-    flex: 1 1 calc(50% - 5px); 
-    display: flex;
-    flex-direction: column; 
+	flex: 1 1 calc(50% - 5px);
+	flex-direction: column;
 }
 
 /* 메모, 버튼 등 전체 너비 요소 */
 .care-form-group.full-width {
-    flex: 1 1 100%; 
+	flex: 1 1 100%;
 }
 
 /* 라벨 스타일 */
 #care-form label {
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 3px;
+	font-weight: bold;
+	color: #555;
+	margin-top:3px;
 }
 
-
 /* 입력 필드 (input, textarea) 공통 스타일 - 라운드 값 적용 */
-#care-form input[type="datetime-local"],
-#care-form textarea {
-    padding: 10px; 
-    border: 1px solid #ccc;
-    border-radius: 6px; 
-    box-sizing: border-box; 
-    margin-top: 4px; 
-    width: 100%; 
-    font-size: 16px;
-    background-color: white; 
+#care-form input[type="datetime-local"], #care-form textarea {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	box-sizing: border-box;
+	width: 100%;
+	font-size: 16px;
+	background-color: white;
 }
 
 /* 메모장 줄 수 설정 */
 #care-form textarea {
-    resize: vertical; 
+	resize: vertical;
 }
 
 /* 예약 전송 버튼 스타일 */
 #confirm-care {
 	font-family: 'Juache', sans-serif;
-	font-size :20px;
-    width: 100%; 
-    padding: 10px; 
-    border: none;
-    border-radius: 20px; 
-    font-weight: bold;
-    cursor: pointer; /* 커서 포인터 유지 */
-    background-color: #D2B48C;
-    color: #fff;
-    transition: background-color 0.3s;
+	font-size: 20px;
+	width: 100%;
+	padding: 10px;
+	margin-bottom :8px;
+	border: none;
+	border-radius: 20px;
+	font-weight: bold;
+	cursor: pointer; /* 커서 포인터 유지 */
+	background-color: #D2B48C;
+	color: #fff;
+	transition: background-color 0.3s;
 }
 
 #confirm-care:hover {
@@ -494,8 +473,8 @@ textarea::placeholder {
 
 /* 버튼 컨테이너 정렬 */
 .button-container {
-    display: flex;
-    justify-content: flex-start;
+	display: flex;
+	justify-content: flex-start;
 }
 
 /* ---------------------------------------------------------------------------------- */
@@ -562,23 +541,23 @@ textarea::placeholder {
 
 /* [수정] 리뷰 등록 폼 스타일 - 배경 박스 추가 */
 #review-form-area {
-    padding: 15px; 
-    margin-bottom: 20px; 
-    background-color: #f7f9fb; /* 연한 회색 배경 */
-    border-radius: 12px; /* 둥근 모서리 */
-    border-top: none; /* 기존 border-top 제거 */
+	padding: 15px;
+	margin-bottom: 20px;
+	background-color: #f7f9fb; /* 연한 회색 배경 */
+	border-radius: 12px; /* 둥근 모서리 */
+	border-top: none; /* 기존 border-top 제거 */
 }
 
 #review-form-area h4 {
 	font-family: 'Juache', sans-serif;
-	font-size:20px;
+	font-size: 20px;
 	margin-top: 0;
 	margin-bottom: 15px; /* 제목 아래 간격 추가 */
 }
 
 #review-form-area textarea {
 	/* [수정] 입력 필드 라운드 값 적용 */
-	border-radius: 6px; 
+	border-radius: 6px;
 	width: 100%;
 	margin-bottom: 10px;
 	box-sizing: border-box;
@@ -602,13 +581,13 @@ textarea::placeholder {
 #submit-review-btn {
 	width: 100%;
 	padding: 10px; /* 버튼 높이 증가 */
-	background: #D2B48C; 
+	background: #D2B48C;
 	color: white;
 	border: none;
-	border-radius: 20px; 
+	border-radius: 20px;
 	cursor: pointer; /* 커서 포인터 추가 */
 	font-weight: 500;
-	font-family: 'Juache', sans-serif; 
+	font-family: 'Juache', sans-serif;
 	transition: background-color 0.3s;
 }
 
@@ -618,7 +597,7 @@ textarea::placeholder {
 
 /* 리뷰 목록 스타일 */
 #review-list {
-	font-size:20px;
+	font-size: 20px;
 	flex-grow: 1;
 	overflow-y: auto;
 	padding-right: 5px;
@@ -627,7 +606,7 @@ textarea::placeholder {
 .review-item {
 	/* 리뷰 내용에도 폰트 적용 */
 	font-family: 'Juache', sans-serif;
-	font-size:18px;
+	font-size: 18px;
 	padding: 10px 0;
 	border-bottom: 1px dotted #ddd;
 	position: relative;
@@ -690,14 +669,20 @@ textarea::placeholder {
 /* ---------------------------------------------------------------------------------- */
 /* 4. 인라인 리뷰 수정 폼 스타일 (이미지 레이아웃에 맞게 조정) */
 /* ---------------------------------------------------------------------------------- */
+/* 수정 폼 컨테이너 */
 .edit-inline-form {
-	padding: 10px 0 0 0;
-	margin-top: 0px;
-	margin-bottom: 5px;
-	width: 100%;
-	box-sizing: border-box;
-	display: block;
-	font-family: 'Juache', sans-serif;
+	 opacity: 0;
+    max-height: 0;          /* 닫힌 상태 */
+    overflow: hidden;
+    transform: translateY(-10px); /* 살짝 위에서 시작 */
+    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.4s ease;
+}
+
+.edit-inline-form.active {
+	opacity: 1;
+    max-height: 500px;      /* 충분히 크게 줌 */
+    transform: translateY(0);
+	
 }
 /* 수정 폼 내부의 경계선 스타일 */
 .edit-inline-form>div {
@@ -713,7 +698,7 @@ textarea::placeholder {
 
 .edit-review-textarea {
 	/* [수정] 입력 필드 라운드 값 적용 */
-	border-radius: 6px; 
+	border-radius: 6px;
 	width: 100%;
 	box-sizing: border-box;
 	margin-bottom: 10px;
@@ -737,23 +722,22 @@ textarea::placeholder {
 }
 
 .edit-actions button {
-	font-size: 0.8em !important;
-	padding: 5px 10px !important;
+	font-size: 14px !important;
 	font-family: 'Juache', sans-serif !important;
-    cursor: pointer !important; /* 커서 포인터 추가 */
+	cursor: pointer !important; /* 커서 포인터 추가 */
 }
 
 .edit-actions button.save {
 	/* [수정] 색상 통일 */
-	background: #D2B48C; 
+	background: #D2B48C;
 	color: white;
 	border: none;
 	border-radius: 4px;
 }
+
 .edit-actions button.save:hover {
 	background: #a38b6a;
 }
-
 
 .edit-actions button.cancel {
 	background: #dc3545;
@@ -763,46 +747,41 @@ textarea::placeholder {
 	margin-left: 5px;
 }
 
-
 .btn-outline-danger {
 	font-family: 'Juache', sans-serif;
-	font-size : 14px;
-    border-radius:999px;
-    background-color: transparent;
-    color: #dc3545;
-    border: 2px solid #dc3545;
-    transition: all 0.3s ease;
-    padding: 6px 8px;
-     cursor: pointer;
-} 
-
-.btn-outline-danger:hover {
-	
-    color: white; 
-    background-color: #dc3545; 
-    border-color: #dc3545;
+	font-size: 14px;
+	border-radius: 999px;
+	background-color: transparent;
+	color: #dc3545;
+	border: 2px solid #dc3545;
+	transition: all 0.3s ease;
+	padding: 6px 8px;
+	cursor: pointer;
 }
 
+.btn-outline-danger:hover {
+	color: white;
+	background-color: #dc3545;
+	border-color: #dc3545;
+}
 
 .btn-outline-brown {
 	font-family: 'Juache', sans-serif;
-	font-size : 14px;
+	font-size: 14px;
 	border: 2px solid #8B4513;
-	border-radius:999px;
-    color: #8B4513; /* 글자색: 새들 브라운 */
-    border-color: #8B4513; /* 테두리색 */
-    background-color: transparent; /* 배경 투명 */
-    cursor: pointer;
-    padding: 6px 8px;
-    transition: all 0.3s ease; /* 부드러운 전환 효과 */
+	border-radius: 999px;
+	color: #8B4513; /* 글자색: 새들 브라운 */
+	border-color: #8B4513; /* 테두리색 */
+	background-color: transparent; /* 배경 투명 */
+	cursor: pointer;
+	padding: 6px 8px;
+	transition: all 0.3s ease; /* 부드러운 전환 효과 */
 }
 
 .btn-outline-brown:hover {
-    color: white;
-    background-color: #8B4513;
-    
+	color: white;
+	background-color: #8B4513;
 }
-
 </style>
 <script
 	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
@@ -1453,7 +1432,7 @@ function createReviewItem(review) {
     let actionButtons = '';
     if (review.authorUserSeq === senderId) { 
         actionButtons = `
-            <div class="review-actions">
+            <div class="review-actions"> 
                 <button class="btn-outline-brown" onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
                 <button class="btn-outline-danger" onclick="deleteReview(${review.reviewSeq})">삭제</button>
             </div>
@@ -1541,10 +1520,10 @@ async function submitReview() {
 }
 
 /**
- * ⭐ 인라인 수정 폼을 생성하고 해당 리뷰 밑에 표시합니다. (원본 내용 유지)
+ * ⭐ 인라인 수정 폼을 생성하고 해당 리뷰 밑에 표시하며 부드럽게 펼칩니다.
  */
 function editReview(reviewId, content, rating) {
-    // 이미 다른 폼이 열려 있다면 닫습니다.
+    // 1. 이미 다른 폼이 열려 있다면 닫습니다.
     if (currentEditForm) {
         cancelEdit();
     }
@@ -1555,11 +1534,11 @@ function editReview(reviewId, content, rating) {
     currentEditReviewId = reviewId;
     currentEditRating = rating;
 
-    // ⭐ 버튼 일시적으로 숨기기
-    const actions = reviewItem.querySelector('.review-actions');
-    if (actions) actions.style.visibility = 'hidden'; 
+    // 2. ⭐ 기존 액션 버튼을 숨깁니다. (클래스명: .review-actions)
+    const reviewActions = reviewItem.querySelector('.review-actions');
+    if (reviewActions) reviewActions.style.display = 'none'; 
     
-    // 폼 내용 (이미지 모양과 일치하도록)
+    // 3. 폼 내용 구성
     const starHtml = `
         <div class="rating-input edit-inline-rating">
             <span data-rating="1">★</span>
@@ -1572,9 +1551,9 @@ function editReview(reviewId, content, rating) {
     
     const formHtml = document.createElement('div');
     formHtml.classList.add('edit-inline-form');
-    // ⭐ div로 감싸고 border-top 스타일을 적용하여 분리된 느낌 연출
+    
     formHtml.innerHTML = `
-        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;">
+        <div style="margin-top: 5px; padding-top: 5px; border-top: 1px dashed #ccc;">
             <h4>별점:</h4>
             ${starHtml}
             <h4>내용:</h4>
@@ -1586,11 +1565,17 @@ function editReview(reviewId, content, rating) {
         </div>
     `;
 
-    // ⭐ 기존 리뷰 내용 바로 밑에 수정 폼 추가
+    // 4. 기존 리뷰 내용 바로 밑에 수정 폼 추가
     reviewItem.appendChild(formHtml);
     currentEditForm = formHtml;
     
-    // 별점 UI 설정
+    // 5. ⭐ 애니메이션을 위한 핵심 로직: DOM 추가 후 다음 틱에 active 클래스 추가 (부드럽게 열림)
+    // 브라우저가 DOM 추가를 인식하도록 미세한 딜레이를 줍니다.
+    setTimeout(() => {
+        formHtml.classList.add('active');
+    }, 10); 
+
+    // 6. 별점 UI 설정 및 이벤트 리스너 추가
     const starContainer = formHtml.querySelector('.edit-inline-rating');
     updateStarRating(rating, starContainer); 
 
@@ -1601,36 +1586,35 @@ function editReview(reviewId, content, rating) {
         });
     });
 
-    // 스크롤 이동
+    // 7. 스크롤 이동 (선택 사항)
     const reviewList = document.getElementById('review-list');
     const itemOffset = reviewItem.offsetTop;
     const listHeight = reviewList.clientHeight;
-    // 수정 폼이 중앙에서 약간 위에 오도록 스크롤 위치 조정
     reviewList.scrollTop = itemOffset - (listHeight / 4);
 }
 
 
-/**
- * ⭐ 수정 폼을 닫고 버튼을 복원합니다.
- */
 function cancelEdit() {
     if (!currentEditReviewId || !currentEditForm) return;
 
     const reviewItem = document.getElementById(`review-item-${currentEditReviewId}`);
-    
-    currentEditForm.remove();
 
-    // ⭐ 버튼 다시 표시
-    if (reviewItem) {
-        const actions = reviewItem.querySelector('.review-actions');
-        if (actions) actions.style.visibility = 'visible';
-    }
-    
-    currentEditReviewId = null;
-    currentEditRating = 0;
-    currentEditForm = null;
+    // active 제거 → CSS transition 시작
+    currentEditForm.classList.remove('active');
+
+    const transitionDuration = 400; // 0.4s (CSS랑 맞추기)
+
+    setTimeout(() => {
+        currentEditForm.remove(); // 애니메이션 끝난 후 제거
+        if (reviewItem) {
+            const reviewActions = reviewItem.querySelector('.review-actions');
+            if (reviewActions) reviewActions.style.display = 'block';
+        }
+        currentEditReviewId = null;
+        currentEditRating = 0;
+        currentEditForm = null;
+    }, transitionDuration);
 }
-
 
 async function saveEditReview() {
     if (!currentEditReviewId || !currentEditForm) return alert("수정할 리뷰를 찾을 수 없습니다.");

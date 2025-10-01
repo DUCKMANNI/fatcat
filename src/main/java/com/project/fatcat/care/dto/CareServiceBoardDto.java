@@ -49,7 +49,7 @@ public class CareServiceBoardDto {
         board.setAddress2(this.address2);
         board.setLatitude(this.latitude);
         board.setLongitude(this.longitude);
-        board.setViewCount(10); //나중에 viewcount로 바꿔서 넣으삼~~~
+        board.setViewCount(this.viewCount); //나중에 viewcount로 바꿔서 넣으삼~~~
         board.setPrice(this.price);
         board.setStatus(CareBoardStatus.OPEN);
         board.setIsDeleted(false);
