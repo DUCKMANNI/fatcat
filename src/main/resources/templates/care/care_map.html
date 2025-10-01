@@ -6,7 +6,6 @@
 <meta charset="utf-8">
 <title>돌봄서비스</title>
 <style>
-
 #controls {
 	background: rgba(255, 255, 255, 0.96);
 	border: 1px solid #ddd;
@@ -34,7 +33,6 @@
 	color: #fff;
 	font-weight: 600;
 } */
-
 #mapListContainer {
 	display: flex;
 	width: calc(100% - 20px);
@@ -137,10 +135,9 @@
 	pointer-events: none;
 }
 
-
 .fixed-element button {
 	display: block !important;
-} 
+}
 
 /* 상세창 */
 #detailPanel {
@@ -169,84 +166,82 @@
 }
 
 .btn-group .btn {
-    border-radius: 5px;
-    padding: 8px 12px;
-    }
+	border-radius: 5px;
+	padding: 8px 12px;
+}
 
 /* .btn-warning {
     background-color: #ffc107;
     color: #212529;
     border: 1px solid #ffc107;
 }*/
-
 .btn-outline-danger {
-	font-size : 16px;
-    border-radius:999px;
-    background-color: transparent;
-    color: #dc3545;
-    border: 2px solid #dc3545;
-    transition: all 0.3s ease;
-} 
-
-.btn-outline-danger:hover {
-	
-    color: white; 
-    background-color: #dc3545; 
-    border-color: #dc3545;
+	font-size: 16px;
+	border-radius: 999px;
+	background-color: transparent;
+	color: #dc3545;
+	border: 2px solid #dc3545;
+	transition: all 0.3s ease;
 }
 
+.btn-outline-danger:hover {
+	color: white;
+	background-color: #dc3545;
+	border-color: #dc3545;
+}
 
 .btn-outline-brown {
-	font-size : 16px;
+	font-size: 16px;
 	border: 2px solid #8B4513;
-	border-radius:999px;
-    color: #8B4513; /* 글자색: 새들 브라운 */
-    border-color: #8B4513; /* 테두리색 */
-    background-color: transparent; /* 배경 투명 */
-    transition: all 0.3s ease; /* 부드러운 전환 효과 */
+	border-radius: 999px;
+	color: #8B4513; /* 글자색: 새들 브라운 */
+	border-color: #8B4513; /* 테두리색 */
+	background-color: transparent; /* 배경 투명 */
+	transition: all 0.3s ease; /* 부드러운 전환 효과 */
 }
 
 .btn-outline-brown:hover {
-    color: white;
-    background-color: #8B4513;
-    
+	color: white;
+	background-color: #8B4513;
 }
 
 .btn-darkbrown {
-	font-size : 16px;
-	border-radius:999px;
-	border: none;  
-    color: white; 
-    background-color: #9a7f5a;
-    transition: all 0.3s ease;
+	font-size: 16px;
+	border-radius: 999px;
+	border: none;
+	color: white;
+	background-color: #9a7f5a;
+	transition: all 0.3s ease;
 }
 
 .btn-darkbrown:hover {
-    background-color: #524538;
-	color: #fff;  
-	border: none;  
+	background-color: #524538;
+	color: #fff;
+	border: none;
 }
 </style>
 
 </head>
-<body>
+<body th:data-logged-in-user-seq="${loggedInUserSeq}">
 	<div layout:fragment="content">
 		<script
 			src="//dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
 
-		<label class="container my-3 d-flex flex-column align-items-center"
-			style="font-family: 'BagelFat', sans-serif; font-size: 50px; /* (80-&gt;50px) */ color: #CD853F;">돌봄서비스 찾기</label>
-		
 		<div id="controls" style="font-size: 20px;">
-			<label>시/도<select id="sido" class="m-1" style="font-size: 18px;"></select></label> 
-			<label>시/군/구<select id="sigungu" class="m-1" style="font-size: 18px;"></select></label>
-			<label>동<select id="dong" class="m-1" style="font-size: 18px;"></select></label>
-			<button id="searchBtn" class="btn btn-fatcat" style="font-size: 20px;">검색</button>
-			<button id="btn" class="btn btn-fatcat"  style="font-size: 20px;" onclick='toggleListView()'>리스트만보기</button>
-			<button id="btn" 
-            class="btn btn-darkbrown" 
-            style="font-size: 20px;" 
-            onclick="location.href='/care/create'">돌봄글 등록</button>
+			<label>시/도<select id="sido" class="m-1"
+				style="font-size: 18px;"></select></label> <label>시/군/구<select
+				id="sigungu" class="m-1" style="font-size: 18px;"></select></label> <label>동<select
+				id="dong" class="m-1" style="font-size: 18px;"></select></label>
+			<button id="searchBtn" class="btn btn-fatcat"
+				style="font-size: 20px;">검색</button>
+			<button id="btn" class="btn btn-fatcat" style="font-size: 20px;"
+				onclick='toggleListView()'>리스트만보기</button>
+
+			<button id="createBtn"
+				th:data-auth="${#authorization.expression('isAuthenticated()')}"
+				class="btn btn-darkbrown" style="font-size: 20px;">돌봄글 등록</button>
+
+
 		</div>
 
 		<div id="mapListContainer">
@@ -262,423 +257,477 @@
 			</div>
 		</div>
 
-		<script>
-			let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7;
-			let openedPlaceId = null, originalCenter = null;
-			let userLocationMarker = null;
+<script>
+    let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7;
+    let openedPlaceId = null, originalCenter = null;
+    let userLocationMarker = null;
 
-			const markers = [];
-			const $sido = document.getElementById('sido');
-			const $sigungu = document.getElementById('sigungu');
-			const $dong = document.getElementById('dong');
-			const $searchBtn = document.getElementById('searchBtn');
-			const $placesList = document.getElementById('placesList');
-			const $pagination = document.getElementById('pagination');
-			
-			const geocoder = new kakao.maps.services.Geocoder();
+    const markers = [];
+    const $sido = document.getElementById('sido');
+    const $sigungu = document.getElementById('sigungu');
+    const $dong = document.getElementById('dong');
+    const $searchBtn = document.getElementById('searchBtn');
+    const $placesList = document.getElementById('placesList');
+    const $pagination = document.getElementById('pagination');
+    
+    const geocoder = new kakao.maps.services.Geocoder();
 
-			const map = new kakao.maps.Map(document.getElementById('map'), {
-				center : new kakao.maps.LatLng(37.566826, 126.9786567),
-				level : 5
-			});
-			
-			const infowindow = new kakao.maps.InfoWindow({zIndex:1});
-			
-			
+    const map = new kakao.maps.Map(document.getElementById('map'), {
+        center : new kakao.maps.LatLng(37.566826, 126.9786567),
+        level : 5
+    });
+    
+    const infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    
+    // 💡 HTML body 태그의 data 속성에서 로그인 UserSeq를 읽어와 전역 변수로 저장 (null 또는 숫자)
+    const $body = document.querySelector('body');
+    const LOGGED_IN_USER_SEQ = parseInt($body.dataset.loggedInUserSeq) || null; 
+    
+    document.getElementById('createBtn').addEventListener('click', function() {
+        const isAuthenticated = this.dataset.auth === 'true';
 
-			window.addEventListener('DOMContentLoaded', () => {
-				fetch('/data/korea_map_info.txt')
-				    .then(res => res.text())
-				    .then(text => {
-					    parseCSV(text);
-					    fillSido();
-					    if (navigator.geolocation) {
-					    	navigator.geolocation.getCurrentPosition(
-					    		(position) => {
-					    			const lat = position.coords.latitude;
-					    			const lon = position.coords.longitude;
-					    			
-					    			displayUserLocation(lat, lon);
-					    			reverseGeocode(lat, lon);
-					    		},
-					    		(error) => {
-					    			console.error("위치 정보를 가져오는 데 실패했습니다.", error);
-					    			fetchCareList();
-					    		}
-					    	);
-					    } else {
-					    	console.error("이 브라우저에서는 Geolocation이 지원되지 않습니다.");
-					    	fetchCareList();
-					    }
-				    })
-				    .catch(err => console.error('CSV 읽기 실패', err));
-			});
-			
-			// 현재 위치 마커 표시 함수
-			function displayUserLocation(lat, lon) {
-				const pos = new kakao.maps.LatLng(lat, lon);
-				
-				if (userLocationMarker) {
-					userLocationMarker.setMap(null);
-				}
+        if (!isAuthenticated) {
+            alert("로그인 후 이용 가능합니다.");
+            window.location.href = "/users/login";
+            return;
+        }
 
-				userLocationMarker = new kakao.maps.Marker({
-					position: pos,
-					map: map,
-				});
+        window.location.href = "/care/create";
+    });
+    
+    
 
-				map.setCenter(pos);
-				
-				
-			}
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch('/data/korea_map_info.txt')
+            .then(res => res.text())
+            .then(text => {
+                parseCSV(text);
+                fillSido();
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            
+                            displayUserLocation(lat, lon);
+                            reverseGeocode(lat, lon);
+                        },
+                        (error) => {
+                            console.error("위치 정보를 가져오는 데 실패했습니다.", error);
+                            fetchCareList();
+                        }
+                    );
+                } else {
+                    console.error("이 브라우저에서는 Geolocation이 지원되지 않습니다.");
+                    fetchCareList();
+                }
+            })
+            .catch(err => console.error('CSV 읽기 실패', err));
+    });
+    
+    // 현재 위치 마커 표시 함수
+    function displayUserLocation(lat, lon) {
+        const pos = new kakao.maps.LatLng(lat, lon);
+        
+        if (userLocationMarker) {
+            userLocationMarker.setMap(null);
+        }
 
-			function parseCSV(csvText) {
-				REGION_DATA = {};
-				csvText.split('\n').slice(1).forEach(line => {
-					const [ sido, sigungu, dong ] = line.split(',').map(s => s.trim());
-					if (!sido || !sigungu || !dong)
-						return;
-					REGION_DATA[sido] = REGION_DATA[sido] || {};
-					REGION_DATA[sido][sigungu] = REGION_DATA[sido][sigungu] || [];
-					REGION_DATA[sido][sigungu].push(dong);
-				});
-			}
+        userLocationMarker = new kakao.maps.Marker({
+            position: pos,
+            map: map,
+        });
 
-			function fillSido() {
-				$sido.innerHTML = '<option value="">시/도 선택</option>';
-				Object.keys(REGION_DATA).forEach(sd => $sido.innerHTML += `<option value="${sd}">${sd}</option>`);
-				$sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
-				$dong.innerHTML = '<option value="">동 선택</option>';
-			}
-			function fillSigungu() {
-				const sd = $sido.value;
-				$sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
-				$dong.innerHTML = '<option value="">동 선택</option>';
-				if (!sd)
-					return;
-				Object.keys(REGION_DATA[sd]).forEach(gu => $sigungu.innerHTML += `<option value="${gu}">${gu}</option>`);
-			}
-			function fillDong() {
-				const sd = $sido.value, gu = $sigungu.value;
-				$dong.innerHTML = '<option value="">동 선택</option>';
-				if (!sd || !gu)
-					return;
-				REGION_DATA[sd][gu].forEach(d => $dong.innerHTML += `<option value="${d}">${d}</option>`);
-			}
-			$sido.addEventListener('change', fillSigungu);
-			$sigungu.addEventListener('change', fillDong);
+        map.setCenter(pos);
+        
+        
+    }
 
-			function clearMarkers() {
-				// CustomOverlay와 마커 모두 제거
-				markers.forEach(m => {
-					m.overlay.setMap(null); // CustomOverlay (핀 이미지+번호) 제거
-					m.marker.setMap(null);  // 투명 마커 제거
-				});
-				markers.length = 0;
-			}
-			function clearList() {
-				$placesList.innerHTML = '';
-			}
-			function buildRegionText() {
-				return [ $sido.value, $sigungu.value, $dong.value ].filter(Boolean).join(' ');
-			}
-			
-			// reverseGeocode 함수
-			function reverseGeocode(lat, lon) {
-				const coord = new kakao.maps.LatLng(lat, lon);
-				
-				if (!geocoder) { 
-					console.error("Geocoder 객체가 초기화되지 않았습니다.");
-					fetchCareList();
-					return;
-				}
+    function parseCSV(csvText) {
+        REGION_DATA = {};
+        csvText.split('\n').slice(1).forEach(line => {
+            const [ sido, sigungu, dong ] = line.split(',').map(s => s.trim());
+            if (!sido || !sigungu || !dong)
+                return;
+            REGION_DATA[sido] = REGION_DATA[sido] || {};
+            REGION_DATA[sido][sigungu] = REGION_DATA[sido][sigungu] || [];
+            REGION_DATA[sido][sigungu].push(dong);
+        });
+    }
 
-				geocoder.coord2RegionCode(coord.getLng(), coord.getLat(), (result, status) => {
-					if (status === kakao.maps.services.Status.OK) {
-						const regionInfo = result.find(item => item.region_type === 'H');
-						
-						if (regionInfo) {
-							const { region_1depth_name, region_2depth_name, region_3depth_name } = regionInfo;
-							
-							$sido.value = region_1depth_name;
-							fillSigungu();
-							$sigungu.value = region_2depth_name;
-							fillDong(); 
-							
-							const dongList = REGION_DATA[region_1depth_name] ? REGION_DATA[region_1depth_name][region_2depth_name] : null;
-							const matchedDong = dongList ? dongList.find(d => region_3depth_name.includes(d) || d.includes(region_3depth_name)) : null;
+    function fillSido() {
+        $sido.innerHTML = '<option value="">시/도 선택</option>';
+        Object.keys(REGION_DATA).forEach(sd => $sido.innerHTML += `<option value="${sd}">${sd}</option>`);
+        $sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
+        $dong.innerHTML = '<option value="">동 선택</option>';
+    }
+    function fillSigungu() {
+        const sd = $sido.value;
+        $sigungu.innerHTML = '<option value="">시/군/구 선택</option>';
+        $dong.innerHTML = '<option value="">동 선택</option>';
+        if (!sd)
+            return;
+        Object.keys(REGION_DATA[sd]).forEach(gu => $sigungu.innerHTML += `<option value="${gu}">${gu}</option>`);
+    }
+    function fillDong() {
+        const sd = $sido.value, gu = $sigungu.value;
+        $dong.innerHTML = '<option value="">동 선택</option>';
+        if (!sd || !gu)
+            return;
+        REGION_DATA[sd][gu].forEach(d => $dong.innerHTML += `<option value="${d}">${d}</option>`);
+    }
+    $sido.addEventListener('change', fillSigungu);
+    $sigungu.addEventListener('change', fillDong);
 
-							if (matchedDong) {
-								$dong.value = matchedDong;
-							} else {
-								console.warn(`"${region_3depth_name}"에 해당하는 동이 데이터에 없거나 일치하지 않습니다.`);
-							}
-							
-							fetchCareList();
-						} else {
-							console.warn("행정동 정보를 찾을 수 없습니다. 전체 목록을 불러옵니다.");
-							fetchCareList();
-						}
-					} else {
-						console.error("주소 변환에 실패했습니다. Status:", status);
-						fetchCareList();
-					}
-				});
-			}
+    function clearMarkers() {
+        // CustomOverlay와 마커 모두 제거
+        markers.forEach(m => {
+            m.overlay.setMap(null); // CustomOverlay (핀 이미지+번호) 제거
+            m.marker.setMap(null);  // 투명 마커 제거
+        });
+        markers.length = 0;
+    }
+    function clearList() {
+        $placesList.innerHTML = '';
+    }
+    function buildRegionText() {
+        return [ $sido.value, $sigungu.value, $dong.value ].filter(Boolean).join(' ');
+    }
+    
+    // reverseGeocode 함수
+    function reverseGeocode(lat, lon) {
+        const coord = new kakao.maps.LatLng(lat, lon);
+        
+        if (!geocoder) { 
+            console.error("Geocoder 객체가 초기화되지 않았습니다.");
+            fetchCareList();
+            return;
+        }
 
-			function fetchCareList() {
-				const region = buildRegionText();
-				const url = `/care/list?region=${encodeURIComponent(region)}`;
-				
-				fetch(url)
-					.then(response => {
-						if (!response.ok) {
-							throw new Error('네트워크 응답이 올바르지 않습니다.');
-						}
-						return response.json();
-					})
-					.then(data => {
-						allPlaces = data;
-						currentPage = 1;
-						renderList();
-					})
-					.catch(error => console.error('게시글 목록을 가져오는 데 실패했습니다:', error));
-			}
-			$searchBtn.addEventListener('click', fetchCareList);
+        geocoder.coord2RegionCode(coord.getLng(), coord.getLat(), (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                const regionInfo = result.find(item => item.region_type === 'H');
+                
+                if (regionInfo) {
+                    const { region_1depth_name, region_2depth_name, region_3depth_name } = regionInfo;
+                    
+                    $sido.value = region_1depth_name;
+                    fillSigungu();
+                    $sigungu.value = region_2depth_name;
+                    fillDong(); 
+                    
+                    const dongList = REGION_DATA[region_1depth_name] ? REGION_DATA[region_1depth_name][region_2depth_name] : null;
+                    const matchedDong = dongList ? dongList.find(d => region_3depth_name.includes(d) || d.includes(region_3depth_name)) : null;
 
-			function addMarker(pos, idx) {
-				
-			    // 1. 시각적으로 보이는 Custom Overlay (핀 이미지 + 번호)
-			    const visualContent = `
-			        <div class="custom-marker-wrap" style="position: relative; width: 50px; height: 50px; cursor: pointer;">
-			            <img src="/images/map_marker.png" style="width: 50px; height: 50px; display: block;">
-			            <div style="
-			                position: absolute;
-			                top: 50%;
-			                left: 50%;
-			                transform: translate(-66%, 0%);
-			                font-size: 20px;
-			                font-weight: bold;
-			                color: #422701;
-			                width: 25px;
-			                text-align: center;
-			            ">${idx + 1}</div>
-			        </div>
-			    `;
+                    if (matchedDong) {
+                        $dong.value = matchedDong;
+                    } else {
+                        console.warn(`"${region_3depth_name}"에 해당하는 동이 데이터에 없거나 일치하지 않습니다.`);
+                    }
+                    
+                    fetchCareList();
+                } else {
+                    console.warn("행정동 정보를 찾을 수 없습니다. 전체 목록을 불러옵니다.");
+                    fetchCareList();
+                }
+            } else {
+                console.error("주소 변환에 실패했습니다. Status:", status);
+                fetchCareList();
+            }
+        });
+    }
 
-			    const overlay = new kakao.maps.CustomOverlay({
-			        position: pos,
-			        content: visualContent,
-			        yAnchor: 1.0,
-			        xAnchor: 0.5,
-			        zIndex: 2 // Custom Overlay를 상단에 표시
-			    });
-			    overlay.setMap(map);
+    function fetchCareList() {
+        const region = buildRegionText();
+        const url = `/care/list?region=${encodeURIComponent(region)}`;
+        
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 응답이 올바르지 않습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                allPlaces = data;
+                currentPage = 1;
+                renderList();
+            })
+            .catch(error => console.error('게시글 목록을 가져오는 데 실패했습니다:', error));
+    }
+    $searchBtn.addEventListener('click', fetchCareList);
 
+    function addMarker(pos, idx) {
+        
+        // 1. 시각적으로 보이는 Custom Overlay (핀 이미지 + 번호)
+        const visualContent = `
+            <div class="custom-marker-wrap" style="position: relative; width: 50px; height: 50px; cursor: pointer;">
+                <img src="/images/map_marker.png" style="width: 50px; height: 50px; display: block;">
+                <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-66%, 0%);
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #422701;
+                    width: 25px;
+                    text-align: center;
+                ">${idx + 1}</div>
+            </div>
+        `;
 
-			    // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
-			    const transparentImage = new kakao.maps.MarkerImage(
-			        'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
-			        new kakao.maps.Size(1, 1), // 사이즈 최소화
-			        { offset: new kakao.maps.Point(0, 0) }
-			    );
-			    
-			    const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
-
-			    
-			    const marker = new kakao.maps.Marker({
-			        position: infowindowPos,
-			        map: map,
-			        image: transparentImage, // 1x1 투명 이미지 적용
-			        opacity: 0.0, // 완전히 투명하게 설정 (안전성 확보)
-			        zIndex: 1 // Custom Overlay 뒤로 숨김
-			    });
-			    
-			    // 3. Custom Overlay에 마우스 이벤트 연결
-			    const overlayElement = overlay.getContent();
-			    overlayElement.onmouseover = function() {
-			        const place = allPlaces[idx];
-			        // 인포윈도우는 투명 마커 객체(marker)에 연결
-			        showInfo(marker, place.careTitle); 
-			    };
-			    overlayElement.onmouseout = function() {
-			        infowindow.close();
-			    };
-
-			    // 4. markers 배열에 저장 (제거 시 CustomOverlay와 투명 마커 모두 제거)
-			    markers.push({ overlay, marker, pos });
-
-			    return { overlay, pos, marker };
-			}
+        const overlay = new kakao.maps.CustomOverlay({
+            position: pos,
+            content: visualContent,
+            yAnchor: 1.0,
+            xAnchor: 0.5,
+            zIndex: 2 // Custom Overlay를 상단에 표시
+        });
+        overlay.setMap(map);
 
 
-			function renderList() {
-				clearMarkers();
-				clearList();
-				
-				const start = (currentPage - 1) * pageSize, end = start + pageSize;
-				const pagePlaces = allPlaces.slice(start, end);
+        // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
+        const transparentImage = new kakao.maps.MarkerImage(
+            'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
+            new kakao.maps.Size(1, 1), // 사이즈 최소화
+            { offset: new kakao.maps.Point(0, 0) }
+        );
+        
+        const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
 
-				if(pagePlaces.length === 0){
-					$placesList.innerHTML = `<li style="text-align:center; padding: 20px; font-size : 20px;">검색 결과가 없습니다.</li>`;
-					$pagination.innerHTML = '';
-					return;
-				}
+        
+        const marker = new kakao.maps.Marker({
+            position: infowindowPos,
+            map: map,
+            image: transparentImage, // 1x1 투명 이미지 적용
+            opacity: 0.0, // 완전히 투명하게 설정 (안전성 확보)
+            zIndex: 1 // Custom Overlay 뒤로 숨김
+        });
+        
+        // 3. Custom Overlay에 마우스 이벤트 연결
+        const overlayElement = overlay.getContent();
+        overlayElement.onmouseover = function() {
+            const place = allPlaces[idx];
+            // 인포윈도우는 투명 마커 객체(marker)에 연결
+            showInfo(marker, place.careTitle); 
+        };
+        overlayElement.onmouseout = function() {
+            infowindow.close();
+        };
 
-				pagePlaces.forEach((place, i) => {
-					const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
-				    const { marker } = addMarker(pos, i + start);
+        // 4. markers 배열에 저장 (제거 시 CustomOverlay와 투명 마커 모두 제거)
+        markers.push({ overlay, marker, pos });
+
+        return { overlay, pos, marker };
+    }
 
 
-					// ⭐ 목록 리스트 항목 생성
-					 
-					const li = document.createElement('li');
-					li.className = 'item';
-					li.innerHTML = `
-						<div class="marker-number">${i + start + 1}</div>
-						<div class="info">
-							<h5>${place.careTitle}</h5>
-							<p class="addr">${place.address1} ${place.address2}</p>
-							<p class="price">${place.price}원</p>
-						</div>
-					`;
-					
-					// 마우스 오버 시 지도에서 정보 창을 표시
-					li.addEventListener('mouseover', () => {
-        				// LatLng(pos) 대신 마커 객체(marker)를 전달
-       				 	showInfo(marker, place.careTitle); 
-        				map.panTo(pos);
-    				});
-					
-					li.addEventListener('mouseout', () => infowindow.close());
+    function renderList() {
+        clearMarkers();
+        clearList();
+        
+        const start = (currentPage - 1) * pageSize, end = start + pageSize;
+        const pagePlaces = allPlaces.slice(start, end);
 
-					li.addEventListener('click', () => {
-						const detailPanel = document.getElementById('detailPanel');
-						const detailContent = document.getElementById('detailContent');
-						
-						if (openedPlaceId === place.careSeq) {
-					        // 1. 이미 열려있는 항목을 다시 클릭한 경우: 닫기
-					        detailPanel.classList.remove('show');
-					        openedPlaceId = null;
-					    } else {
-					        // 2. 다른 항목을 클릭했거나 닫혀있는 상태에서 클릭한 경우: 열기/업데이트
+        if(pagePlaces.length === 0){
+            $placesList.innerHTML = `<li style="text-align:center; padding: 20px; font-size : 20px;">검색 결과가 없습니다.</li>`;
+            $pagination.innerHTML = '';
+            return;
+        }
 
-					        // 상세 내용 구성
-					        detailContent.innerHTML = `
-					            <button id="closeDetail" class="btn-close" aria-label="Close"></button>
-					            <strong style="font-size : 25px">${place.careTitle}</strong>
-					            <p style="font-size : 20px"><strong>작성자:</strong> ${place.authorNickname}</p>
-					            <p style="font-size : 20px"><strong>주소:</strong> ${place.address1} ${place.address2}</p>
-					            <p style="font-size : 20px"><strong>가격:</strong> ${place.price}원</p>
-					            <p style="font-size : 20px"><strong>내용:</strong> ${place.careContent}</p>
-					            
-					            <div style="margin-top: 20px; text-align: right;">
-					                <a href="/care/modify/${place.careSeq}" class=" btn btn-outline-brown" style="font-size : 16px">수정</a>
-					                <form action="/care/delete/${place.careSeq}" method="post" style="display:inline;">
-					                    <button type="submit" class="btn btn-outline-danger" style="font-size : 16px" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
-					                </form>
-					                <button class="btn btn-outline-brown" style="font-size : 16px" onclick="openChatPopup(${place.authorUserSeq})">채팅하기</button>
-					            </div>
-					        `;
-					        
-					        detailPanel.classList.add('show');
-					        openedPlaceId = place.careSeq; // 💡 현재 열린 ID 업데이트
+        pagePlaces.forEach((place, i) => {
+            const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
+            const { marker } = addMarker(pos, i + start);
 
-					        // 'X' 버튼 클릭 시 닫기
-					        document.getElementById('closeDetail').onclick = () => {
-					            detailPanel.classList.remove('show');
-					            openedPlaceId = null;
-					        };
-					    }
-					});
-					
-					$placesList.appendChild(li);
-				});
 
-				renderPagination();
+            // ⭐ 목록 리스트 항목 생성
+             
+            const li = document.createElement('li');
+            li.className = 'item';
+            li.innerHTML = `
+                <div class="marker-number">${i + start + 1}</div>
+                <div class="info">
+                    <h5>${place.careTitle}</h5>
+                    <p class="addr">${place.authorNickname}</p>
+                    
+                    <p class="price">${place.price}원</p>
+                    
+                    <p class="date">${place.createDate}</p>
+                </div>
+            `;
+            
+            // 마우스 오버 시 지도에서 정보 창을 표시
+            li.addEventListener('mouseover', () => {
+                showInfo(marker, place.careTitle); 
+                map.panTo(pos);
+            });
+            
+            li.addEventListener('mouseout', () => infowindow.close());
 
-				if (document.getElementById('map').style.display !== 'none' && allPlaces.length > 0) {
-					const bounds = new kakao.maps.LatLngBounds();
-					allPlaces.forEach(p => bounds.extend(new kakao.maps.LatLng(p.latitude, p.longitude)));
-					map.setBounds(bounds, 20);
-				}
-			}
+            li.addEventListener('click', () => {
+                const detailPanel = document.getElementById('detailPanel');
+                const detailContent = document.getElementById('detailContent');
+                
+                if (openedPlaceId === place.careSeq) {
+                    detailPanel.classList.remove('show');
+                    openedPlaceId = null;
+                } else {
+                    
+                    const isAuthor = LOGGED_IN_USER_SEQ && LOGGED_IN_USER_SEQ == place.userSeq;
+                    
+                    let actionButtons = '';
+                    let chatButton = '';
+                    
+                    // 💡 문제 1 해결: 작성자 본인일 경우 수정/삭제 버튼 표시
+                    if (isAuthor) {
+                        actionButtons = `
+                            <a href="/care/modify/${place.careSeq}" class=" btn btn-outline-brown" style="font-size : 16px">수정</a>
+                            <form action="/care/delete/${place.careSeq}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-outline-danger" style="font-size : 16px" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
+                            </form>
+                        `;
+                    }
+                    
+                    // 💡 문제 2 해결: 로그인 상태 여부에 따라 채팅 버튼을 분리
+                    if (LOGGED_IN_USER_SEQ && !isAuthor) {
+                        // 로그인했고, 작성자 본인이 아닐 경우: 상대방 userSeq를 넘겨 채팅 활성화
+                        chatButton = `<button class="btn btn-outline-brown" style="font-size : 16px" onclick="openChatPopup(${place.userSeq})">채팅하기</button>`;
+                    } else if (!LOGGED_IN_USER_SEQ) {
+                        // 비로그인 상태: userSeq 없이 openChatPopup() 호출 (함수 내에서 로그인 유도)
+                        chatButton = `<button class="btn btn-outline-brown" style="font-size : 16px" onclick="openChatPopup()">채팅하기</button>`;
+                    }
 
-			function renderPagination() {
-				$pagination.innerHTML = '';
-				const totalPages = Math.ceil(allPlaces.length / pageSize);
-				for (let i = 1; i <= totalPages; i++) {
-					const a = document.createElement('a');
-					a.href = '#';
-					a.textContent = i;
-					if (i === currentPage)
-						a.className = 'on';
-					else
-						a.addEventListener('click', e => {
-							e.preventDefault();
-							currentPage = i;
-							renderList();
-						});
-					$pagination.appendChild(a);
-				}
-			}
+                    // 상세 내용 구성
+                    detailContent.innerHTML = `
+                        <button id="closeDetail" class="btn-close" aria-label="Close"></button>
+                        <strong style="font-size : 25px">${place.careTitle}</strong>
+                        <p style="font-size : 20px"><strong>작성자:</strong> ${place.authorNickname}</p>
+                        <p style="font-size : 20px"><strong>주소:</strong> ${place.address1} ${place.address2}</p>
+                        <p style="font-size : 20px"><strong>가격:</strong> ${place.price}원</p>
+                        <p style="font-size : 20px"><strong>내용:</strong> ${place.careContent}</p>
+                        <p style="font-size : 20px"><strong>작성일자:</strong> ${place.createDate}</p>
+                        
+                        <div style="margin-top: 20px; text-align: right;">
+                            ${actionButtons}
+                            ${chatButton}
+                        </div>
+                    `;
+                    
+                    detailPanel.classList.add('show');
+                    openedPlaceId = place.careSeq; // 💡 현재 열린 ID 업데이트
 
-			// showInfo 함수 (첫 번째 인수로 마커 객체를 받음)
-			function showInfo(marker, title) {
-			    if (!map) return;
-			    infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
-			    // 마커 객체를 전달하여 b.v is not a function 오류 해결
-			    infowindow.open(map, marker); 
-			}
-			
-			function toggleListView() {
-				const mapDiv = document.getElementById('map');
-				const btn = document.getElementById('btn');
-				const menuWrap = document.getElementById('menu_wrap');
+                    // 'X' 버튼 클릭 시 닫기
+                    document.getElementById('closeDetail').onclick = () => {
+                        detailPanel.classList.remove('show');
+                        openedPlaceId = null;
+                    };
+                }
+            });
+            
+            $placesList.appendChild(li);
+        });
 
-				if (mapDiv.style.display !== 'none') {
-					mapDiv.style.display = 'none';
-					btn.innerText = '지도랑 같이 보기';
-					$placesList.style.display = 'grid';
-					$placesList.style.gridTemplateColumns = 'repeat(3,1fr)';
-					$placesList.style.gap = '10px';
-					pageSize = 15;
-					currentPage = 1;
-					menuWrap.style.flex = '1';
-					renderList();
-				} else {
-					mapDiv.style.display = 'block';
-					btn.innerText = '리스트만 보기';
-					kakao.maps.event.trigger(map, 'resize');
-					$placesList.style.display = 'block';
-					$placesList.style.gridTemplateColumns = 'none';
-					$placesList.style.gap = '0';
-					pageSize = 7;
-					currentPage = 1;
-					menuWrap.style.flex = '0.5';
-					kakao.maps.event.trigger(map, 'resize');
-					renderList();
-				}
-			}
-			
-		
-			function openChatPopup(authorUserSeq) {
-			    if (!authorUserSeq) {
-			        alert("채팅 상대방 정보가 없습니다.");
-			        return;
-			    }
-			    
-			    const url = `/chat/start?receiverSeq=${authorUserSeq}`;
-			    
-			    const width = 600;
-			    const height = 800;
-			    const left = (window.innerWidth / 2) - (width / 2);
-			    const top = (window.innerHeight / 2) - (height / 2);
-			    const options = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
-			    
-			    window.open(url, "chatPopup", options);
-			}
-		</script>
+        renderPagination();
+
+        if (document.getElementById('map').style.display !== 'none' && allPlaces.length > 0) {
+            const bounds = new kakao.maps.LatLngBounds();
+            allPlaces.forEach(p => bounds.extend(new kakao.maps.LatLng(p.latitude, p.longitude)));
+            map.setBounds(bounds, 20);
+        }
+    }
+
+    function renderPagination() {
+        $pagination.innerHTML = '';
+        const totalPages = Math.ceil(allPlaces.length / pageSize);
+        for (let i = 1; i <= totalPages; i++) {
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = i;
+            if (i === currentPage)
+                a.className = 'on';
+            else
+                a.addEventListener('click', e => {
+                    e.preventDefault();
+                    currentPage = i;
+                    renderList();
+                });
+            $pagination.appendChild(a);
+        }
+    }
+
+    // showInfo 함수 (첫 번째 인수로 마커 객체를 받음)
+    function showInfo(marker, title) {
+        if (!map) return;
+        infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
+        // 마커 객체를 전달하여 b.v is not a function 오류 해결
+        infowindow.open(map, marker); 
+    }
+    
+    function toggleListView() {
+        const mapDiv = document.getElementById('map');
+        const btn = document.getElementById('btn');
+        const menuWrap = document.getElementById('menu_wrap');
+
+        if (mapDiv.style.display !== 'none') {
+            mapDiv.style.display = 'none';
+            btn.innerText = '지도랑 같이 보기';
+            $placesList.style.display = 'grid';
+            $placesList.style.gridTemplateColumns = 'repeat(3,1fr)';
+            $placesList.style.gap = '10px';
+            pageSize = 15;
+            currentPage = 1;
+            menuWrap.style.flex = '1';
+            renderList();
+        } else {
+            mapDiv.style.display = 'block';
+            btn.innerText = '리스트만 보기';
+            kakao.maps.event.trigger(map, 'resize');
+            $placesList.style.display = 'block';
+            $placesList.style.gridTemplateColumns = 'none';
+            $placesList.style.gap = '0';
+            pageSize = 7;
+            currentPage = 1;
+            menuWrap.style.flex = '0.5';
+            kakao.maps.event.trigger(map, 'resize');
+            renderList();
+        }
+    }
+    
+    
+    function openChatPopup(userSeq) {
+        // 💡 1. 비로그인 상태 체크: LOGGED_IN_USER_SEQ가 null이면 무조건 로그인 유도
+        if (!LOGGED_IN_USER_SEQ) {
+            alert('로그인 후 이용 가능합니다.');
+            window.location.href='/users/login';
+            return; // 비로그인 시 여기서 종료
+        }
+        
+        // 2. 채팅 상대방 정보 체크 (로그인 상태이므로 proceed)
+        if (!userSeq) {
+            alert("채팅 상대방 정보가 없습니다.");
+            return;
+        }
+        
+        // 3. 작성자 본인에게 채팅을 시도하는 경우 차단 (선택 사항)
+        if (LOGGED_IN_USER_SEQ === userSeq) {
+            alert("자신의 글에는 채팅을 요청할 수 없습니다.");
+            return;
+        }
+
+        const url = `/chat/start?senderSeq=${LOGGED_IN_USER_SEQ}&receiverSeq=${userSeq}`;
+        
+        const width = 600;
+        const height = 800;
+        const left = (window.innerWidth / 2) - (width / 2);
+        const top = (window.innerHeight / 2) - (height / 2);
+        const options = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+        
+        // 4. 로그인 상태이고 상대방 정보가 있다면 팝업창 오픈 (정상 작동)
+        window.open(url, "chatPopup", options);
+        
+    }
+</script>
 	</div>
 </body>
 </html>

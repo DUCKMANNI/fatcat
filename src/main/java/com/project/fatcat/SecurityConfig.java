@@ -25,6 +25,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+            		
+            		
+            		.requestMatchers(new AntPathRequestMatcher("/care/create")).authenticated() //<---황미진 수정!!
+            		
+            		
                 .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
             .formLogin(login -> login
                     .loginPage("/users/login")   // 내가 만든 로그인 페이지

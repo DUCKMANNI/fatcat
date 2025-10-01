@@ -1,6 +1,9 @@
 package com.project.fatcat.care.dto;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,10 +20,11 @@ public class CareServiceBoardListDto {
     private Double longitude;
     private Integer price;
     private String authorNickname;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createDate;
-    private Integer authorUserSeq;
+    private Integer userSeq;
 
-    public CareServiceBoardListDto(Integer careSeq, String careTitle, String careContent, String address1, String address2, Double latitude, Double longitude, Integer price, String authorNickname, LocalDateTime createDate, Integer authorUserSeq) {
+    public CareServiceBoardListDto(Integer careSeq, String careTitle, String careContent, String address1, String address2, Double latitude, Double longitude, Integer price, String authorNickname, LocalDateTime createDate, Integer userSeq) {
         this.careSeq = careSeq;
         this.careTitle = careTitle;
         this.careContent = careContent;
@@ -31,6 +35,6 @@ public class CareServiceBoardListDto {
         this.price = price;
         this.authorNickname = authorNickname;
         this.createDate = createDate;
-        this.authorUserSeq = authorUserSeq;
+        this.userSeq = userSeq;
     }
 }

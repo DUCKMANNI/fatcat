@@ -17,11 +17,15 @@ public interface CareServiceBoardService {
     
     List<CareServiceBoardListDto> getBoardsWithinRadiusAsDto(Double latitude, Double longitude, double radiusInKm);
 
-    	void deleteBoard(Integer careSeq);
+    	void deleteBoard(Integer careSeq,Integer userSeq);
     	
     	CareServiceBoard getBoard(Integer careSeq);
     	
-    void modify(Integer careSeq, CareServiceBoardDto careServiceBoardDto); 
+    void modify(Integer careSeq, CareServiceBoardDto careServiceBoardDto,  Integer userSeq);
+
+
+
+	
 
 
 }
