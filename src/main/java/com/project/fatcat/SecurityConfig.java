@@ -27,7 +27,15 @@ public class SecurityConfig {
             .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
             		
             		
-            		.requestMatchers(new AntPathRequestMatcher("/care/create")).authenticated() //<---황미진 수정!!
+            		 .requestMatchers(new AntPathRequestMatcher("/care/create")).authenticated() //<---황미진 수정!!
+            		 
+            		 // 유정이 수정
+            		 .requestMatchers(new AntPathRequestMatcher("/post/create/**")).authenticated()
+                     .requestMatchers(new AntPathRequestMatcher("/post/modify/**")).authenticated()
+                     .requestMatchers(new AntPathRequestMatcher("/post/delete/**")).authenticated()
+                     .requestMatchers(new AntPathRequestMatcher("/comment/create/**")).authenticated()
+                     .requestMatchers(new AntPathRequestMatcher("/mypage/**")).authenticated()
+
             		
             		
                 .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
@@ -38,6 +46,7 @@ public class SecurityConfig {
                     .failureUrl("/users/login?error=true") // 실패 시
                     .usernameParameter("userEmail") // DTO에서 이메일을 username처럼 사용
                     .passwordParameter("userPassword")
+                    .defaultSuccessUrl("/mypage") // 로그인 성공 후 마이페이지로 이동
                 )
 
             .logout(logout -> logout

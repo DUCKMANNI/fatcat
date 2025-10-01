@@ -3,7 +3,6 @@ package com.project.fatcat.mypage.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -29,7 +28,7 @@ public class MyPageController {
     private final CatService catService;
     private final UserRepository userRepository;
     
-    @Qualifier("myPageOrderService") 
+    
     private final OrderService orderService;
 
     // 마이페이지 URL로 접속하면 이 메소드가 호출됩니다.
@@ -80,9 +79,9 @@ public class MyPageController {
     @GetMapping("/mypage")
     public String myPage(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            throw new IllegalStateException("로그인 필요");
-        }
+//        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+//            throw new IllegalStateException("로그인 필요");
+//        }
 
         if (!(auth.getPrincipal() instanceof CustomUserDetails userDetails)) {
             throw new IllegalStateException("인증된 사용자 정보 없음");

@@ -16,14 +16,7 @@ import com.project.fatcat.entity.KnowledgePost;
 
 public interface PostRepository extends JpaRepository<KnowledgePost, Integer> {
 
-	 // 게시판 코드로 게시글 페이징 조회 (JPQL)
-//    @Query("SELECT p FROM KnowledgePost p WHERE p.knowledgeBoard.boardCode = :boardCode")
-//    Page<KnowledgePost> findPostsByBoardCode(@Param("boardCode") String boardCode, Pageable pageable);
-//    
-//    @Query("SELECT p FROM KnowledgePost p JOIN FETCH p.knowledgeBoard WHERE p.postSeq = :seq")
-//    Optional<KnowledgePost> findByIdWithBoard(@Param("seq") Integer seq);
 
-	
 	
 	@Query("SELECT p FROM KnowledgePost p LEFT JOIN FETCH p.knowledgeCommentList WHERE p.postSeq = :postSeq")
 	Optional<KnowledgePost> findByIdWithComments(@Param("postSeq") Integer postSeq);

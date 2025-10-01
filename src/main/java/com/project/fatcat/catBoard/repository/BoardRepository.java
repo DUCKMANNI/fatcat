@@ -17,12 +17,6 @@ import com.project.fatcat.entity.KnowledgePost;
 
 public interface BoardRepository extends JpaRepository<KnowledgeBoard, Integer> {
 	
-//	 // KnowledgeBoard의 boardCode로 게시글 조회
-//	@Query("SELECT p FROM KnowledgePost p WHERE p.knowledgeBoard.boardCode = :boardCode")
-//	Page<KnowledgePost> findPostsByBoardCode(@Param("boardCode") String boardCode, Pageable pageable);
-//	
-//	 Optional<KnowledgeBoard> findByBoardCode(String boardCode);
-	
 	Optional<KnowledgeBoard> findByBoardCode(String boardCode);
 	 
 }
