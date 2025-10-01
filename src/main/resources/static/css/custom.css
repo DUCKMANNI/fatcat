@@ -386,7 +386,7 @@ body {
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #ff6600;       /* 👉 브랜드 컬러 */
+  color: #ff6600 !important;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -402,10 +402,17 @@ body {
   opacity: 1;
 }
 .swiper-pagination-bullet-active {
-  background: #ff6600;
+  background: #ff6600 !important;
 }
 
 .mySwiper .swiper-slide {
   width: 33.33% !important;
+  transition: transform 0.5s, opacity 0.5s;
+  border-radius: 20px;     /* radius 둥글게 */
+}
+
+.mySwiper .swiper-slide-active {
+  transform: scale(1.05);  /* 가운데 슬라이드 강조 */
+  z-index: 10;
 }
 

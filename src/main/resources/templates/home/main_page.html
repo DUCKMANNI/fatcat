@@ -20,25 +20,34 @@
 		<div class="swiper mySwiper" style="width: 100%; max-width: 1600px;">
 		  <div class="swiper-wrapper">
 		    <div class="swiper-slide">
-		      <img th:src="@{/images/banner1.jpeg}" 
+		      <img th:src="@{/images/10A002a.jpg}" 
 		           alt="배너1"  >
 		    </div>
 		    <div class="swiper-slide">
-		     <img th:src="@{/images/banner2.jpeg}" 
+		     <img th:src="@{/images/10A046a.jpg}" 
 		           alt="배너2"  >
 		    </div>
 		    <div class="swiper-slide">
-		      <img th:src="@{/images/banner3.jpeg}" 
+		      <img th:src="@{/images/11A002.jpg}" 
 		           alt="배너3"  >
 		    </div>
 		     <div class="swiper-slide">
-		      <img th:src="@{/images/banner1.jpeg}" 
+		      <img th:src="@{/images/11B002.jpg}" 
 		           alt="배너1"  >
 		    </div>
 		     <div class="swiper-slide">
-		     <img th:src="@{/images/banner2.jpeg}" 
+		     <img th:src="@{/images/12A014.jpg}" 
 		           alt="배너2"  >
 		    </div>
+		    <div class="swiper-slide">
+		     <img th:src="@{/images/12C002.jpg}" 
+		           alt="배너2"  >
+		    </div>
+		    <div class="swiper-slide">
+		     <img th:src="@{/images/17A012c.jpg}" 
+		           alt="배너2"  >
+		    </div>
+		    
 		    <!-- 필요하면 더 추가 -->
 		  </div>
 		
@@ -61,18 +70,19 @@
 		var swiper = new Swiper(".mySwiper", {
 		    loop: true,
 		    effect: 'coverflow',
-		    centeredSlides: false, 
+		    centeredSlides: true,
+		    centeredSlidesBounds: true,
 		    spaceBetween: 0,
 		    slidesPerView: 3,
 		    coverflowEffect: {
 		      rotate: 0,
 		      stretch: 0,
-		      depth: 100,
-		      modifier: 1,
+		      depth: 200,
+		      modifier: 2,
 		      slideShadows: true
 		    },
 		    autoplay: {
-		        delay: 3000
+		        delay: 2000
 		    },
 		    navigation: {
 		        nextEl: ".swiper-button-next",
