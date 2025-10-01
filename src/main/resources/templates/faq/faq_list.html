@@ -136,7 +136,7 @@ body {
     border-radius: 5px;
     resize: vertical;
     color: var(--tan-text);
-    font-size: 16px;
+    font-size: 20px;
 }
 
 .faq-answer .btn-warning {
@@ -146,7 +146,7 @@ body {
     padding: 8px 15px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px;
     transition: background-color 0.3s;
 }
 
@@ -202,7 +202,8 @@ body {
     </div> -->
 
     <!-- ✅ 메뉴 -->
-    <div class="menu-links">
+    <br>
+    <div class="menu-links" >
         <a style="font-size:25px;" th:href="@{/chat}">1:1 채팅 상담하기</a>
         <a style="font-size:25px;" th:href="@{/faq/ask}">질문하기</a>
     </div>
@@ -220,6 +221,7 @@ body {
         <div class="faq-item" th:each="faq : ${paging}">
             <div class="faq-question">
                 <b>Q : <span th:text="${faq.question}"></span></b>
+                
                 <span>▶</span>
             </div>
             

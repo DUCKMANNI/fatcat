@@ -10,6 +10,5 @@ import com.project.fatcat.entity.KnowledgePost;
 
 public interface CommentRepository extends JpaRepository<KnowledgeComment, Integer> {
 	
-//	 List<KnowledgeComment> findByKnowledgePostOrderByCreateDateAsc(KnowledgePost post);
 
 	}
