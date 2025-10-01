@@ -16,6 +16,7 @@
 	align-items: center;
 	margin: 20px auto;
 	width: fit-content;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 #controls select {
@@ -52,6 +53,7 @@
 	border: 1px solid #e5e5e5;
 	border-radius: 24px;
 	position: relative;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 #menu_wrap {
@@ -158,11 +160,10 @@
 
 #detailPanel #closeDetail {
 	float: right;
-	cursor: pointer;
-	border-radius: 60px;
 	background: white;
-	border-color: white;
-	color: #CD853F;
+	border: none;
+	cursor: pointer;
+	color: black;
 }
 
 .btn-group .btn {
@@ -208,6 +209,7 @@
 .btn-darkbrown {
 	font-size: 16px;
 	border-radius: 999px;
+	padding: 6px 16px;
 	border: none;
 	color: white;
 	background-color: #9a7f5a;
@@ -252,7 +254,7 @@
 				<div id="pagination"></div>
 			</div>
 			<div id="detailPanel">
-				<button id="closeDetail">X</button>
+				<button id="closeDetail">x</button>
 				<div id="detailContent"></div>
 			</div>
 		</div>
@@ -524,6 +526,13 @@
 
 
     function renderList() {
+    	
+    	 // 🔹 검색 시 이전 상세창 닫기
+        const detailPanel = document.getElementById('detailPanel');
+        detailPanel.classList.remove('show');
+        openedPlaceId = null;
+        
+        
         clearMarkers();
         clearList();
         
@@ -542,6 +551,8 @@
 
 
             // ⭐ 목록 리스트 항목 생성
+            
+            const formattedPrice = place.price.toLocaleString('ko-KR');
              
             const li = document.createElement('li');
             li.className = 'item';
@@ -551,7 +562,7 @@
                     <h5>${place.careTitle}</h5>
                     <p class="addr">${place.authorNickname}</p>
                     
-                    <p class="price">${place.price}원</p>
+                    <p class="price"> ${formattedPrice} 원</p>
                     
                     <p class="date">${place.createDate}</p>
                 </div>
@@ -592,27 +603,81 @@
                     // 💡 문제 2 해결: 로그인 상태 여부에 따라 채팅 버튼을 분리
                     if (LOGGED_IN_USER_SEQ && !isAuthor) {
                         // 로그인했고, 작성자 본인이 아닐 경우: 상대방 userSeq를 넘겨 채팅 활성화
-                        chatButton = `<button class="btn btn-outline-brown" style="font-size : 16px" onclick="openChatPopup(${place.userSeq})">채팅하기</button>`;
+                        chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup(${place.userSeq})">채팅하기</button>`;
                     } else if (!LOGGED_IN_USER_SEQ) {
                         // 비로그인 상태: userSeq 없이 openChatPopup() 호출 (함수 내에서 로그인 유도)
-                        chatButton = `<button class="btn btn-outline-brown" style="font-size : 16px" onclick="openChatPopup()">채팅하기</button>`;
+                        chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup()">채팅하기</button>`;
                     }
 
-                    // 상세 내용 구성
-                    detailContent.innerHTML = `
+                    const formattedPrice = place.price.toLocaleString('ko-KR');
+                    
+                    // 🚨 [수정된 핵심 로직]: careContent에서 날짜와 내용을 분리
+                    let careContentText = place.careContent || '';
+                    let startDateDisplay = '';
+                    let endDateDisplay = '';
+                    
+                    const lines = careContentText.split('\n').map(line => line.trim()).filter(line => line !== '');
+                    
+                    // 시작일, 종료일 패턴 확인 및 추출 (첫 두 줄이 날짜 정보여야 함)
+                    if (lines.length >= 2 && lines[0].startsWith('시작일:') && lines[1].startsWith('종료일:')) {
+                        // **날짜 정보에서 "시작일:" 또는 "종료일:" 레이블 제거** (아래 HTML에서 다시 붙일 예정)
+                        startDateDisplay = lines[0].replace('시작일:', '').trim(); 
+                        endDateDisplay = lines[1].replace('종료일:', '').trim(); 
+                        careContentText = lines.slice(2).join('\n'); // 나머지 줄이 실제 내용
+                    }
+                    
+                    
+                 // 상세 내용 구성
+                     detailContent.innerHTML = `
                         <button id="closeDetail" class="btn-close" aria-label="Close"></button>
-                        <strong style="font-size : 25px">${place.careTitle}</strong>
-                        <p style="font-size : 20px"><strong>작성자:</strong> ${place.authorNickname}</p>
-                        <p style="font-size : 20px"><strong>주소:</strong> ${place.address1} ${place.address2}</p>
-                        <p style="font-size : 20px"><strong>가격:</strong> ${place.price}원</p>
-                        <p style="font-size : 20px"><strong>내용:</strong> ${place.careContent}</p>
-                        <p style="font-size : 20px"><strong>작성일자:</strong> ${place.createDate}</p>
+                        <strong style="font-size: 25px;">${place.careTitle}</strong>
+                        <p style="font-size: 20px;"><strong>작성자:</strong> ${place.authorNickname}</p>
+                        
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size: 20px; font-weight: bold; color: #343a40;">주소:</label>
+                            <div style="font-size: 20px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 0.25rem; background-color: #f9f9f9;">
+                                ${place.address1} ${place.address2}
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size: 20px; font-weight: bold; color: #343a40;">가격:</label>
+                            <div style="font-size: 20px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 0.25rem; background-color: #f9f9f9;">
+                                ${formattedPrice} 원
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size: 20px; font-weight: bold; color: #343a40;">시작일:</label>
+                            <div style="font-size: 20px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 0.25rem; background-color: #f9f9f9;">
+                                ${startDateDisplay}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size: 20px; font-weight: bold; color: #343a40;">종료일:</label>
+                            <div style="font-size: 20px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 0.25rem; background-color: #f9f9f9;">
+                                ${endDateDisplay}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size: 20px; font-weight: bold; color: #343a40;">내용:</label>
+                            <div style="font-size: 20px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 0.25rem; background-color: #f9f9f9;">
+                                ${careContentText}
+                            </div>
+                        </div>
+
+                        <p style="font-size: 16px; margin-top: 15px; color: #6c757d; text-align: right;">
+                            작성일자: ${place.createDate}
+                        </p>
                         
                         <div style="margin-top: 20px; text-align: right;">
                             ${actionButtons}
                             ${chatButton}
                         </div>
                     `;
+                    
                     
                     detailPanel.classList.add('show');
                     openedPlaceId = place.careSeq; // 💡 현재 열린 ID 업데이트
@@ -633,7 +698,7 @@
         if (document.getElementById('map').style.display !== 'none' && allPlaces.length > 0) {
             const bounds = new kakao.maps.LatLngBounds();
             allPlaces.forEach(p => bounds.extend(new kakao.maps.LatLng(p.latitude, p.longitude)));
-            map.setBounds(bounds, 20);
+            map.setBounds(bounds, 50);
         }
     }
 
@@ -717,8 +782,8 @@
 
         const url = `/chat/start?senderSeq=${LOGGED_IN_USER_SEQ}&receiverSeq=${userSeq}`;
         
-        const width = 600;
-        const height = 800;
+        const width = 700;
+        const height = 900;
         const left = (window.innerWidth / 2) - (width / 2);
         const top = (window.innerHeight / 2) - (height / 2);
         const options = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`;

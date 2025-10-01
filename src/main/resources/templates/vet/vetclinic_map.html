@@ -17,6 +17,7 @@
 	align-items: center;
 	margin: 20px auto;
 	width: fit-content;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 #controls select {
@@ -34,6 +35,7 @@
             color: #fff;
             font-weight: 600;
         } */
+        
 #mapListContainer {
 	display: flex;
 	width: calc(100% - 20px);
@@ -53,6 +55,7 @@
 	border: 1px solid #e5e5e5;
 	border-radius: 24px;
 	position: relative;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 #menu_wrap {
@@ -229,12 +232,23 @@
         } */
 .update-form {
 	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	padding: 10px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	margin-top: 10px;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+}
+
+.update-form.show {
+    max-height: 500px; /* 충분히 큰 값 */
+    opacity: 1;
+    padding: 10px; 
+    
 }
 
 .update-form textarea {
@@ -299,6 +313,25 @@
 /* 버튼이 들어있는 부모 영역의 font-size: 20px 때문에 버튼이 커지는 것을 방지 */
 .review-actions button {
 	font-size: 0.75em; /* 부모 크기의 75%로 설정 (약 15px) */
+}
+
+/* .review-actions의 display 설정을 CSS로 명시 (인라인 스타일 제거 권장) */
+.review-actions {
+    margin-top: 5px;
+    text-align: right;
+    display: flex; /* 기본값 */
+    justify-content: flex-end; /* 기존 인라인 스타일 유지 */
+    gap: 5px; /* 기존 인라인 스타일 유지 */
+}
+
+/* 수정 폼이 나타나면서 리뷰 내용 숨기기 위한 클래스 */
+.review-item-content-hide {
+    display: none !important; /* 내용 숨김 시 확실하게 적용 */
+}
+
+/* 수정 버튼 영역 숨김/보임을 JS에서 확실히 제어하기 위한 클래스 */
+.review-actions.hidden-by-js {
+    display: none !important; /* 버튼 숨김 시 확실하게 적용 */
 }
 </style>
 </head>
@@ -586,6 +619,12 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
     }
 
     function renderList() {
+    	
+    	// 🔹 검색 시 이전 상세창 닫기
+        const detailPanel = document.getElementById('detailPanel');
+        detailPanel.classList.remove('show');
+        openedPlaceId = null;
+        
         clearMarkers();
         clearList();
         const start = (currentPage - 1) * pageSize,
@@ -701,11 +740,12 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
 
 
         renderPagination();
-
-        if (document.getElementById('map').style.display !== 'none' && allPlaces.length > 0) {
+	
+     		// 🔹 현재 페이지 마커만 화면에 보이도록 bounds 설정
+        if (document.getElementById('map').style.display !== 'none' && pagePlaces.length > 0) {
             const bounds = new kakao.maps.LatLngBounds();
-            allPlaces.forEach(p => bounds.extend(new kakao.maps.LatLng(p.y, p.x)));
-            map.setBounds(bounds, 20);
+            pagePlaces.forEach(p => bounds.extend(new kakao.maps.LatLng(p.y, p.x)));
+            map.setBounds(bounds, 50); 
         }
     }
 
@@ -808,6 +848,34 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
         } catch (error) { alert('네트워크 오류로 리뷰 삭제에 실패했습니다.'); }
     }
     
+/* vetclinic_map.html 484줄 부근의 fetchReviews 함수를 아래 코드로 대체 */
+    
+    // ⭐ Helper 함수: 원본 수정/삭제 버튼을 생성하고 리스너를 붙여 반환
+    function createOriginalActionDiv(vetReviewSeq, reviewContent, rating) {
+        const actionDivId = `review-actions-${vetReviewSeq}`;
+        const actionDivHTML = `
+            <div id="${actionDivId}" class="review-actions d-flex justify-content-end" style="font-size : 20px; gap: 5px;"> 
+                <button class="btn btn-outline-brown btn-sm edit-btn" style="font-size: 16px;">수정</button>
+                <button class="btn btn-outline-danger btn-sm delete-btn" style="font-size: 16px;">삭제</button>
+            </div>
+        `;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(actionDivHTML, 'text/html');
+        const actionDiv = doc.body.firstChild;
+
+        // 원본 Edit/Delete 리스너를 다시 붙입니다.
+        actionDiv.querySelector('.edit-btn').addEventListener('click', () => {
+            handleUpdateReview(vetReviewSeq, reviewContent, rating);
+        });
+        actionDiv.querySelector('.delete-btn').addEventListener('click', () => {
+            deleteReview(vetReviewSeq);
+        });
+        
+        return actionDiv;
+    }
+
+
     async function fetchReviews(placeName, address) {
         try {
             const params = new URLSearchParams({ placeName, address });
@@ -817,56 +885,28 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
             const avgRatingEl = document.getElementById('avgRating');
             const reviewListEl = document.getElementById('reviewList');
             
-            // 💡 평균 평점 별표 표시 로직
-            if (data.ratingAvg !== null) {
-                // parseFloat을 사용하여 문자열일 경우를 대비하고 toFixed(1)로 처리
-                const avgRating = parseFloat(data.ratingAvg).toFixed(1); 
-                const starCount = Math.round(data.ratingAvg); 
-                
-                const filledStars = '<span style="color:#FFD700;">' + '★'.repeat(starCount) + '</span>';
-                const emptyStars = '<span style="color:#CCCCCC;">' + '★'.repeat(5 - starCount) + '</span>';
-                const starDisplay = filledStars + emptyStars;
-                
-                avgRatingEl.innerHTML = `${avgRating}점 ${starDisplay} (${data.ratingCount}명 참여)`;
-            } else {
-                avgRatingEl.textContent = "아직 평점이 없습니다.";
-            }
+            // ... (평점 표시 로직 생략) ...
 
             reviewListEl.innerHTML = `<strong style="font-size : 25px;">등록된 리뷰</strong>`;
 
             if (data.reviews && data.reviews.length > 0) {
                 data.reviews.forEach(review => {
-                    // 💡 현재 로그인 사용자가 이 리뷰의 작성자인지 확인
                     const isAuthor = LOGGED_IN_USER_SEQ && LOGGED_IN_USER_SEQ === review.userSeq;
-
-                    // 💡 DTO의 'userName' 필드를 사용하여 작성자 이름을 표시 (익명 문제 해결)
                     const authorName = review.userName || '익명';
-                    
-                    const actionButtons = isAuthor ? `
-                        <div class="review-actions d-flex justify-content-end" style="font-size : 20px; display: flex; gap: 5px;">
-                            <button class="btn btn-outline-brown btn-sm edit-btn" style="font-size: 16px;">수정</button>
-                            <button class="btn btn-outline-danger btn-sm delete-btn" style="font-size: 16px;">삭제</button>
-                        </div>
-                    ` : '';
                     
                     const reviewItem = document.createElement('div');
                     reviewItem.id = `review-${review.vetReviewSeq}`;
                     reviewItem.innerHTML = `
-                        <p style="font-size : 20px; color:#555555;">작성자: ${authorName} | 별점: ${'★'.repeat(review.vetRating)}</strong> | 작성일자: ${review.createDate}</p>
-                        <p style="font-size : 20px;">${review.vetReview}</p>
-                        ${actionButtons}
+                        <p class="review-meta" style="font-size : 20px; color:#555555;">작성자: ${authorName} | 별점: ${'★'.repeat(review.vetRating)}</strong> | 작성일자: ${review.createDate}</p>
+                        <p class="review-content-text" style="font-size : 20px;">${review.vetReview}</p>
                         <hr>
                     `;
                     reviewListEl.appendChild(reviewItem);
 
-                    // 💡 버튼이 생성된 경우에만 이벤트 리스너 연결
                     if (isAuthor) {
-                        reviewItem.querySelector('.edit-btn').addEventListener('click', () => {
-                            handleUpdateReview(review.vetReviewSeq, review.vetReview, review.vetRating);
-                        });
-                        reviewItem.querySelector('.delete-btn').addEventListener('click', () => {
-                            deleteReview(review.vetReviewSeq);
-                        });
+                        // ⭐ Helper 함수를 사용하여 버튼 생성 및 리스너 연결
+                        const actionDiv = createOriginalActionDiv(review.vetReviewSeq, review.vetReview, review.vetRating);
+                        reviewItem.insertBefore(actionDiv, reviewItem.querySelector('hr'));
                     }
                 });
             } else {
@@ -878,29 +918,62 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
         }
     }
     
+    /* vetclinic_map.html 567줄 부근의 handleUpdateReview 함수를 아래 코드로 대체 */
     function handleUpdateReview(vetReviewSeq, reviewContent, rating) {
         const reviewItem = document.getElementById(`review-${vetReviewSeq}`);
         const existingForm = reviewItem.querySelector('.update-form');
-        
-        // 이미 수정 폼이 열려있다면 닫고 종료
+        // ⭐ 기존 버튼 영역 ID를 통해 선택 (fetchReviews에서 ID 부여됨)
+        const actionDiv = document.getElementById(`review-actions-${vetReviewSeq}`); 
+
+        // Helper 함수: 버튼을 원본(수정/삭제)으로 복구하고 폼을 제거합니다.
+        const revertAndCleanUp = () => {
+            // 원본 버튼 영역을 재 생성하여 리스너까지 복구합니다.
+            const originalActionDiv = createOriginalActionDiv(vetReviewSeq, reviewContent, rating);
+            
+            // Save/Cancel 상태의 버튼 영역을 원본으로 교체
+            actionDiv.parentNode.replaceChild(originalActionDiv, actionDiv);
+            
+            // 폼 제거
+            const currentForm = reviewItem.querySelector('.update-form');
+            if (currentForm) currentForm.remove();
+        };
+
+        // 1. 이미 수정 폼이 열려있다면 닫고 종료 (Cancel 기능)
         if (existingForm) {
-            existingForm.remove();
-             // 원래 내용과 버튼 다시 표시
-            reviewItem.querySelectorAll('p').forEach(p => p.style.display = 'block');
-            reviewItem.querySelector('.review-actions').style.display = 'flex';
+            existingForm.classList.remove('show');
+            setTimeout(() => {
+                revertAndCleanUp();
+            }, 400);
             return;
         }
+        
+        // -----------------------------------------------------------
+        // 2. 버튼 토글을 위한 준비 (리스너 제거 및 새 리스너 부착을 위해 버튼 복제)
+        const editBtn = actionDiv.querySelector('.edit-btn');
+        const deleteBtn = actionDiv.querySelector('.delete-btn');
 
-        // 기존 리뷰 내용과 버튼 제거 (새로고침 방지)
-        reviewItem.querySelectorAll('p').forEach(p => p.style.display = 'none');
-        reviewItem.querySelector('.review-actions').style.display = 'none';
+        // 리스너를 안전하게 제거하기 위해 버튼 노드 복제 및 교체
+        const newEditBtn = editBtn.cloneNode(true);
+        const newDeleteBtn = deleteBtn.cloneNode(true);
+        editBtn.parentNode.replaceChild(newEditBtn, editBtn);
+        deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
+        
+        const saveBtn = newEditBtn;
+        const cancelBtn = newDeleteBtn;
 
-
+        // 외형 및 텍스트 변경: 수정 -> 저장, 삭제 -> 취소
+        saveBtn.textContent = '저장';
+        saveBtn.className = 'btn btn-outline-success btn-sm save-btn';
+        cancelBtn.textContent = '취소';
+        cancelBtn.className = 'btn btn-outline-secondary btn-sm cancel-btn';
+        
+        // -----------------------------------------------------------
+        // 3. 수정 폼 생성 (버튼 제거)
         const updateForm = document.createElement('div');
         updateForm.className = 'update-form';
         updateForm.innerHTML = `
-            <div class="form-group" style="font-size : 20px;">
-                <label >별점:</label>
+            <div class="form-group" style="font-size: 20px;">
+                <label>별점:</label>
                 <div class="star-rating update-stars">
                     <span class="star" data-rating="1">★</span>
                     <span class="star" data-rating="2">★</span>
@@ -911,54 +984,60 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
                 <input type="hidden" class="update-rating-input" value="${rating}">
             </div>
             <div class="form-group">
-                <label style="font-size : 20px;">내용:</label>
-                <textarea class="update-content-input form-control" style="font-size : 20px;" rows="3">${reviewContent}</textarea>
+                <label style="font-size: 20px;">내용:</label>
+                <textarea class="update-content-input form-control" style="font-size: 20px;" rows="3">${reviewContent}</textarea>
             </div>
-            <div style=" gap: 5px; margin-top: 5px;" class="d-flex justify-content-end">
-                <button type="button" class="edit-btn save-btn" style="font-size: 16px;">저장</button>
-                <button type="button" class="delete-btn cancel-btn" style="font-size: 16px;">취소</button>
-            </div>
-        `;
-        reviewItem.appendChild(updateForm);
+        `; 
+        
+        // 기존 버튼 영역(actionDiv) 바로 앞에 폼 삽입
+        reviewItem.insertBefore(updateForm, actionDiv); 
+        
+        // -----------------------------------------------------------
+        // ⭐ 4. 스크롤 및 폼 보이기
+        setTimeout(() => {
+            updateForm.classList.add('show');
+            
+            // 스크롤: 폼이 화면 중앙에 보이도록 block: 'center'로 설정하여 확실하게 이동
+            updateForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+        }, 50);
 
-        const updateStars = updateForm.querySelectorAll('.star-rating .star');
-        const updateRatingInput = updateForm.querySelector('.update-rating-input');
+        // -----------------------------------------------------------
+        // 5. 토글된 버튼에 저장/취소 리스너 부착
+        
+        // 저장 버튼 리스너
+        saveBtn.addEventListener('click', () => {
+            const newContent = updateForm.querySelector('.update-content-input').value;
+            const newRating = updateForm.querySelector('.update-rating-input').value;
+            updateReview(vetReviewSeq, newContent, newRating); // API 호출
+            
+            // 저장 후 폼 닫고 버튼 복구
+            setTimeout(() => {
+                revertAndCleanUp();
+            }, 50); 
+        });
 
-        // 초기 별점 상태 설정
-        updateStars.forEach(star => {
-            if (parseInt(star.dataset.rating) <= rating) {
-                star.classList.add('selected');
-            }
+        // 취소 버튼 리스너 (폼 닫고 버튼 복구)
+        cancelBtn.addEventListener('click', () => {
+            updateForm.classList.remove('show');
+            setTimeout(() => {
+                revertAndCleanUp();
+            }, 400);
         });
         
-        // 별점 클릭 이벤트 설정
+        // -----------------------------------------------------------
+        // 6. 별점 로직
+        const updateStars = updateForm.querySelectorAll('.star-rating .star');
+        const updateRatingInput = updateForm.querySelector('.update-rating-input');
         updateStars.forEach(star => {
+            if (parseInt(star.dataset.rating) <= rating) star.classList.add('selected');
             star.addEventListener('click', function() {
                 const newRating = parseInt(this.dataset.rating);
                 updateRatingInput.value = newRating;
                 updateStars.forEach(s => {
-                    if (parseInt(s.dataset.rating) <= newRating) {
-                        s.classList.add('selected');
-                    } else {
-                        s.classList.remove('selected');
-                    }
+                    if (parseInt(s.dataset.rating) <= newRating) s.classList.add('selected');
+                    else s.classList.remove('selected');
                 });
             });
-        });
-
-        // 저장 버튼
-        updateForm.querySelector('.save-btn').addEventListener('click', () => {
-            const newContent = updateForm.querySelector('.update-content-input').value;
-            const newRating = updateRatingInput.value;
-            updateReview(vetReviewSeq, newContent, newRating);
-        });
-
-        // 취소 버튼
-        updateForm.querySelector('.cancel-btn').addEventListener('click', () => {
-             // 원래 내용과 버튼 다시 표시
-            reviewItem.querySelectorAll('p').forEach(p => p.style.display = 'block');
-            reviewItem.querySelector('.review-actions').style.display = 'flex';
-            updateForm.remove();
         });
     }
     

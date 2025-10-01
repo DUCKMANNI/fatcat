@@ -91,12 +91,11 @@
 			<div class="col-md-6">
 				<h2 class="my-3 border-bottom pb-2 text-center">돌봄서비스 구인등록</h2>
 
-				<form method="post" th:object="${careServiceBoardDto}"
+				<form method="post" id="careServiceForm" th:object="${careServiceBoardDto}"
 					th:action="@{${careSeq != null} ? '/care/modify/' + ${careSeq} : '/care/create'}">
 					
 					<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
 
-					<!-- 나중에 사용자 정보 로그인하구 히든으로 바꾸세여 지금은 임시로 텍스트 넣는거임 ~~~ --> 
 					<input type="hidden"	th:field="*{userSeq}" />
 
 					<div class="mb-2">
@@ -105,10 +104,25 @@
 							class="form-control" style="font-size:20px;" required />
 						<div class="invalid-feedback" style="font-size:20px;">제목을 입력해주세요.</div>
 					</div>
+					
+					<div class="mb-2">
+					<label class="form-label" style="font-size:25px;">돌봄 희망 기간</label>
+					    <div class="d-flex gap-3">
+					        <div class="d-flex flex-column flex-grow-1">
+					            <label for="startDate" class="form-label" style="font-size:20px;">시작일:</label>
+					            <input type="date" id="startDate" class="form-control" style="font-size:20px; width: 100%;" required />
+					        </div>
+					        <div class="d-flex flex-column flex-grow-1">
+					            <label for="endDate" class="form-label" style="font-size:20px;">종료일:</label>
+					            <input type="date" id="endDate" class="form-control" style="font-size:20px; width: 100%;" required />
+					        </div>
+					    </div>
+					    </div>
+				
 
 					<div class="mb-2">
 						<label for="careContent" class="form-label" style="font-size:25px;">내용</label>
-						<textarea id="careContent" th:field="*{careContent}" rows="10"
+						<textarea id="careContent" th:field="*{careContent}" rows="8"
 							class="form-control" style="font-size:20px;" required></textarea>
 						<div class="invalid-feedback" style="font-size:20px;">내용을 입력해주세요.</div>
 					</div>
@@ -169,12 +183,23 @@
     const $sigungu = document.getElementById('sigungu');
     const $dong = document.getElementById('dong');
     const $searchBtn = document.getElementById('searchBtn');
+    
+    // 🚨 누락되었던 필수 변수들을 여기에 정의합니다.
+    const $form = document.getElementById('careServiceForm'); 
+    const $startDate = document.getElementById('startDate');
+    const $endDate = document.getElementById('endDate');
+    const $careContent = document.getElementById('careContent');
+    // $careContent가 null일 경우를 대비하여 체크
+    const originalContent = $careContent ? $careContent.value : ''; 
+    // ----------------------------------------------------
 
     const map = new kakao.maps.Map(document.getElementById('map'), {
         center: new kakao.maps.LatLng(37.566826, 126.9786567),
         level: 5
     });
     const geocoder = new kakao.maps.services.Geocoder();
+    
+    
 
     window.addEventListener('DOMContentLoaded', () => {
         // CSV 파일 로드 및 데이터 파싱을 먼저 완료
@@ -183,6 +208,23 @@
             .then(text => {
                 parseCSV(text);
                 fillSido();
+                
+                // 🚨 수정 시 careContent에서 날짜 추출하여 DatePicker 채우기
+                // $careContent가 있을 때만 실행하도록 변경 (불필요한 에러 방지)
+                if ($careContent && originalContent.includes('시작일:') && originalContent.includes('종료일:')) {
+                    const lines = originalContent.split('\n');
+                    const startDateLine = lines.find(line => line.startsWith('시작일:'));
+                    const endDateLine = lines.find(line => line.startsWith('종료일:'));
+
+                    if (startDateLine) {
+                        $startDate.value = startDateLine.split(':')[1].trim();
+                    }
+                    if (endDateLine) {
+                        $endDate.value = endDateLine.split(':')[1].trim();
+                    }
+                    // 내용 필드에서 날짜 정보 제거 (제출 시 다시 합칠 예정)
+                    $careContent.value = lines.filter(line => !line.startsWith('시작일:') && !line.startsWith('종료일:')).join('\n').trim();
+                }
 
                 // CSV 데이터 로드 완료 후 위치 정보 가져오기 시작
                 if (navigator.geolocation) {
@@ -196,17 +238,51 @@
 
                     }, err => {
                         console.warn("위치 가져오기 실패", err);
-                        // 실패 시 기본 지도로 설정하고 검색 버튼 클릭 이벤트와 연결
+                        // 실패 시 기본 지도로 설정
                         addCenterMarkerAndCircle(new kakao.maps.LatLng(37.566826, 126.9786567));
-                        $searchBtn.addEventListener('click', searchLocation);
                     });
                 } else {
                     console.warn("Geolocation API를 지원하지 않는 브라우저입니다.");
-                    $searchBtn.addEventListener('click', searchLocation);
                 }
+                
+                // 🚨 searchBtn 이벤트 리스너를 Geolocation 결과와 상관없이 여기서 한 번만 등록
+                $searchBtn.addEventListener('click', searchLocation);
+
             })
             .catch(err => console.error('CSV 읽기 실패', err));
     });
+    
+ // 🚨 폼 제출 이벤트 리스너 (변수 정의가 상단으로 이동했으므로 정상 작동)
+    $form.addEventListener('submit', function(e) {
+        const startDate = $startDate.value;
+        const endDate = $endDate.value;
+        const rawContent = $careContent.value.trim();
+
+        // 1. 날짜 유효성 검사 (HTML required 속성이 있지만, JS로 한 번 더 체크)
+        if (!startDate || !endDate) {
+            e.preventDefault();
+            alert("돌봄 희망 기간 (시작일/종료일)을 모두 선택해주세요.");
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            e.preventDefault();
+            alert("시작일은 종료일보다 이전이거나 같아야 합니다.");
+            return;
+        }
+        
+        if (rawContent.length < 5) {
+             e.preventDefault();
+             alert("내용을 5자 이상 입력해주세요.");
+             return;
+        }
+
+        // 2. 내용에 시작일/종료일 정보 통합
+        const combinedContent = `시작일: ${startDate}\n종료일: ${endDate}\n${rawContent}`;
+        $careContent.value = combinedContent;
+        
+    });
+
 
     function parseCSV(csvText) {
         REGION_DATA = {};
@@ -249,7 +325,7 @@
         return [$sido.value, $sigungu.value, $dong.value].filter(Boolean).join(' ');
     }
     
-    // ⭐️ 새로 추가된 함수: 좌표를 주소로 변환하고 드롭다운을 설정합니다.
+ // ⭐️ 새로 추가된 함수: 좌표를 주소로 변환하고 드롭다운을 설정합니다.
     function reverseGeocode(lat, lon, loc) {
         geocoder.coord2RegionCode(lon, lat, (result, status) => {
             if (status === kakao.maps.services.Status.OK) {
@@ -339,9 +415,6 @@
             }
         });
     }
-
-  
-    $searchBtn.addEventListener('click', searchLocation);
 
 </script>
 	</div>
