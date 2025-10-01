@@ -18,7 +18,7 @@
 
             body {
                 /* 배경색은 건드리지 않음 */
-                color: var(--tan-darker);
+               /*  color: var(--tan-darker); */
             }
 
             /* 컨테이너 수정: 게시판 최대 너비 1250px로 확장 */
@@ -38,7 +38,6 @@
             .btn {
                 background-color: var(--tan-lighter);
                 border-color: var(--tan-lighter);
-                color: var(--tan-darkest);
                 transition: background-color 0.3s, color 0.3s;
             }
             
@@ -188,9 +187,8 @@
 
         <div class="board-container">
             <center>
-                <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${boardName}" style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F;"></h5>
-
-                <!-- 게시판 선택 링크 -->
+<!--                 <h5 class="my-3 border-bottom pb-2" th:text="'고양이 지식방 - ' + ${boardName}" style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F;"></h5>
+ -->
                 <div class="board-selection-links mb-3">
                     <a th:href="@{/post/list/1}"
                        th:classappend="${boardSeq} == 1 ? ' active-board' : ''">수의사에게 질문하기</a>
@@ -251,4 +249,8 @@
     </div>
 </body>
 </html>
-  
+
+   
+   
+   
+   
