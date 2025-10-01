@@ -50,7 +50,8 @@ public class Product {
 	@Column(nullable = false)
 	private Integer productSeq; // 일련번호 (001, 002 …)
 
-	@Column(columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
+	@Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime createDate;
 
 	private LocalDateTime updateDate;
@@ -67,5 +68,8 @@ public class Product {
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
 	private List<OrderItem> orderItemList = new ArrayList<>();
 
+	@Builder.Default
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProductReview> productReviewList = new ArrayList<>();
 
 }

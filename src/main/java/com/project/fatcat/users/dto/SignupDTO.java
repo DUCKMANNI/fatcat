@@ -1,5 +1,7 @@
 package com.project.fatcat.users.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.project.fatcat.entity.enums.UserRole;
 
 import lombok.Getter;
@@ -31,8 +33,10 @@ public class SignupDTO {
     private String userType;    // "예비집사" (기본) → 고양이 등록 시 "냥집사"로 업데이트
 
     // 🔹 선택 입력
-    private String profileImageUrl;  // 프로필 사진 (선택)
+    //private String profileImageUrl;  // 프로필 사진 (선택)
+    private MultipartFile profileImageFile;
 
     // 🔹 수의사 회원일 경우
-    private String vetLicenseImage;  // 수의사 면허 이미지 (선택)
+    //private String vetLicenseImage;  // 수의사 면허 이미지 (선택)
+    private MultipartFile vetLicenseImageFile;
 }

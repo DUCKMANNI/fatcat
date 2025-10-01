@@ -56,7 +56,8 @@ public class Payment {
 	@Column(nullable = false)
 	private String pgTid;		//transactionKey or paymentKey -> PG사 거래 고유번호
 	
-	@Column(columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
+	@Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime approvedDate;		//approvedAt
 	
 	private LocalDateTime failedDate;

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.project.fatcat.cats.dto.CatAddDTO;
 import com.project.fatcat.cats.dto.CatUpdateDTO;
 import com.project.fatcat.cats.service.CatService;
 import com.project.fatcat.entity.Cat;
@@ -28,6 +29,22 @@ import lombok.RequiredArgsConstructor;
 public class CatController {
 	
 	private final CatService catService;
+	
+	// 고양이 정보 추가 폼
+    @GetMapping("/add")
+    public String addForm(Model model) {
+        model.addAttribute("catCreateDTO", new CatAddDTO());
+        model.addAttribute("breeds", catService.getAllBreeds()); // 종 목록
+        return "cats/add";
+    }
+    
+ // 추가 처리
+    @PostMapping("/add")
+    public String addSubmit(@ModelAttribute CatAddDTO dto) {
+        catService.createCat(dto);
+//        return "redirect:/cats/list";
+        return "redirect:/home";
+    }
 
     // 고양이 정보 수정 폼 페이지를 보여주는 GET 메서드
     @GetMapping("/modify/{catSeq}")
@@ -67,13 +84,7 @@ public class CatController {
         model.addAttribute("genders", Cat.Gender.values());
 
         // 고양이 종 목록을 모델에 추가
-        model.addAttribute("breeds", List.of(
-            "코리안 숏헤어", "페르시안", "샴", "러시안 블루", 
-            "아메리칸 숏헤어", "스코티시 폴드", "벵갈", "노르웨이 숲 고양이",
-            "메인 쿤", "아비시니안", "터키시 앙고라", "스핑크스",
-            "렉돌", "브리티시 숏헤어", "먼치킨", "시베리안",
-            "뱅갈", "데본 렉스", "아메리칸 컬"
-        ));
+        model.addAttribute("breeds", catService.getAllBreeds());
 
         return "cats/cats_modify"; // Thymeleaf 템플릿 경로
     }

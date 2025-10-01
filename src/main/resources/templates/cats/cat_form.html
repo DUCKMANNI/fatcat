@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>고양이 정보</title>
+</head>
+<body>
+
+	<!-- fragments/cat_form.html -->
+	<div th:fragment="catFormFragment">
+		<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+
+		<div class="form-group">
+			<label for="catName" class="required">이름</label> <input type="text"
+				id="catName" th:field="*{catName}">
+		</div>
+
+		<div class="form-group">
+			<label for="catBirthday">생일</label> <input type="date"
+				id="catBirthday" th:field="*{catBirthday}">
+		</div>
+
+		<div class="form-group">
+			<label for="catGender" class="required">성별</label>
+			<div class="radio-group">
+				<input type="radio" id="male" th:field="*{catGender}"
+					th:value="MALE"> <label for="male">남아</label> <input
+					type="radio" id="female" th:field="*{catGender}" th:value="FEMALE">
+				<label for="female">여아</label>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="required">중성화 여부</label>
+			<div class="radio-group">
+				<input type="radio" id="neutered-yes" th:field="*{isNeutered}"
+					th:value="true"> <label for="neutered-yes">예</label> <input
+					type="radio" id="neutered-no" th:field="*{isNeutered}"
+					th:value="false"> <label for="neutered-no">아니오</label>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="catBreed">고양이 종</label> <select id="catBreed"
+				th:field="*{catBreed}">
+				<option value="">고양이 종 선택</option>
+				<option th:each="breed : ${breeds}" th:value="${breed}"
+					th:text="${breed}"></option>
+			</select>
+		</div>
+
+		<!-- 기존 이미지가 있을 경우만 표시 -->
+		<div class="form-group" th:if="${currentImageUrl}">
+			<label>기존 사진</label> <img th:src="@{${currentImageUrl}}"
+				alt="현재 고양이 프로필 사진"
+				style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+		</div>
+
+		<!-- 업로드 -->
+		<div class="form-group mb-3">
+			<label for="catImageFile" class="form-label">프로필 사진</label>
+			<div class="image-preview-container">
+				<img id="current-image-preview"
+					th:src="${currentImageUrl} ? @{${currentImageUrl}} : @{/images/default-cat.png}"
+					class="profile-image-preview" alt="현재 프로필 사진">
+			</div>
+			<input type="file" class="form-control" id="catImageFile"
+				name="catImageFile" accept="image/*" onchange="previewImage(event);">
+		</div>
+
+		<div class="form-group">
+			<label for="hasDisease">질병</label> <input type="text" id="hasDisease"
+				th:field="*{hasDisease}">
+		</div>
+
+		<div class="form-group">
+			<label for="hasAllergy">알러지</label> <input type="text"
+				id="hasAllergy" th:field="*{hasAllergy}">
+		</div>
+	</div>
+
+</body>
+</html>

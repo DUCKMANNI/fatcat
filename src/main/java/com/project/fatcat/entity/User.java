@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.project.fatcat.entity.enums.UserRole;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -79,6 +80,8 @@ public class User implements UserDetails{
 	
 	@Column(length = 50)
     private String userType;	//A ->냥집사, B ->예비집사
+	
+	private String profileImage;
 	
 	private String vetLicenseImage;
 	
@@ -169,6 +172,10 @@ public class User implements UserDetails{
 	@Builder.Default
     @OneToMany(mappedBy = "user")
     private List<InquiryComment> inquiryCommentsList = new ArrayList<>();
+	
+	@Builder.Default
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProductReview> productReviewList = new ArrayList<>();
 	
 	
 	// --- ✅ UserDetails 메서드 구현부 ---
