@@ -34,7 +34,7 @@ public class ProductReviewServiceImpl implements ProductReviewService{
                 .orElseThrow(() -> new RuntimeException("상품 없음"));
 
         // 🚨 구매 여부 체크
-        boolean purchased = orderItemRepository.existsByOrderUserAndProduct(user, product);
+        boolean purchased = orderItemRepository.existsByOrderInfo_UserAndProduct(user, product);
         if (!purchased) {
             throw new RuntimeException("구매자만 리뷰 작성 가능");
         }

@@ -1,6 +1,7 @@
 package com.project.fatcat.shopping.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -86,6 +87,12 @@ public class OrderService {
         });
 
         return orderRepository.save(order);
+    }
+    
+ // 🔹 사용자 ID(userSeq)로 주문 내역 조회 함수
+    public List<Order> getOrdersByUserId(Integer userSeq) {
+        // Repository를 호출하여 해당 사용자의 주문 목록만 가져옵니다.
+        return orderRepository.findByUserUserSeq(userSeq); 
     }
 
 }
