@@ -97,8 +97,7 @@
 					<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
 
 					<!-- 나중에 사용자 정보 로그인하구 히든으로 바꾸세여 지금은 임시로 텍스트 넣는거임 ~~~ --> 
-					<input type="text"
-											th:field="*{userSeq}" />
+					<input type="hidden"	th:field="*{userSeq}" />
 
 					<div class="mb-2">
 						<label for="careTitle" class="form-label" style="font-size:25px;">제목</label> <input

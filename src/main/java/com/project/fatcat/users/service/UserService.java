@@ -9,4 +9,8 @@ public interface UserService {
 
 	User register(SignupDTO dto) throws IOException;
 	
+	//---------------미진추가---------------------------------
+
+	String getUserNickNameBySeq(Integer userSeq);
+	
 }

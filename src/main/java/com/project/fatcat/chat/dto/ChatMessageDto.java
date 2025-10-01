@@ -16,7 +16,9 @@ import lombok.Setter;
 public class ChatMessageDto {
     private Integer chatRoomId;
     private Integer senderId;
+    private String senderUserName;   // ⭐ 변경됨: 보내는 사람 userName
     private Integer receiverId;
+    private String receiverUserName; // ⭐ 변경됨: 받는 사람 userName
     private String type;      // "CHAT", "CARE_REQUEST", "CARE_CONFIRM"
     private String content;
 
@@ -33,15 +35,16 @@ public class ChatMessageDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
     
-    // ⭐ ⭐ ⭐ 추가된 필드: 확정 시간 ⭐ ⭐ ⭐
-    // CareSession CONFIRMED 상태일 때 프론트엔드 UI 업데이트를 위해 사용됩니다.
+    // 추가된 필드: 확정 시간
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String confirmedTime;
     
     public ChatMessageDto(ChatMessageDto other) {
         this.chatRoomId = other.chatRoomId;
         this.senderId = other.senderId;
+        this.senderUserName = other.senderUserName; // ⭐ 변경됨
         this.receiverId = other.receiverId;
+        this.receiverUserName = other.receiverUserName; // ⭐ 변경됨
         this.type = other.type;
         this.content = other.content;
         this.startDate = other.startDate;

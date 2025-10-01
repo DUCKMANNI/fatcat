@@ -16,6 +16,7 @@ import com.project.fatcat.chat.repository.CareChatHistoryRepository;
 import com.project.fatcat.chat.repository.ChatRoomRepository;
 import com.project.fatcat.entity.CareChatHistory;
 import com.project.fatcat.entity.CareChatRoom;
+import com.project.fatcat.entity.User; // ⭐ 가정: User 엔티티 임포트
 import com.project.fatcat.users.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,21 @@ public class ChatServiceImpl implements ChatService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // ⭐ 변경됨: userName을 DB에서 조회하는 헬퍼 메서드 ⭐
+    private String getUserName(Integer userSeq) {
+        if (userSeq == null) return "Unknown User";
+        
+        // [주의] User 엔티티에 getUserName() 메서드가 있다고 가정하고 닉네임 대신 사용합니다.
+        return userRepository.findById(userSeq)
+                             .map(user -> user.getUserName()) // ⭐ 변경됨: getNickname() -> getUserName()
+                             .orElse("User " + userSeq);
+    }
+    // ⭐ END: userName 헬퍼 메서드 ⭐
+
     @Override
-    public CareChatRoom getOrCreateChatRoom(Integer senderId, Integer receiverId) {
-        String chatName = Math.min(senderId, receiverId) + "-" + Math.max(senderId, receiverId);
+    // senderId, receiverId -> senderSeq, receiverSeq로 변경
+    public CareChatRoom getOrCreateChatRoom(Integer senderSeq, Integer receiverSeq) { 
+        String chatName = Math.min(senderSeq, receiverSeq) + "-" + Math.max(senderSeq, receiverSeq);
         Optional<CareChatRoom> existingRoom = chatRoomRepository.findByChatName(chatName);
 
         return existingRoom.orElseGet(() -> {
@@ -63,6 +76,10 @@ public class ChatServiceImpl implements ChatService {
     public ChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
         // DTO 복사본을 만들어 saveMessage에 전달하여 원본 DTO를 건드리지 않음
         ChatMessageDto dtoToSave = new ChatMessageDto(chatMessageDto);
+        
+        // ⭐ 변경됨: userName을 DTO에 설정 (메시지 전송 직전에 DB 조회)
+        dtoToSave.setSenderUserName(getUserName(dtoToSave.getSenderId())); // ⭐ 변경됨
+        dtoToSave.setReceiverUserName(getUserName(dtoToSave.getReceiverId())); // ⭐ 변경됨
         
         CareChatHistory chatHistory = convertToEntity(dtoToSave);
         chatHistory.setChatDate(LocalDateTime.now());
@@ -103,10 +120,20 @@ public class ChatServiceImpl implements ChatService {
 
     // --- DTO → 엔티티 변환 (Data Truncation 방지 로직 수정) ---
     private CareChatHistory convertToEntity(ChatMessageDto dto) {
+    	
+    	 // 💡 오류 방지 로직 추가: chatRoomId가 null이면 예외 발생
+        if (dto.getChatRoomId() == null) {
+            throw new IllegalArgumentException("ChatRoom ID가 null이므로 메시지를 저장할 수 없습니다. (DTO: " + dto.toString() + ")");
+        }
+        
         CareChatHistory entity = new CareChatHistory();
-        CareChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow();
+        
+        // chatRoomRepository.findById(null) 호출 방지
+        CareChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId())
+                                                 .orElseThrow(() -> new RuntimeException("ChatRoom ID " + dto.getChatRoomId() + "를 찾을 수 없습니다."));
 
-        entity.setChatSender(String.valueOf(dto.getSenderId()));
+        // chatSender는 String 타입이므로, userSeq를 String으로 변환
+        entity.setChatSender(String.valueOf(dto.getSenderId())); 
         entity.setCareChatRoom(chatRoom);
 
         String messageType = dto.getType();
@@ -120,13 +147,10 @@ public class ChatServiceImpl implements ChatService {
             entity.setCareStatus(dto.getStatus()); 
         }
 
-        // ⭐ ⭐ ⭐ 수정됨: startDate, endDate를 null 처리하는 로직을 제거했습니다. ⭐ ⭐ ⭐
-        // 이 정보를 DB의 chatMessage JSON 필드에 그대로 저장하여 히스토리 조회 시 사용할 수 있도록 합니다.
+        // startDate, endDate를 JSON 필드에 그대로 저장하여 히스토리 조회 시 사용합니다.
         if ("CARE_REQUEST".equals(dto.getType())) {
             dto.setConfirmedTime(null);
-            // dto.setNote(null); // NOTE가 길다면 이것도 null 처리 고려
         }
-        // ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ 
 
         try {
             if ("CARE_REQUEST".equals(dto.getType()) || "CARE_CONFIRM".equals(dto.getType())) {
@@ -142,19 +166,28 @@ public class ChatServiceImpl implements ChatService {
         return entity;
     }
 
-    // --- 엔티티 → DTO 변환 (변경 없음) ---
+    // --- 엔티티 → DTO 변환 (변경됨: userName 설정 로직 추가) ---
     private ChatMessageDto convertToDto(CareChatHistory entity) {
         ChatMessageDto dto = new ChatMessageDto();
 
         dto.setChatRoomId(entity.getCareChatRoom().getChatSeq());
-        dto.setSenderId(Integer.parseInt(entity.getChatSender()));
+        // String sender를 Integer userSeq로 변환
+        Integer senderSeq = Integer.parseInt(entity.getChatSender());
+        dto.setSenderId(senderSeq); 
+        // ⭐ 변경됨: userName 설정 (DB 조회)
+        dto.setSenderUserName(getUserName(senderSeq)); 
 
         String chatName = entity.getCareChatRoom().getChatName();
         String[] ids = chatName.split("-");
         Integer member1 = Integer.parseInt(ids[0]);
         Integer member2 = Integer.parseInt(ids[1]);
 
-        dto.setReceiverId(Integer.parseInt(entity.getChatSender()) == member1 ? member2 : member1);
+        // receiverId도 userSeq를 기반으로 결정
+        Integer receiverSeq = senderSeq.equals(member1) ? member2 : member1;
+        dto.setReceiverId(receiverSeq);
+        // ⭐ 변경됨: userName 설정 (DB 조회)
+        dto.setReceiverUserName(getUserName(receiverSeq));
+
         dto.setTimestamp(entity.getChatDate());
 
         try {
@@ -171,6 +204,12 @@ public class ChatServiceImpl implements ChatService {
                 dto.setEndDate(payload.getEndDate());
                 dto.setNote(payload.getNote());
                 dto.setConfirmedTime(payload.getConfirmedTime());
+                
+                // ⭐ 변경됨: CARE_REQUEST/CONFIRM DTO에도 userName이 반영되도록 처리
+                // DTO는 항상 최신 DB 조회 결과로 userName을 덮어씌웁니다.
+                if(payload.getSenderUserName() != null) dto.setSenderUserName(payload.getSenderUserName());
+                if(payload.getReceiverUserName() != null) dto.setReceiverUserName(payload.getReceiverUserName());
+                
             } else {
                 // 일반 채팅
                 dto.setType(entity.getMessageType() != null ? entity.getMessageType() : "CHAT"); 

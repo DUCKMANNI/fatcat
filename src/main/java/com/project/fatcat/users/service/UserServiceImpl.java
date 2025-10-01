@@ -66,4 +66,17 @@ public class UserServiceImpl implements UserService{
 //        }
 //        return null;
 //    }
+    
+  //----------------------------------------------------------아래 미진 추가-------------------------------------------------------- 
+   
+    @Override
+    public String getUserNickNameBySeq(Integer userSeq) {
+        
+            
+        User user = userRepository.findById(userSeq)
+                            .orElseThrow(() -> new IllegalArgumentException("User not found with seq: " + userSeq));
+        
+        // 조회된 User 엔티티에서 userName 필드를 반환합니다.
+        return user.getNickname();
+    }
 }

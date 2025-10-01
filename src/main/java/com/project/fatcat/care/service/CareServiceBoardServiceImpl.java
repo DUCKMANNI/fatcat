@@ -28,6 +28,7 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
     @Override
     @Transactional
     public void save(CareServiceBoardDto careServiceBoardDto) {
+    	
         Optional<User> userOptional = userRepository.findById(careServiceBoardDto.getUserSeq());
 
         if (userOptional.isPresent()) {
@@ -102,7 +103,7 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
                 board.getLatitude(),
                 board.getLongitude(),
                 board.getPrice(),
-                board.getUser() != null ? board.getUser().getNickname() : "알 수 없음",
+                board.getUser() != null ? board.getUser().getNickname()  : "알 수 없음",
                 board.getCreateDate(),
                 board.getUser() != null ? board.getUser().getUserSeq() : null
             ))
@@ -111,8 +112,14 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
     
     @Override
     @Transactional
-    public void deleteBoard(Integer careSeq) {
+    public void deleteBoard(Integer careSeq, Integer userSeq) {
         CareServiceBoard careServiceBoard = getBoard(careSeq);
+        
+        // 본인 글만 삭제 가능
+        if (!careServiceBoard.getUser().getUserSeq().equals(userSeq)) {
+            throw new SecurityException("본인 글만 삭제할 수 있습니다.");
+            
+        }
         this.careServiceBoardRepository.delete(careServiceBoard);
     }
     
@@ -130,9 +137,14 @@ public class CareServiceBoardServiceImpl implements CareServiceBoardService {
   
     @Override
     @Transactional
-    public void modify(Integer careSeq, CareServiceBoardDto careServiceBoardDto) {
+    public void modify(Integer careSeq, CareServiceBoardDto careServiceBoardDto, Integer userSeq) {
        
         CareServiceBoard careBoard = getBoard(careSeq);
+        
+     // 본인 글만 수정 가능
+        if (!careBoard.getUser().getUserSeq().equals(userSeq)) {
+            throw new SecurityException("본인 글만 수정할 수 있습니다.");
+        }
 
         // 2. DTO의 필드 값을 엔티티에 복사합니다.
         careBoard.setCareTitle(careServiceBoardDto.getCareTitle());

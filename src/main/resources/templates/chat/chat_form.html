@@ -476,6 +476,7 @@ textarea::placeholder {
 /* 예약 전송 버튼 스타일 */
 #confirm-care {
 	font-family: 'Juache', sans-serif;
+	font-size :20px;
     width: 100%; 
     padding: 10px; 
     border: none;
@@ -771,7 +772,7 @@ textarea::placeholder {
     color: #dc3545;
     border: 2px solid #dc3545;
     transition: all 0.3s ease;
-    padding: 6px 10px;
+    padding: 6px 8px;
      cursor: pointer;
 } 
 
@@ -792,7 +793,7 @@ textarea::placeholder {
     border-color: #8B4513; /* 테두리색 */
     background-color: transparent; /* 배경 투명 */
     cursor: pointer;
-    padding: 6px 10px;
+    padding: 6px 8px;
     transition: all 0.3s ease; /* 부드러운 전환 효과 */
 }
 
@@ -801,6 +802,7 @@ textarea::placeholder {
     background-color: #8B4513;
     
 }
+
 </style>
 <script
 	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
@@ -809,20 +811,6 @@ textarea::placeholder {
 </head>
 <body>
 
-	<div id="user-select">
-		<label>보내는 사람: <select id="sender-select">
-				<option value="">선택하세요</option>
-				<option value="10" data-username="황미진">User 10</option>
-				<option value="11" data-username="채지민">User 11</option>
-				
-		</select>
-		</label> <label>받는 사람: <select id="receiver-select">
-				<option value="">선택하세요</option>
-				<option value="10" data-username="황미진">User 10</option>
-				<option value="11" data-username="채지민">User 11</option>
-		</select>
-		</label>
-	</div>
 
 	<div id="chat-container">
 		<div id="message-area"></div>
@@ -905,55 +893,78 @@ const endDateInput = document.getElementById('end-date');
 const confirmCare = document.getElementById('confirm-care');
 
 
+//--------------------------------------------------------
+//사용자 닉네임 조회 로직 추가
+//--------------------------------------------------------
+async function fetchUserNames(userSeq) {
+ try {
+     // ⭐ 서버의 사용자 닉네임 조회 API 경로로 변경해야 합니다.
+     // 예를 들어, '/api/users/{userSeq}/nickname'과 같은 경로를 가정합니다.
+     const res = await fetch(`/api/users/${userSeq}/userName`);
+     if (res.ok) {
+         const data = await res.json();
+         // 서버 응답 구조에 따라 'data.nickname' 또는 'data.userName' 등으로 수정하세요.
+         return data.userName; 
+     } else {
+         console.error(`Error fetching userName for user ${userSeq}:`, res.status);
+         return `User ${userSeq}`; // 실패 시 기본값
+     }
+ } catch (error) {
+     console.error(`Network error fetching userName for user ${userSeq}:`, error);
+     return `User ${userSeq}`;
+ }
+}
+
+
 // --------------------------------------------------------
 // 초기화 및 이벤트 리스너
 // --------------------------------------------------------
 
 window.onload = function() {
-    const senderSelect = document.getElementById('sender-select');
-    const receiverSelect = document.getElementById('receiver-select');
+  
+    // 💡 [수정] URL에서 senderSeq와 receiverSeq를 가져와 ID 설정
+    const urlParams = new URLSearchParams(window.location.search);
+    // URL에 파라미터가 없으면 임시로 1과 11을 기본값으로 사용하거나, null 처리합니다.
+    senderId = parseInt(urlParams.get('senderSeq')) || null; 
+    receiverId = parseInt(urlParams.get('receiverSeq')) || null;
 
-    function extractUserNames(selectElement) {
-        Array.from(selectElement.options).forEach(option => {
-            if (option.value) {
-                userNames[option.value] = option.dataset.username || `User ${option.value}`;
-            }
-        });
-    }
-    extractUserNames(senderSelect);
-    extractUserNames(receiverSelect);
-
-
-    senderSelect.addEventListener('change', async (e) => {
-        senderId = parseInt(e.target.value);
-        if(document.getElementById('review-popup').classList.contains('show') && targetUserSeqForReview) {
-            fetchReviews(targetUserSeqForReview);
-        }
-        if (senderId && receiverId) await initChatRoom();
-    });
+    // 💡 [수정] userNames 초기화 (채팅 표시를 위해 필요)
+    userNames[senderId] = '나'; 
+    userNames[receiverId] = '상대방'; 
     
-    receiverSelect.addEventListener('change', async (e) => {
-        receiverId = parseInt(e.target.value);
-        if (senderId && receiverId) await initChatRoom();
-    });
+
+    // ID 유효성 검사 및 채팅 초기화
+    if (senderId && receiverId && senderId !== receiverId) {
+        // UI에 표시 (이전 단계에서 추가된 #sender-info, #receiver-info가 있다면)
+        const senderInfo = document.getElementById('sender-info');
+        const receiverInfo = document.getElementById('receiver-info');
+        if (senderInfo) senderInfo.textContent = userNames[senderId];
+        if (receiverInfo) receiverInfo.textContent = userNames[receiverId];
+
+        initChatRoom(); // ID가 설정되면 바로 채팅방 초기화 시작
+    } else if (senderId === receiverId && senderId !== null) {
+        alert("자기 자신과는 채팅을 할 수 없습니다.");
+    } else {
+        // URL 파라미터가 누락된 경우
+        // alert("채팅에 필요한 사용자 ID가 설정되지 않았습니다. (URL: senderSeq, receiverSeq 확인 필요)");
+        console.warn("채팅 ID가 URL에 없어 초기화되지 않았습니다. 테스트를 위해 임시 ID를 사용합니다.");
+    }
+
 
     sendButton.addEventListener('click', sendMessage);
     messageInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') sendMessage();
     });
 
-    // ✨ 돌봄 예약 토글 로직 수정 (더블클릭 문제 해결) ✨
+    // 돌봄 예약 토글 로직
     careToggle.addEventListener('click', () => {
     	 
-    	        // 클래스 토글: 폼의 'active' 클래스를 추가/제거합니다.
     	        careForm.classList.toggle('active');
     	        
-    	        // 버튼 텍스트 변경
     	        if (careForm.classList.contains('active')) {
     	            careToggle.textContent = '예약 취소';
     	        } else {
     	            careToggle.textContent = '돌봄 예약';
-    	        
     	        }
     });
 
@@ -968,7 +979,6 @@ window.onload = function() {
 
     document.getElementById('submit-review-btn').addEventListener('click', submitReview);
 };
-
 // --------------------------------------------------------
 // 채팅 및 돌봄 요청 로직 
 // --------------------------------------------------------
@@ -1056,6 +1066,14 @@ async function initChatRoom() {
     if (stompClient && stompClient.connected) stompClient.disconnect();
 
     try {
+    	
+    			// 💡 [수정] 상대방 닉네임을 먼저 가져옵니다.
+        const receiverName = await fetchUserNames(receiverId);
+    			
+     // userNames 객체를 실제 닉네임으로 업데이트
+        userNames[senderId] = '나'; 
+        userNames[receiverId] = receiverName; // ⭐ 상대방의 실제 닉네임으로 설정
+    			
         const res = await fetch(`/api/chat/room?sender=${senderId}&receiver=${receiverId}`);
         const data = await res.json();
         chatRoomId = data.chatSeq;
@@ -1436,8 +1454,8 @@ function createReviewItem(review) {
     if (review.authorUserSeq === senderId) { 
         actionButtons = `
             <div class="review-actions">
-                <button class="btn btn-outline-brown"onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
-                <button class="btn btn-outline-danger" onclick="deleteReview(${review.reviewSeq})">삭제</button>
+                <button class="btn-outline-brown" onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
+                <button class="btn-outline-danger" onclick="deleteReview(${review.reviewSeq})">삭제</button>
             </div>
         `;
     }
@@ -1562,8 +1580,8 @@ function editReview(reviewId, content, rating) {
             <h4>내용:</h4>
             <textarea class="edit-review-textarea" rows="3">${content}</textarea>
             <div class="edit-actions" style="margin-top: 5px; text-align: right;">
-                <button class="save" onclick="saveEditReview()">저장</button>
-                <button class="cancel" onclick="cancelEdit()">취소</button>
+                <button class="btn-outline-brown" onclick="saveEditReview()">저장</button>
+                <button class="btn-outline-danger" onclick="cancelEdit()">취소</button>
             </div>
         </div>
     `;
