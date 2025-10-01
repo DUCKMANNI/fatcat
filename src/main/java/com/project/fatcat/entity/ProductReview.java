@@ -28,7 +28,7 @@ public class ProductReview {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer reviewId;
+    private Integer reviewSeq;
 
     // 상품과 연관관계 (N:1)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,7 +41,7 @@ public class ProductReview {
     private User user;
 
     @Column(nullable = false)
-    private int rating; // 별점 (1~5)
+    private Integer rating; // 별점 (1~5)
 
     @Column(nullable = false, length = 1000)
     private String content; // 리뷰 내용

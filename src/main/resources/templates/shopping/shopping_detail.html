@@ -33,10 +33,10 @@
 				<div class="flex-fill p-4 d-flex flex-column"
 					style="min-height: var(--box-h);">
 					<h3 th:text="${product.productName}">상품명</h3>
-
-					<p class="mb-2">
+					<p class="mb-2" id="starRating">
+					<!-- <p class="mb-2">
 						★★★★★ <span class="text-muted">(0개)</span>
-					</p>
+					</p> -->
 
 					<form th:action="@{/shopping/cart/add}" method="post"
 						class="mt-auto">
@@ -101,14 +101,38 @@
 					</div>
 				</div>
 
+				<!-- <div class="tab-pane fade" id="review" role="tabpanel">
+				    <h5 class="mb-4">상품 리뷰</h5>
+				
+				    평균 평점
+				    <div id="avgRating" class="mb-3"></div>
+				
+				    리뷰 작성 폼
+				    <div class="mb-4">
+				        <textarea id="reviewContent" class="form-control mb-2" placeholder="리뷰 내용을 입력하세요"></textarea>
+				        <select id="reviewRating" class="form-select w-auto mb-2">
+				            <option value="5">★★★★★</option>
+				            <option value="4">★★★★☆</option>
+				            <option value="3">★★★☆☆</option>
+				            <option value="2">★★☆☆☆</option>
+				            <option value="1">★☆☆☆☆</option>
+				        </select>
+				        <button id="submitReview" class="btn btn-primary">리뷰 작성</button>
+				    </div>
+				
+				    리뷰 리스트
+				    <div id="reviewList"></div>
+				</div> -->
+				
 				<div class="tab-pane fade" id="review" role="tabpanel">
 					<h5 class="mb-4">상품 리뷰</h5>
 					<p>아직 등록된 리뷰가 없습니다.</p>
 				</div>
+
 			</div>
 		</div>
 
-		<script>
+		<script th:inline="javascript">
 		(function () {
 			  const box = document.querySelector('#orderBox');
 			  if (!box) return;
@@ -142,6 +166,82 @@
 
 			  update(parseQty(input.value));
 			})();
+		
+		/* const productCode = '[[${product.productCode}]]';
+		
+		console.log("productCode : ", productCode)
+
+		// 리뷰 불러오기
+		function loadReviews() {
+		    fetch(`/reviews/${productCode}`)
+		        .then(res => res.json())
+		        .then(data => {
+		            const avgRatingEl = document.getElementById("avgRating");
+
+		            if (data.ratingAvg !== null) {
+		                const avgRating = parseFloat(data.ratingAvg).toFixed(1);
+		                const starCount = Math.round(data.ratingAvg);
+		                
+		                console.log("ratingAvg:", data.ratingAvg, typeof data.ratingAvg);
+
+		                const filledStars = '<span style="color:#FFD700;">' + '★'.repeat(starCount) + '</span>';
+		                const emptyStars = '<span style="color:#CCCCCC;">' + '★'.repeat(5 - starCount) + '</span>';
+
+		                avgRatingEl.innerHTML = `${avgRating}점 ${filledStars}${emptyStars} (${data.ratingCount}명 참여)`;
+		            } else {
+		                avgRatingEl.textContent = "아직 평점이 없습니다.";
+		            }
+
+		            // 리뷰 리스트
+		            const reviewListEl = document.getElementById("reviewList");
+		            reviewListEl.innerHTML = "";
+		            data.reviews.forEach(review => {
+		                const reviewItem = document.createElement("div");
+		                reviewItem.innerHTML = `
+		                    <p style="font-size: 20px; color:#555555;">
+		                        작성자: ${review.authorName} |
+		                        별점: ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)} |
+		                        작성일자: ${review.createDate}
+		                    </p>
+		                    <p style="font-size: 20px;">${review.content}</p>
+		                    <hr>
+		                `;
+		                reviewListEl.appendChild(reviewItem);
+		            });
+		        });
+		}
+
+		// 리뷰 작성
+		document.getElementById("submitReview").addEventListener("click", () => {
+		    const content = document.getElementById("reviewContent").value;
+		    const rating = document.getElementById("reviewRating").value;
+
+		    fetch("/reviews/add", {
+		        method: "POST",
+		        headers: { "Content-Type": "application/json" },
+		        body: JSON.stringify({ productCode, content, rating })
+		    })
+		    .then(res => res.json())
+		    .then(msg => {
+		        alert(msg);
+		        document.getElementById("reviewContent").value = "";
+		        document.getElementById("reviewRating").value = "5";
+		        loadReviews(); // 새 리뷰 반영
+		    })
+		    .catch(err => console.error(err));
+		});
+
+		// 초기 로딩
+		window.addEventListener("load", loadReviews); */
+		
+		function renderStars(rating, count) {
+		    const filledStars = '<span style="color:#FFD700;">' + '★'.repeat(rating) + '</span>';
+		    const emptyStars  = '<span style="color:#CCCCCC;">' + '★'.repeat(5 - rating) + '</span>';
+		    return `${filledStars}${emptyStars} <span class="text-muted">(${count}개)</span>`;
+		  }
+
+		  // 리뷰가 없을 경우
+		  document.getElementById("starRating").innerHTML = renderStars(0, 0);
 
 </script>
 	</div>
