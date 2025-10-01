@@ -39,15 +39,15 @@ class FatcatApplicationTests {
 		
 		
 //		
-//		// 1. 테스트를 위한 유저 정보 가져오기 (user_seq=2)
-//		User user = userRepository.findById(1).orElseThrow();
+		// 1. 테스트를 위한 유저 정보 가져오기 (user_seq=2)
+//		User user = userRepository.findById(12).orElseThrow();
 //
 //		// 2. 새로운 고양이 정보 저장 (INSERT)
 //		// "수컷" 대신 Enum 타입인 Cat.Gender.MALE 사용
 //		Cat newCat = Cat.builder()
 //		.user(user) // 유저 정보는 이제 ID 2번을 사용합니다.
 //		.catName("설이")
-//		.catBirtthday(LocalDate.of(2021, 7, 10)) // catBirtthday 오타를 수정했습니다.
+//		.catBirtthday(LocalDate.of(2021, 7, 10)) 
 //		.catGender(Cat.Gender.FEMALE) // 'cat_gender' 필드를 올바른 Enum 값으로 설정
 //		.catBreed("코리안 숏헤어") // 필수 필드인 종 이름도 추가
 //		.isNeutered(true) // 필수 필드인 중성화 여부도 추가
