@@ -1,9 +1,7 @@
 
 package com.project.fatcat.mypage.controller;
 
-import java.security.Principal; // Principal 객체를 사용하기 위한 Import 추가
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
@@ -16,7 +14,7 @@ import com.project.fatcat.cats.service.CatService;
 import com.project.fatcat.entity.Cat;
 import com.project.fatcat.entity.Order;
 import com.project.fatcat.entity.User;
-import com.project.fatcat.order.OrderService;
+import com.project.fatcat.shopping.service.OrderService;
 import com.project.fatcat.users.repository.UserRepository;
 import com.project.fatcat.users.service.CustomUserDetails;
 

@@ -8,5 +8,5 @@ import com.project.fatcat.entity.User;
 
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer>{
 
-	boolean existsByOrderUserAndProduct(User user, Product product);
+	boolean existsByOrderInfo_UserAndProduct(User user, Product product);
 }
