@@ -1,4 +1,7 @@
-<html xmlns:th="http://www.thymeleaf.org"
+
+ 
+ 
+ <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{shared/layout}">
 
@@ -47,6 +50,35 @@
 			gap: 20px;
 			border: 1px solid var(--border-light); /* 연한 탄색 테두리 */
 		}
+        
+        /* ⭐⭐ 추가된 CSS: 폼 그룹 및 드롭다운 스타일 ⭐⭐ */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: var(--tan-darker);
+            font-size: 1.1em;
+        }
+
+        .form-group select, .form-group input[type="text"] {
+            padding: 12px 15px;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1em;
+            color: var(--tan-darker);
+            background-color: var(--white);
+            transition: border-color 0.3s;
+        }
+
+        .form-group select:focus, .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--tan-medium);
+        }
+		/* ⭐⭐ 추가된 CSS 끝 ⭐⭐ */
 
 		textarea {
 			width: 100%;
@@ -66,26 +98,16 @@
 			border-color: var(--tan-darkest); /* 포커스 시 진한 색 */
 			box-shadow: 0 0 8px rgba(76, 60, 48, 0.3); /* 진한 그림자 */
 		}
-
-		/* 버튼 공통 스타일 */
-		.btn {
-			padding: 15px 25px; /* 버튼 크기 키움 */
-			text-align: center;
-			text-decoration: none;
-			border: none;
-			cursor: pointer;
-			font-size: 1.2em;
-			font-weight: bold;
-			border-radius: 30px; /* 둥근 알약 모양 */
-			transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-		}
-
+		
 		/* 질문 등록 버튼 (.btn-fatcat) 전용 스타일 */
 		.btn-fatcat {
-			background-color: var(--tan-medium); /* 메인 탄색 */
-			color: var(--white);
-			box-shadow: 0 4px 8px rgba(195, 153, 122, 0.4);
-		}
+	background-color: #D2B48C;
+	color: #fff;
+	border-radius: 999px;
+	padding: 6px 16px;
+	border: none;
+	font-weight: 500;
+}
 
 		.btn-fatcat:hover {
 			background-color: var(--tan-darker); /* 호버 시 진한 탄색 */
@@ -95,9 +117,14 @@
 	</style>
 
 	<div class="ask-container">
-		<h1>질문하기</h1>
+		<h1>1:1 질문하기</h1>
 		<form th:action="@{/faq/ask}" method="post" class="ask-form">
-			<textarea name="question" required placeholder="질문을 입력해주세요. 문의하신 내용은 빠르게 확인하여 답변드리겠습니다."></textarea>
+		    
+		    
+            
+            
+
+			<textarea name="question" required placeholder="상세 내용을 입력해주세요. 문의하신 내용은 빠르게 확인하여 답변드리겠습니다."></textarea>
 			<button type="submit" class="btn btn-fatcat">질문 등록</button>
 		</form>
 	</div>
