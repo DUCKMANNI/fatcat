@@ -442,7 +442,7 @@
     function fetchCareList() {
         const region = buildRegionText();
         const url = `/care/list?region=${encodeURIComponent(region)}`;
-        
+
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -453,10 +453,26 @@
             .then(data => {
                 allPlaces = data;
                 currentPage = 1;
+
+                if (allPlaces.length === 0) {
+                    // 경고창 띄우기
+                    alert(`${region} 에 해당하는 검색 결과가 없습니다.`);
+
+                    // 지도 위치 이동
+                    const geocoder = new kakao.maps.services.Geocoder();
+                    geocoder.addressSearch(region, (result, status) => {
+                        if (status === kakao.maps.services.Status.OK) {
+                            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                            map.setCenter(coords); // 지도 이동
+                        }
+                    });
+                }
+
                 renderList();
             })
             .catch(error => console.error('게시글 목록을 가져오는 데 실패했습니다:', error));
     }
+
     $searchBtn.addEventListener('click', fetchCareList);
 
     function addMarker(pos, idx) {
@@ -480,44 +496,45 @@
         `;
 
         const overlay = new kakao.maps.CustomOverlay({
-            position: pos,
+       	 	position: pos,
             content: visualContent,
-            yAnchor: 1.0,
-            xAnchor: 0.5,
-            zIndex: 2 // Custom Overlay를 상단에 표시
+            yAnchor: -0.1, // 1보다 크게 하면 위로 올라감
+            xAnchor: 0.4,
+            zIndex: 3
         });
         overlay.setMap(map);
+        
+        
 
 
         // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
         const transparentImage = new kakao.maps.MarkerImage(
             'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
-            new kakao.maps.Size(1, 1), // 사이즈 최소화
-            { offset: new kakao.maps.Point(0, 0) }
+            new kakao.maps.Size(50, 50), // 사이즈 최소화
+            { offset: new kakao.maps.Point(25, -7) }
         );
         
         const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
 
         
         const marker = new kakao.maps.Marker({
-            position: infowindowPos,
+            position: pos,
             map: map,
             image: transparentImage, // 1x1 투명 이미지 적용
             opacity: 0.0, // 완전히 투명하게 설정 (안전성 확보)
-            zIndex: 1 // Custom Overlay 뒤로 숨김
+            zIndex: 3 // Custom Overlay 뒤로 숨김
         });
         
-        // 3. Custom Overlay에 마우스 이벤트 연결
-        const overlayElement = overlay.getContent();
-        overlayElement.onmouseover = function() {
-            const place = allPlaces[idx];
-            // 인포윈도우는 투명 마커 객체(marker)에 연결
-            showInfo(marker, place.careTitle); 
-        };
-        overlayElement.onmouseout = function() {
-            infowindow.close();
-        };
+        kakao.maps.event.addListener(marker, 'mouseover', function() {
+            infowindow.setContent('<div style="padding:5px;font-size:13px;">' + allPlaces[idx].careTitle + '</div>');
+            infowindow.open(map, marker);
+        });
 
+        // 투명 마커에 마우스 아웃 이벤트를 등록합니다.
+        kakao.maps.event.addListener(marker, 'mouseout', function() {
+            infowindow.close();
+        });
+        
         // 4. markers 배열에 저장 (제거 시 CustomOverlay와 투명 마커 모두 제거)
         markers.push({ overlay, marker, pos });
 

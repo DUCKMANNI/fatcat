@@ -577,27 +577,51 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
     }
 
     function addMarker(pos, idx,  title = "이름 없음") {
+    	
+    	// 1. 시각적으로 보이는 Custom Overlay (핀 이미지 + 번호)
+        const visualContent = `
+            <div class="custom-marker-wrap" style="position: relative; width: 50px; height: 50px; cursor: pointer;">
+                <img src="/images/map_marker.png" style="width: 50px; height: 50px; display: block;">
+                <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-66%, 0%);
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #422701;
+                    width: 25px;
+                    text-align: center;
+                ">${idx + 1}</div>
+            </div>
+        `;
+
+        const overlay = new kakao.maps.CustomOverlay({
+       	 	position: pos,
+            content: visualContent,
+            yAnchor: -0.1, // 1보다 크게 하면 위로 올라감
+            xAnchor: 0.4,
+            zIndex: 3
+        });
+        overlay.setMap(map);
+        
+        // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
+        const transparentImage = new kakao.maps.MarkerImage(
+            'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
+            new kakao.maps.Size(50, 50), // 사이즈 최소화
+            { offset: new kakao.maps.Point(25, -7) }
+        );
+        
+ const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
+
+        
         const marker = new kakao.maps.Marker({
             position: pos,
             map: map,
-            image: new kakao.maps.MarkerImage("/images/map_marker.png", new kakao.maps.Size(50, 50))
+            image: transparentImage, // 1x1 투명 이미지 적용
+            opacity: 0.0, // 완전히 투명하게 설정 (안전성 확보)
+            zIndex: 3 // Custom Overlay 뒤로 숨김
         });
-        const overlay = new kakao.maps.CustomOverlay({
-            position: pos,
-            content: `<div style="
-		                position: absolute;
-		                top: 50%;
-		                left: 50%;
-		                transform: translate(-64%, -80%);
-		                font-size: 20px;
-		                font-weight: bold;
-		                color: #422701;
-		                width: 25px;
-		                text-align: center;
-		            ">${idx + 1}</div>`,
-      
-        });
-        overlay.setMap(map);
         
         // 📌 마커에 마우스 올렸을 때 infoWindow 보이게
         kakao.maps.event.addListener(marker, "mouseover", () => {
