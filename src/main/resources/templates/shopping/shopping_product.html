@@ -57,8 +57,8 @@
 					th:href="@{/products(page=${productPage.number - 1}, size=${productPage.size},
                               category=${#strings.isEmpty(main)?'all':main},
                               sub=${#strings.isEmpty(sub)?null:sub},
-                              detail=${#strings.isEmpty(detail)?null:detail})}">
-						이전 </a></li>
+                              detail=${#strings.isEmpty(detail)?null:detail})}" >
+						&lt; </a></li>
 
 				<!-- 번호 -->
 				<li class="page-item"
@@ -79,7 +79,7 @@
                               category=${#strings.isEmpty(main)?'all':main},
                               sub=${#strings.isEmpty(sub)?null:sub},
                               detail=${#strings.isEmpty(detail)?null:detail})}">
-						다음 </a></li>
+						&gt; </a></li>
 
 			</ul>
 		</nav>

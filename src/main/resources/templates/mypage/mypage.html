@@ -453,16 +453,34 @@
 								    <a th:href="@{/users/edit}" class="btn btn-fatcat"
 									style="font-size:20px;">내 정보 수정</a>
 								</div>
-								<ul class="info-list" style="padding-left: 20px;">
-									<li class="info-item"><strong>이름</strong>: <span
-										th:text="${user.userName ?: '정보 없음'}"></span></li>
-									<li class="info-item"><strong>이메일</strong>: <span
-										th:text="${user.username ?: '정보 없음'}"></span></li>
-									<li class="info-item"><strong>연락처</strong>: <span
-										th:text="${user.formattedPhoneNumber ?: '정보 없음'}"></span></li>
-									<li class="info-item"><strong>회원등급</strong>: <span
-										th:text="${user.userGrade ?: '정보 없음'}"></span></li>
-								</ul>
+								
+								<div class="my-info-container d-flex align-items-center">
+    
+								    <!-- 프로필 이미지 -->
+								    <div class="profile-img-wrapper me-5">
+								         <img th:src="${user.profileImage != null && !#strings.isEmpty(user.profileImage) 
+								                  ? user.profileImage 
+								                  : '/images/user_no_image.jpg'}"
+								         alt="프로필 사진" class="profile-img">
+								    </div>
+								
+								    <!-- 내 정보 리스트 -->
+								    <ul class="info-list ms-3">
+								        <li class="info-item">
+								            <strong>이름</strong>: <span th:text="${user.userName ?: '정보 없음'}"></span>
+								        </li>
+								        <li class="info-item">
+								            <strong>이메일</strong>: <span th:text="${user.username ?: '정보 없음'}"></span>
+								        </li>
+								        <li class="info-item">
+								            <strong>연락처</strong>: <span th:text="${user.formattedPhoneNumber ?: '정보 없음'}"></span>
+								        </li>
+								        <li class="info-item">
+								            <strong>회원등급</strong>: <span th:text="${user.userGrade ?: '정보 없음'}"></span>
+								        </li>
+								    </ul>
+								</div>
+
 
 							</div>
 						</div>

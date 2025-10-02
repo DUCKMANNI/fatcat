@@ -12,6 +12,7 @@ import com.project.fatcat.shopping.dto.OrderFormDTO;
 import com.project.fatcat.shopping.repository.OrderRepository;
 import com.project.fatcat.shopping.repository.ShoppingCartRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -87,6 +88,17 @@ public class OrderService {
         });
 
         return orderRepository.save(order);
+    }
+    
+    @Transactional
+    public void completeCart(Integer cartSeq) {
+        ShoppingCart cart = shoppingCartRepository.findById(cartSeq)
+                .orElseThrow(() -> new RuntimeException("장바구니 없음"));
+
+        cart.setIsCompleted(true);
+        cart.setUpdateDate(LocalDateTime.now());
+
+        shoppingCartRepository.save(cart);
     }
     
  // 🔹 사용자 ID(userSeq)로 주문 내역 조회 함수

@@ -31,7 +31,7 @@
             <span th:text="${payment.status == 'DONE' ? '결제완료' : payment.status}"></span>
         </p>
         <p><strong>승인시간:</strong> <span th:text="${payment.approvedAt}"></span></p>
-        <p><strong>승인시간22:</strong> <span th:text="${#temporals.format(payment.approvedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+        <!-- <p><strong>승인시간22:</strong> <span th:text="${#temporals.format(payment.approvedAt, 'yyyy-MM-dd HH:mm')}"></span></p> -->
     </div>
 
     <!-- 버튼 -->
