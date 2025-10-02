@@ -44,6 +44,15 @@ public class ChatServiceImpl implements ChatService {
                              .orElse("User " + userSeq);
     }
     // ⭐ END: userName 헬퍼 메서드 ⭐
+    
+ // ✅ 추가: 사용자 프로필 이미지 URL을 조회하는 헬퍼 메서드
+    public String getUserProfileImage(Integer userSeq) {
+        if (userSeq == null) return null; // 또는 기본 이미지 URL을 반환
+        
+        return userRepository.findById(userSeq)
+                             .map(user -> user.getProfileImage()) // User 엔티티의 profileImage 필드를 사용
+                             .orElse(null); // 사용자가 없거나 이미지가 없으면 null 반환
+    }
 
     @Override
     // senderId, receiverId -> senderSeq, receiverSeq로 변경
@@ -80,11 +89,13 @@ public class ChatServiceImpl implements ChatService {
         // ⭐ 변경됨: userName을 DTO에 설정 (메시지 전송 직전에 DB 조회)
         dtoToSave.setSenderUserName(getUserName(dtoToSave.getSenderId())); // ⭐ 변경됨
         dtoToSave.setReceiverUserName(getUserName(dtoToSave.getReceiverId())); // ⭐ 변경됨
+     
         
         CareChatHistory chatHistory = convertToEntity(dtoToSave);
         chatHistory.setChatDate(LocalDateTime.now());
         CareChatHistory savedHistory = chatHistoryRepository.save(chatHistory);
         
+        // convertToDto 호출 시 프로필 이미지를 설정합니다.
         ChatMessageDto savedDto = convertToDto(savedHistory);
         
         // CARE_CONFIRM의 경우, 확정 시간을 savedDto에 설정하여 웹소켓으로 반환
@@ -96,6 +107,7 @@ public class ChatServiceImpl implements ChatService {
                 savedDto.setConfirmedTime(confirmedSession.getConfirmedDate().toString());
             }
         }
+        
         return savedDto;
     }
 
@@ -166,7 +178,7 @@ public class ChatServiceImpl implements ChatService {
         return entity;
     }
 
-    // --- 엔티티 → DTO 변환 (변경됨: userName 설정 로직 추가) ---
+    // --- 엔티티 → DTO 변환 (Sender/Receiver 프로필 이미지 조회 및 보존 로직 추가) ---
     private ChatMessageDto convertToDto(CareChatHistory entity) {
         ChatMessageDto dto = new ChatMessageDto();
 
@@ -189,6 +201,17 @@ public class ChatServiceImpl implements ChatService {
         dto.setReceiverUserName(getUserName(receiverSeq));
 
         dto.setTimestamp(entity.getChatDate());
+        
+        // ✅ 1. 보낸 사람(Sender) 프로필 이미지 DB에서 가져오기 (⭐ 추가됨)
+        userRepository.findById(senderSeq).ifPresent(user -> dto.setSenderProfileImage(user.getProfileImage())); 
+        
+        // ✅ 2. 받는 사람(Receiver) 프로필 이미지 DB에서 가져오기 (기존 로직)
+        userRepository.findById(receiverSeq).ifPresent(user -> dto.setReceiverProfileImage(user.getProfileImage()));
+        
+        // ⭐⭐ [핵심 수정 1] JSON 역직렬화 시 손실 방지를 위해 프로필 URL을 임시 변수에 저장합니다. ⭐⭐
+        String receiverProfileImageUrl = dto.getReceiverProfileImage();
+        String senderProfileImageUrl = dto.getSenderProfileImage(); 
+
 
         try {
             String rawMessage = entity.getChatMessage();
@@ -206,10 +229,12 @@ public class ChatServiceImpl implements ChatService {
                 dto.setConfirmedTime(payload.getConfirmedTime());
                 
                 // ⭐ 변경됨: CARE_REQUEST/CONFIRM DTO에도 userName이 반영되도록 처리
-                // DTO는 항상 최신 DB 조회 결과로 userName을 덮어씌웁니다.
                 if(payload.getSenderUserName() != null) dto.setSenderUserName(payload.getSenderUserName());
                 if(payload.getReceiverUserName() != null) dto.setReceiverUserName(payload.getReceiverUserName());
                 
+                // ⭐⭐ [핵심 수정 2] JSON 역직렬화 후, 임시 변수에 저장했던 프로필 이미지들을 다시 설정합니다. ⭐⭐
+                dto.setReceiverProfileImage(receiverProfileImageUrl);
+                dto.setSenderProfileImage(senderProfileImageUrl);
             } else {
                 // 일반 채팅
                 dto.setType(entity.getMessageType() != null ? entity.getMessageType() : "CHAT"); 
@@ -219,6 +244,16 @@ public class ChatServiceImpl implements ChatService {
             dto.setType(entity.getMessageType() != null ? entity.getMessageType() : "CHAT");
             dto.setContent(entity.getChatMessage());
         }
+        
+        
+        
+        // ⭐⭐⭐ 최종 전송 값 확인용 디버깅 로그 (필요 없으면 삭제하세요) ⭐⭐⭐
+        System.out.println("DEBUG (ChatService): ChatRoom ID " + dto.getChatRoomId() 
+                            + " / Sender ID " + dto.getSenderId() 
+                            + " / Sender Profile URL: " + dto.getSenderProfileImage());
+        System.out.println("DEBUG (ChatService): ChatRoom ID " + dto.getChatRoomId() 
+                            + " / Receiver ID " + dto.getReceiverId() 
+                            + " / Receiver Profile URL: " + dto.getReceiverProfileImage()); 
 
         return dto;
     }

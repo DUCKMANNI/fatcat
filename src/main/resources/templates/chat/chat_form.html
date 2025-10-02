@@ -4,53 +4,85 @@
 <meta charset="utf-8">
 <title>최종 수정본: 1:1 채팅 + CareSession + 리뷰 + UI 개선 (날짜 구분선 포함)</title>
 <style>
+.profile-image {
+	margin-top: 5px; /* 닉네임과의 간격 조절 (선택 사항) */
+	width: 40px; /* 크기 조절 */
+	height: 40px; /* 크기 조절 */
+	border-radius: 50%; /* 원형 */
+	margin-right: 8px; /* 메시지 버블과의 간격 */
+	align-self: flex-start; /* 메시지 row의 시작점에 정렬 */
+	flex-shrink: 0;
+	object-fit: cover; /* 이미지가 잘리지 않고 꽉 차게 */
+	border: 1px solid #eee; /* 테두리 (선택 사항) */
+	cursor: pointer;
+}
+
+/* 닉네임과 이미지가 정렬되도록 받은 메시지 스타일 조정 (선택 사항) */
+.message-row.received {
+    /* 기존: justify-content: flex-start; */
+	align-items: flex-start; /* 닉네임과 이미지를 맨 위에 정렬 */
+}
+
 
 
 .sent .message.tail::after {
-	content: '';
-	position: absolute;
-	bottom: 0; /* 메시지 박스 하단에 위치 */
-	right: -7px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
-	width: 0;
-	height: 0;
-	z-index: 1;
-	/* 꼬리 삼각형 모양 만들기 */
-	border: 9px solid transparent; /* 꼬리 크기 조절 */
-	border-radius: 2px;
-	border-left-color: #ebdecd; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
-	border-bottom-color: #ebdecd;
-	/* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
-	border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
-	border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
-	/* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
-	transform: rotate(6deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
+    content: '';
+    position: absolute;
+    bottom: 0; /* 메시지 박스 하단에 위치 */
+    right: -7px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
+    width: 0;
+    height: 0;
+    z-index: 1;
+    
+    /* 꼬리 삼각형 모양 만들기 */
+    border: 9px solid transparent; /* 꼬리 크기 조절 */
+    border-radius : 2px;
+    border-left-color: #ebdecd; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+    border-bottom-color: #ebdecd;
+    
+      
+    /* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
+    border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
+    border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
+    
+    /* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
+    transform: rotate(6deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
+    
+   
 }
+
 
 /* ---------------------------------------------------------------------------------- */
 /* 2. 받은 메시지 (왼쪽 아래 꼬리) */
 /* ---------------------------------------------------------------------------------- */
 .received .message.tail::after {
-	content: '';
-	position: absolute;
-	bottom: 0; /* 메시지 박스 하단에 위치 */
-	left: -10px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
-	width: 0;
-	height: 0;
-	z-index: 1;
-	/* 꼬리 삼각형 모양 만들기 */
-	border: 9px solid transparent; /* 꼬리 크기 조절 */
-	border-radius: 2px;
-	border-left-color: #ffffff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
-	border-bottom-color: #ffffff;
-	/* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
-	border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
-	border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
-	/* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
-	transform: rotateY(186deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
+    content: '';
+    position: absolute;
+    bottom: 0; /* 메시지 박스 하단에 위치 */
+    left: -10px; /* 메시지 박스 바깥쪽 오른쪽으로 빼냅니다. */
+    width: 0;
+    height: 0;
+    z-index: 1;
+    
+    /* 꼬리 삼각형 모양 만들기 */
+    border: 9px solid transparent; /* 꼬리 크기 조절 */
+    border-radius : 2px;
+    border-left-color: #ffffff; /* 꼬리가 메시지 배경색과 동일하게 보입니다. */
+    border-bottom-color: #ffffff;
+    
+      
+    /* 꼬리를 둥글고 휘어지게 만드는 핵심 속성 */
+    border-bottom-right-radius: 30px; /* 꼬리의 끝을 둥글게 */
+    border-bottom-left-radius: 80%; /* 꼬리의 몸통 부분을 곡선으로 만듦 */
+    
+    /* 꼬리가 뾰족한 삼각형이 아닌 둥근 모양처럼 보이도록 회전 */
+    transform:rotateY(186deg); /* 원하는 만큼 회전하여 휘어짐 정도 조정 */
+    
 }
 /* ---------------------------------------------------------------------------------- */
 /* 1. 기본 채팅 UI 스타일 */
 /* ---------------------------------------------------------------------------------- */
+
 @font-face {
 	font-family: 'Juache';
 	src:
@@ -60,9 +92,11 @@
 	font-display: swap;
 }
 
+
 body {
-	font-family: 'Juache', sans-serif;
-	font-size: 16px;
+	
+	font-family: 'Juache', sans-serif; 
+	font-size:16px;
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -82,7 +116,7 @@ body {
 /* 기본 입력 필드 스타일 및 폰트 적용 */
 select, input, textarea {
 	font-family: 'Juache', sans-serif;
-	font-size: 16px;
+	font-size:16px;
 	padding: 5px 10px;
 	border-radius: 6px;
 	border: 1px solid #ccc;
@@ -91,27 +125,28 @@ select, input, textarea {
 /* ---------------------------------------------------------------------------------- */
 /* 플레이스홀더 폰트 적용 */
 /* ---------------------------------------------------------------------------------- */
-#message-input::placeholder, #session-note::placeholder, input::placeholder,
-	textarea::placeholder {
-	font-family: 'Juache', sans-serif !important;
+#message-input::placeholder,
+#session-note::placeholder,
+input::placeholder,
+textarea::placeholder {
+    font-family: 'Juache', sans-serif !important;
 }
 
 ::-webkit-input-placeholder { /* Chrome, Safari */
-	font-family: 'Juache', sans-serif !important;
+    font-family: 'Juache', sans-serif !important;
 }
-
 :-moz-placeholder { /* Firefox 18- */
-	font-family: 'Juache', sans-serif !important;
+    font-family: 'Juache', sans-serif !important;
 }
-
 ::-moz-placeholder { /* Firefox 19+ */
-	font-family: 'Juache', sans-serif !important;
+    font-family: 'Juache', sans-serif !important;
 }
-
 :-ms-input-placeholder { /* IE */
-	font-family: 'Juache', sans-serif !important;
+    font-family: 'Juache', sans-serif !important;
 }
 /* ---------------------------------------------------------------------------------- */
+
+
 #chat-container {
 	flex-grow: 1;
 	display: flex;
@@ -130,25 +165,28 @@ select, input, textarea {
 	background: #f7f7f7;
 	display: flex;
 	flex-direction: column;
+	
 }
 
 /* ✨ 날짜 구분선 스타일 ✨ */
 .date-separator {
-	text-align: center;
-	margin: 15px 0; /* 위아래 간격 */
+    text-align: center;
+    margin: 15px 0; /* 위아래 간격 */
 }
 
 .date-separator span {
-	font-size: 16px;
-	color: #888;
-	background: #e9e9e9; /* 연한 회색 배경 */
-	padding: 4px 10px;
-	border-radius: 12px; /* 둥근 모양 */
-	font-weight: 500;
-	font-family: 'Juache', sans-serif;
-	display: inline-block; /* 배경이 텍스트 크기만큼만 채워지도록 */
+    font-size: 16px;
+    color: #888;
+    background: #e9e9e9; /* 연한 회색 배경 */
+    padding: 4px 10px;
+    border-radius: 12px; /* 둥근 모양 */
+    font-weight: 500;
+    font-family: 'Juache', sans-serif;
+    display: inline-block; /* 배경이 텍스트 크기만큼만 채워지도록 */
 }
 /* ✨ 날짜 구분선 스타일 끝 ✨ */
+
+
 .message-row {
 	display: flex;
 	margin-bottom: 10px;
@@ -173,6 +211,7 @@ select, input, textarea {
 	align-self: flex-start;
 	flex-shrink: 0;
 	cursor: pointer;
+	
 }
 
 .message-content-wrapper {
@@ -202,8 +241,8 @@ select, input, textarea {
 
 .sent .message {
 	background: #ebdecd;
+	
 }
-
 .message {
 	padding: 8px 12px;
 	border-radius: 18px;
@@ -211,6 +250,8 @@ select, input, textarea {
 	word-wrap: break-word;
 	position: relative;
 }
+
+
 
 .received .message {
 	background: #fff;
@@ -233,100 +274,101 @@ select, input, textarea {
 }
 
 .care-request-card {
-	border-radius: 20px;
-	background-color: #fff3b0;
-	font-size: 16px;
-	line-height: 1.4;
-	padding: 15px 10px;
+	border-radius:20px;
+	background-color:#fff3b0;
+    font-size: 16px;
+    line-height: 1.4;
+    padding : 15px 10px;
 }
 
 .card-header {
-	display: flex;
-	align-items: center;
-	padding-bottom: 8px;
-	margin-bottom: 10px;
-	border-bottom: 1px solid #eeeeee; /* 구분선 */
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eeeeee; /* 구분선 */
 }
 
 .header-icon {
-	font-size: 1.2em;
-	margin-right: 6px;
+    font-size: 1.2em;
+    margin-right: 6px;
 }
 
 .header-title {
-	font-weight: 700;
-	font-size: 1.1em;
-	color: #333333;
+    font-weight: 700;
+    font-size: 1.1em;
+    color: #333333;
 }
 
 .detail-row {
-	display: flex;
-	margin-bottom: 6px; /* 줄 간격 */
-	align-items: flex-start;
+    display: flex;
+    margin-bottom: 6px; /* 줄 간격 */
+    align-items: flex-start;
 }
 
 .detail-icon {
-	color: #888; /* 아이콘 색상 */
-	margin-right: 8px;
-	padding-top: 2px;
+    color: #888; /* 아이콘 색상 */
+    margin-right: 8px;
+    padding-top: 2px;
 }
 
 .label {
-	font-weight: 600;
-	color: #555;
-	display: inline-block;
-	min-width: 40px; /* 라벨 너비 고정으로 정렬 맞춤 */
+    font-weight: 600;
+    color: #555;
+    display: inline-block;
+    min-width: 40px; /* 라벨 너비 고정으로 정렬 맞춤 */
 }
 
 /* -----------------------------------
    3. Footer 및 상태/버튼 스타일
    ----------------------------------- */
 .card-footer {
-	display: flex;
-	justify-content: space-between; /* 상태 표시와 버튼을 양 끝으로 분리 */
-	align-items: center;
-	margin-top: 10px;
-	padding-top: 10px;
-	border-top: 1px solid #555;
+    display: flex;
+    justify-content: space-between; /* 상태 표시와 버튼을 양 끝으로 분리 */
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #555;
+    
 }
 
 /* 상태 표시 뱃지 스타일 */
 .care-status {
-	display: inline-block;
-	padding: 3px 8px;
-	border-radius: 12px; /* 둥근 뱃지 모양 */
-	font-weight: 600 !important;
-	font-size: 18px !important;
-	white-space: nowrap;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px; /* 둥근 뱃지 모양 */
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    white-space: nowrap;
 }
 
 /* 확정 상태 */
-.care-status[style*="green"] {
-	/*  background-color: #e6f7e6; */
-	color: #38761d !important;
+.care-status[style*="green"] { 
+   /*  background-color: #e6f7e6; */
+    color: #38761d !important; 
 }
 
 /* 취소 상태 */
-.care-status[style*="red"] {
-	/* background-color: #fceceb; */
-	color: #cc0000 !important;
+.care-status[style*="red"] { 
+    /* background-color: #fceceb; */
+    color: #cc0000 !important;
 }
 
 /* 버튼 스타일 (확정 버튼) */
 .confirm-btn {
-	background-color: #4c8cff; /* 깔끔한 파란색 */
-	color: white;
-	border: none;
-	padding: 6px 12px;
-	border-radius: 999px;
-	cursor: pointer;
-	font-weight: 600;
-	font-size: 0.9em;
-	transition: background-color 0.2s;
+    background-color: #4c8cff; /* 깔끔한 파란색 */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
 }
 
 .confirm-btn:hover {
-	background-color: #3a75e0;
+    background-color: #3a75e0;
 }
 
 .care-confirmed {
@@ -337,21 +379,21 @@ select, input, textarea {
 }
 
 .btn-darkbrown {
-	font-size: 16px;
+	font-size : 16px;
 	font-family: 'Juache', sans-serif;
 	padding: 6px 16px;
 	border-radius: 999px;
-	border: none;
-	color: white;
-	background-color: #9a7f5a;
-	transition: all 0.3s ease;
-	cursor: pointer;
+	border: none;  
+    color: white; 
+    background-color: #9a7f5a;
+    transition: all 0.3s ease;
+    cursor : pointer;
 }
 
 .btn-darkbrown:hover {
-	background-color: #524538;
-	color: #fff;
-	border: none;
+    background-color: #524538;
+	color: #fff;  
+	border: none;  
 }
 
 #input-area {
@@ -370,101 +412,98 @@ select, input, textarea {
 }
 
 /* 버튼에도 폰트, 커서 포인터 적용 */
-#send-button {
-	font-family: 'Juache', sans-serif;
+ #send-button{
+ 	font-family: 'Juache', sans-serif;
 	background-color: #D2B48C;
 	color: #fff;
 	border-radius: 20px;
 	padding: 6px 16px;
 	border: none;
 	font-weight: 500;
-	cursor: pointer; /* 커서 포인터 추가 */
-}
+    cursor: pointer; /* 커서 포인터 추가 */
+} 
 
-#send-button:hover {
+
+#send-button:hover{
 	background-color: #a38b6a; /* hover 시 조금 진하게 */
 	color: #fff;
-}
+} 
 
 /* ---------------------------------------------------------------------------------- */
 /* 2. 돌봄 요청 폼 (CARE FORM) 스타일: 디자인 개선 및 라운드 값 적용 */
 /* ---------------------------------------------------------------------------------- */
+
 #care-form {
-	opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.4s ease;
-    padding: 0 18px; /* 닫힐 때는 패딩 제거 */
-    margin: 0 10px;
-    border: 1px solid transparent; /* 기본은 테두리 안 보이게 */
-    border-radius: 12px;
-    background-color: #f7f9fb;
-    flex-wrap: wrap;
-    gap: 10px;
-    flex-direction: row;
-    font-size: 16px;
-    line-height: 2;
+    display: none; /* 기본은 숨김 */
+    padding: 18px; 
+    border: 1px solid #e0e0e0; 
+    border-radius: 12px; 
+    margin: 10px; 
+    background-color: #f7f9fb; /* 배경 박스 */
+    flex-wrap: wrap; 
+    gap: 10px; 
+    flex-direction: row; 
+    font-size: 16px; 
+    line-height: 1.4;
+    border-top: 1px solid #ddd; 
 }
 
 /* JS로 .active 클래스가 붙으면 폼이 보입니다. */
 #care-form.active {
-	opacity: 1;
-    max-height: 600px; /* 폼 높이보다 살짝 크게 */
-    transform: translateY(0);
-    padding: 0 18px; /* 닫힐 때는 패딩 제거 */
-    margin: 0 10px;
-    border: 1px solid #e0e0e0;
+    display: flex;
 }
 
 /* 개별 입력 그룹 스타일 */
 .care-form-group {
-	flex: 1 1 calc(50% - 5px);
-	flex-direction: column;
+    flex: 1 1 calc(50% - 5px); 
+    display: flex;
+    flex-direction: column; 
 }
 
 /* 메모, 버튼 등 전체 너비 요소 */
 .care-form-group.full-width {
-	flex: 1 1 100%;
+    flex: 1 1 100%; 
 }
 
 /* 라벨 스타일 */
 #care-form label {
-	font-weight: bold;
-	color: #555;
-	margin-top:3px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 3px;
 }
 
+
 /* 입력 필드 (input, textarea) 공통 스타일 - 라운드 값 적용 */
-#care-form input[type="datetime-local"], #care-form textarea {
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 6px;
-	box-sizing: border-box;
-	width: 100%;
-	font-size: 16px;
-	background-color: white;
+#care-form input[type="datetime-local"],
+#care-form textarea {
+    padding: 10px; 
+    border: 1px solid #ccc;
+    border-radius: 6px; 
+    box-sizing: border-box; 
+    margin-top: 4px; 
+    width: 100%; 
+    font-size: 16px;
+    background-color: white; 
 }
 
 /* 메모장 줄 수 설정 */
 #care-form textarea {
-	resize: vertical;
+    resize: vertical; 
 }
 
 /* 예약 전송 버튼 스타일 */
 #confirm-care {
 	font-family: 'Juache', sans-serif;
-	font-size: 20px;
-	width: 100%;
-	padding: 10px;
-	margin-bottom :8px;
-	border: none;
-	border-radius: 20px;
-	font-weight: bold;
-	cursor: pointer; /* 커서 포인터 유지 */
-	background-color: #D2B48C;
-	color: #fff;
-	transition: background-color 0.3s;
+	font-size :20px;
+    width: 100%; 
+    padding: 10px; 
+    border: none;
+    border-radius: 20px; 
+    font-weight: bold;
+    cursor: pointer; /* 커서 포인터 유지 */
+    background-color: #D2B48C;
+    color: #fff;
+    transition: background-color 0.3s;
 }
 
 #confirm-care:hover {
@@ -473,8 +512,8 @@ select, input, textarea {
 
 /* 버튼 컨테이너 정렬 */
 .button-container {
-	display: flex;
-	justify-content: flex-start;
+    display: flex;
+    justify-content: flex-start;
 }
 
 /* ---------------------------------------------------------------------------------- */
@@ -541,23 +580,23 @@ select, input, textarea {
 
 /* [수정] 리뷰 등록 폼 스타일 - 배경 박스 추가 */
 #review-form-area {
-	padding: 15px;
-	margin-bottom: 20px;
-	background-color: #f7f9fb; /* 연한 회색 배경 */
-	border-radius: 12px; /* 둥근 모서리 */
-	border-top: none; /* 기존 border-top 제거 */
+    padding: 15px; 
+    margin-bottom: 20px; 
+    background-color: #f7f9fb; /* 연한 회색 배경 */
+    border-radius: 12px; /* 둥근 모서리 */
+    border-top: none; /* 기존 border-top 제거 */
 }
 
 #review-form-area h4 {
 	font-family: 'Juache', sans-serif;
-	font-size: 20px;
+	font-size:20px;
 	margin-top: 0;
 	margin-bottom: 15px; /* 제목 아래 간격 추가 */
 }
 
 #review-form-area textarea {
 	/* [수정] 입력 필드 라운드 값 적용 */
-	border-radius: 6px;
+	border-radius: 6px; 
 	width: 100%;
 	margin-bottom: 10px;
 	box-sizing: border-box;
@@ -581,13 +620,13 @@ select, input, textarea {
 #submit-review-btn {
 	width: 100%;
 	padding: 10px; /* 버튼 높이 증가 */
-	background: #D2B48C;
+	background: #D2B48C; 
 	color: white;
 	border: none;
-	border-radius: 20px;
+	border-radius: 20px; 
 	cursor: pointer; /* 커서 포인터 추가 */
 	font-weight: 500;
-	font-family: 'Juache', sans-serif;
+	font-family: 'Juache', sans-serif; 
 	transition: background-color 0.3s;
 }
 
@@ -597,7 +636,7 @@ select, input, textarea {
 
 /* 리뷰 목록 스타일 */
 #review-list {
-	font-size: 20px;
+	font-size:20px;
 	flex-grow: 1;
 	overflow-y: auto;
 	padding-right: 5px;
@@ -606,7 +645,7 @@ select, input, textarea {
 .review-item {
 	/* 리뷰 내용에도 폰트 적용 */
 	font-family: 'Juache', sans-serif;
-	font-size: 18px;
+	font-size:18px;
 	padding: 10px 0;
 	border-bottom: 1px dotted #ddd;
 	position: relative;
@@ -669,20 +708,14 @@ select, input, textarea {
 /* ---------------------------------------------------------------------------------- */
 /* 4. 인라인 리뷰 수정 폼 스타일 (이미지 레이아웃에 맞게 조정) */
 /* ---------------------------------------------------------------------------------- */
-/* 수정 폼 컨테이너 */
 .edit-inline-form {
-	 opacity: 0;
-    max-height: 0;          /* 닫힌 상태 */
-    overflow: hidden;
-    transform: translateY(-10px); /* 살짝 위에서 시작 */
-    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.4s ease;
-}
-
-.edit-inline-form.active {
-	opacity: 1;
-    max-height: 500px;      /* 충분히 크게 줌 */
-    transform: translateY(0);
-	
+	padding: 10px 0 0 0;
+	margin-top: 0px;
+	margin-bottom: 5px;
+	width: 100%;
+	box-sizing: border-box;
+	display: none; /* 기본적으로 숨김 처리 */
+	font-family: 'Juache', sans-serif;
 }
 /* 수정 폼 내부의 경계선 스타일 */
 .edit-inline-form>div {
@@ -698,7 +731,7 @@ select, input, textarea {
 
 .edit-review-textarea {
 	/* [수정] 입력 필드 라운드 값 적용 */
-	border-radius: 6px;
+	border-radius: 6px; 
 	width: 100%;
 	box-sizing: border-box;
 	margin-bottom: 10px;
@@ -722,22 +755,23 @@ select, input, textarea {
 }
 
 .edit-actions button {
-	font-size: 14px !important;
+	font-size: 0.8em !important;
+	padding: 5px 10px !important;
 	font-family: 'Juache', sans-serif !important;
-	cursor: pointer !important; /* 커서 포인터 추가 */
+    cursor: pointer !important; /* 커서 포인터 추가 */
 }
 
 .edit-actions button.save {
 	/* [수정] 색상 통일 */
-	background: #D2B48C;
+	background: #D2B48C; 
 	color: white;
 	border: none;
 	border-radius: 4px;
 }
-
 .edit-actions button.save:hover {
 	background: #a38b6a;
 }
+
 
 .edit-actions button.cancel {
 	background: #dc3545;
@@ -747,42 +781,48 @@ select, input, textarea {
 	margin-left: 5px;
 }
 
+
 .btn-outline-danger {
 	font-family: 'Juache', sans-serif;
-	font-size: 14px;
-	border-radius: 999px;
-	background-color: transparent;
-	color: #dc3545;
-	border: 2px solid #dc3545;
-	transition: all 0.3s ease;
-	padding: 6px 8px;
-	cursor: pointer;
-}
+	font-size : 14px;
+    border-radius:999px;
+    background-color: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    transition: all 0.3s ease;
+    padding: 6px 8px;
+     cursor: pointer;
+} 
 
 .btn-outline-danger:hover {
-	color: white;
-	background-color: #dc3545;
-	border-color: #dc3545;
+	
+    color: white; 
+    background-color: #dc3545; 
+    border-color: #dc3545;
 }
+
 
 .btn-outline-brown {
 	font-family: 'Juache', sans-serif;
-	font-size: 14px;
+	font-size : 14px;
 	border: 2px solid #8B4513;
-	border-radius: 999px;
-	color: #8B4513; /* 글자색: 새들 브라운 */
-	border-color: #8B4513; /* 테두리색 */
-	background-color: transparent; /* 배경 투명 */
-	cursor: pointer;
-	padding: 6px 8px;
-	transition: all 0.3s ease; /* 부드러운 전환 효과 */
+	border-radius:999px;
+    color: #8B4513; /* 글자색: 새들 브라운 */
+    border-color: #8B4513; /* 테두리색 */
+    background-color: transparent; /* 배경 투명 */
+    cursor: pointer;
+    padding: 6px 8px;
+    transition: all 0.3s ease; /* 부드러운 전환 효과 */
 }
 
 .btn-outline-brown:hover {
-	color: white;
-	background-color: #8B4513;
+    color: white;
+    background-color: #8B4513;
+    
 }
+
 </style>
+
 <script
 	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script
@@ -854,9 +894,7 @@ let chatRoomId = null;
 let stompClient = null;
 let targetUserSeqForReview = null; 
 let currentRating = 0; 
-let currentEditReviewId = null; 
-let currentEditRating = 0; 
-let currentEditForm = null; 
+
 let userNames = {}; 
 
 // ✨ 날짜 구분선 로직을 위한 전역 변수 추가 ✨
@@ -1205,10 +1243,26 @@ function displayMessage(chatMessage) {
     const timeString = `${ampm} ${hour12}:${minutes}`;
     
     if (!isSent) {
-        const profilePlaceholder = document.createElement('div');
-        profilePlaceholder.classList.add('profile-placeholder');
-        profilePlaceholder.addEventListener('click', () => openReviewPopup(senderIdForPopup));
-        messageRow.appendChild(profilePlaceholder);
+        // 받은 메시지
+        
+        // ⭐ [수정] div 대신 img 태그를 사용하고, URL은 receiverProfileImage를 사용합니다. ⭐
+        const profileImage = document.createElement('img');
+        profileImage.className = 'profile-image'; // ⭐ 아래 CSS에 추가할 클래스 이름
+        profileImage.alt = senderName + ' 프로필'; // 상대방의 닉네임을 alt 텍스트로 사용
+        
+       
+        profileImage.src = chatMessage.senderProfileImage || '/images/no_image.jpg'; 
+
+
+        // -------------------------------------------------
+        // ⭐ 프로필 이미지 클릭 시 리뷰 팝업 로직 (유지) ⭐
+        // -------------------------------------------------
+        profileImage.onclick = (e) => {
+            e.stopPropagation();
+            openReviewPopup(senderIdForPopup, senderName); // openReviewPopup은 senderId를 사용합니다.
+        };
+        
+        messageRow.appendChild(profileImage); // 수정된 img 태그를 추가합니다.
     }
 
     const contentWrapper = document.createElement('div');
@@ -1349,9 +1403,13 @@ function openReviewPopup(targetSeq) {
         return;
     }
     
-    if (currentEditForm) {
-        cancelEdit();
+    // ⭐ [수정] 다른 리뷰 수정 폼이 열려있다면 닫기
+    const activeForm = document.querySelector('.edit-inline-form[data-is-editing="true"]');
+    if (activeForm) {
+        const activeReviewId = parseInt(activeForm.dataset.reviewId);
+        cancelEdit(activeReviewId);
     }
+
 
     targetUserSeqForReview = targetSeq;
     const targetName = userNames[targetSeq] || `User ${targetSeq}`;
@@ -1370,8 +1428,11 @@ function closeReviewPopup() {
     document.getElementById('new-review-text').value = '';
     updateStarRating(0, document.getElementById('new-rating'));
 
-    if (currentEditForm) {
-        cancelEdit();
+    // ⭐ [수정] 팝업 닫을 때 열려있는 수정 폼이 있다면 닫기
+    const activeForm = document.querySelector('.edit-inline-form[data-is-editing="true"]');
+    if (activeForm) {
+        const activeReviewId = parseInt(activeForm.dataset.reviewId);
+        cancelEdit(activeReviewId);
     }
 }
 
@@ -1430,18 +1491,42 @@ function createReviewItem(review) {
 
     // 현재 로그인된 사용자가 리뷰 작성자인 경우에만 수정/삭제 버튼 표시
     let actionButtons = '';
+    let editFormHtml = ''; 
+    
     if (review.authorUserSeq === senderId) { 
         actionButtons = `
             <div class="review-actions"> 
-                <button class="btn-outline-brown" onclick="editReview(${review.reviewSeq}, '${review.careReview.replace(/'/g, "\\'")}', ${review.careRating})">수정</button>
+                <button class="btn-outline-brown" onclick="editReview(${review.reviewSeq}, this)">수정</button>
                 <button class="btn-outline-danger" onclick="deleteReview(${review.reviewSeq})">삭제</button>
+            </div>
+        `;
+        
+        // ⭐ 인라인 수정 폼 추가 (기본적으로 숨겨짐)
+        editFormHtml = `
+            <div class="edit-inline-form" data-review-id="${review.reviewSeq}">
+                <div>
+                    <h4>별점:</h4>
+                    <div class="rating-input edit-inline-rating" data-initial-rating="${review.careRating}">
+                        <span data-rating="1">★</span>
+                        <span data-rating="2">★</span>
+                        <span data-rating="3">★</span>
+                        <span data-rating="4">★</span>
+                        <span data-rating="5">★</span>
+                    </div>
+                    <h4>내용:</h4>
+                    <textarea class="edit-review-textarea" rows="3">${review.careReview}</textarea>
+                    <div class="edit-actions" style="margin-top: 5px; text-align: right;">
+                        <button class="btn-outline-brown" onclick="saveEditReview(${review.reviewSeq}, this)">저장</button>
+                        <button class="btn-outline-danger" onclick="cancelEdit(${review.reviewSeq}, this)">취소</button>
+                    </div>
+                </div>
             </div>
         `;
     }
 
 
     item.innerHTML = `
-        <div class="review-content-wrapper">
+        <div class="review-content-wrapper" id="review-content-${review.reviewSeq}">
             <div class="review-header">
                 <span>${review.authorNickname}</span>
                 <span class="star-rating">${starHtml}</span>
@@ -1452,8 +1537,27 @@ function createReviewItem(review) {
                 ${actionButtons}
             </div>
         </div>
+        ${editFormHtml}
     `;
     item.id = `review-item-${review.reviewSeq}`;
+    
+    // ⭐ 초기 별점 UI 설정 및 이벤트 리스너 설정
+    if (review.authorUserSeq === senderId) {
+        const starContainer = item.querySelector('.edit-inline-rating');
+        
+        // saveEditReview에서 사용할 현재 평점을 data-current-rating에 저장
+        starContainer.setAttribute('data-current-rating', review.careRating); 
+        updateStarRating(review.careRating, starContainer); 
+        
+        starContainer.querySelectorAll('span').forEach(star => {
+            star.addEventListener('click', () => {
+                const newRating = parseInt(star.dataset.rating);
+                // HTML 요소 자체에 현재 평점을 저장하여 saveEditReview에서 사용
+                starContainer.setAttribute('data-current-rating', newRating); 
+                updateStarRating(newRating, starContainer);
+            });
+        });
+    }
 
     return item;
 }
@@ -1520,126 +1624,100 @@ async function submitReview() {
 }
 
 /**
- * ⭐ 인라인 수정 폼을 생성하고 해당 리뷰 밑에 표시하며 부드럽게 펼칩니다.
+ * ⭐ 수정 버튼 클릭 시 인라인 수정 폼을 표시합니다.
+ * @param {number} reviewId - 수정할 리뷰 ID
  */
-function editReview(reviewId, content, rating) {
-    // 1. 이미 다른 폼이 열려 있다면 닫습니다.
-    if (currentEditForm) {
-        cancelEdit();
+function editReview(reviewId) {
+    // 1. 현재 수정 중인 다른 폼이 있는지 확인하고 닫기
+    const activeForm = document.querySelector('.edit-inline-form[data-is-editing="true"]');
+    if (activeForm && parseInt(activeForm.dataset.reviewId) !== reviewId) {
+        const activeReviewId = parseInt(activeForm.dataset.reviewId);
+        cancelEdit(activeReviewId);
     }
-    
-    const reviewItem = document.getElementById(`review-item-${reviewId}`);
-    if (!reviewItem) return;
 
-    currentEditReviewId = reviewId;
-    currentEditRating = rating;
+    const reviewContentWrapper = document.getElementById(`review-content-${reviewId}`);
+    const editForm = document.querySelector(`.edit-inline-form[data-review-id="${reviewId}"]`);
 
-    // 2. ⭐ 기존 액션 버튼을 숨깁니다. (클래스명: .review-actions)
-    const reviewActions = reviewItem.querySelector('.review-actions');
-    if (reviewActions) reviewActions.style.display = 'none'; 
-    
-    // 3. 폼 내용 구성
-    const starHtml = `
-        <div class="rating-input edit-inline-rating">
-            <span data-rating="1">★</span>
-            <span data-rating="2">★</span>
-            <span data-rating="3">★</span>
-            <span data-rating="4">★</span>
-            <span data-rating="5">★</span>
-        </div>
-    `;
-    
-    const formHtml = document.createElement('div');
-    formHtml.classList.add('edit-inline-form');
-    
-    formHtml.innerHTML = `
-        <div style="margin-top: 5px; padding-top: 5px; border-top: 1px dashed #ccc;">
-            <h4>별점:</h4>
-            ${starHtml}
-            <h4>내용:</h4>
-            <textarea class="edit-review-textarea" rows="3">${content}</textarea>
-            <div class="edit-actions" style="margin-top: 5px; text-align: right;">
-                <button class="btn-outline-brown" onclick="saveEditReview()">저장</button>
-                <button class="btn-outline-danger" onclick="cancelEdit()">취소</button>
-            </div>
-        </div>
-    `;
-
-    // 4. 기존 리뷰 내용 바로 밑에 수정 폼 추가
-    reviewItem.appendChild(formHtml);
-    currentEditForm = formHtml;
-    
-    // 5. ⭐ 애니메이션을 위한 핵심 로직: DOM 추가 후 다음 틱에 active 클래스 추가 (부드럽게 열림)
-    // 브라우저가 DOM 추가를 인식하도록 미세한 딜레이를 줍니다.
-    setTimeout(() => {
-        formHtml.classList.add('active');
-    }, 10); 
-
-    // 6. 별점 UI 설정 및 이벤트 리스너 추가
-    const starContainer = formHtml.querySelector('.edit-inline-rating');
-    updateStarRating(rating, starContainer); 
-
-    starContainer.querySelectorAll('span').forEach(star => {
-        star.addEventListener('click', () => {
-            currentEditRating = parseInt(star.dataset.rating);
-            updateStarRating(currentEditRating, starContainer);
-        });
-    });
-
-    // 7. 스크롤 이동 (선택 사항)
-    const reviewList = document.getElementById('review-list');
-    const itemOffset = reviewItem.offsetTop;
-    const listHeight = reviewList.clientHeight;
-    reviewList.scrollTop = itemOffset - (listHeight / 4);
-}
-
-
-function cancelEdit() {
-    if (!currentEditReviewId || !currentEditForm) return;
-
-    const reviewItem = document.getElementById(`review-item-${currentEditReviewId}`);
-
-    // active 제거 → CSS transition 시작
-    currentEditForm.classList.remove('active');
-
-    const transitionDuration = 400; // 0.4s (CSS랑 맞추기)
-
-    setTimeout(() => {
-        currentEditForm.remove(); // 애니메이션 끝난 후 제거
-        if (reviewItem) {
-            const reviewActions = reviewItem.querySelector('.review-actions');
-            if (reviewActions) reviewActions.style.display = 'block';
+    if (reviewContentWrapper && editForm) {
+        // 2. 리뷰 내용 숨기고 폼 보이기
+        reviewContentWrapper.style.display = 'none';
+        editForm.style.display = 'block';
+        editForm.setAttribute('data-is-editing', 'true');
+        
+        // 3. 폼에 포커스 주기
+        const textarea = editForm.querySelector('.edit-review-textarea');
+        if (textarea) textarea.focus();
+        
+        // 4. 스크롤 조정 (리뷰 목록의 맨 위로 스크롤하여 수정할 리뷰가 잘 보이도록)
+        const reviewList = document.getElementById('review-list');
+        const item = document.getElementById(`review-item-${reviewId}`);
+        if (reviewList && item) {
+             reviewList.scrollTop = item.offsetTop - reviewList.offsetTop - 10; // 10px 여백
         }
-        currentEditReviewId = null;
-        currentEditRating = 0;
-        currentEditForm = null;
-    }, transitionDuration);
+    }
 }
 
-async function saveEditReview() {
-    if (!currentEditReviewId || !currentEditForm) return alert("수정할 리뷰를 찾을 수 없습니다.");
+/**
+ * ⭐ 수정 폼을 닫고 원래 리뷰 내용으로 되돌립니다.
+ * @param {number} reviewId - 리뷰 ID
+ */
+function cancelEdit(reviewId) {
+    const reviewContentWrapper = document.getElementById(`review-content-${reviewId}`);
+    const editForm = document.querySelector(`.edit-inline-form[data-review-id="${reviewId}"]`);
+    
+    if (reviewContentWrapper && editForm) {
+        // 1. 폼 숨기고 리뷰 내용 보이기
+        editForm.style.display = 'none';
+        editForm.removeAttribute('data-is-editing');
+        reviewContentWrapper.style.display = 'block';
+        
+        // 2. 수정 중이었던 폼의 내용 초기화 (리뷰 내용으로)
+        const ratingContainer = editForm.querySelector('.edit-inline-rating');
+        const initialRating = parseInt(ratingContainer.dataset.initialRating);
+        const initialContent = reviewContentWrapper.querySelector('.review-body').innerText;
+        
+        editForm.querySelector('.edit-review-textarea').value = initialContent;
+        ratingContainer.setAttribute('data-current-rating', initialRating);
+        updateStarRating(initialRating, ratingContainer);
+    }
+}
+
+/**
+ * ⭐ 수정된 내용을 저장하고 API를 호출합니다.
+ * @param {number} reviewId - 수정할 리뷰 ID
+ * @param {HTMLElement} saveButton - 클릭된 저장 버튼 요소
+ */
+async function saveEditReview(reviewId, saveButton) {
+    const editForm = saveButton.closest('.edit-inline-form');
+    if (!editForm) return alert("수정 폼을 찾을 수 없습니다.");
     if (!senderId) return alert("'보내는 사람'을 선택해야 수정이 가능합니다. (API 호출에 필요)"); 
 
-    const editedText = currentEditForm.querySelector('.edit-review-textarea').value.trim();
+    const editedText = editForm.querySelector('.edit-review-textarea').value.trim();
+    const ratingContainer = editForm.querySelector('.edit-inline-rating');
+    
+    // data-current-rating에서 현재 선택된 평점을 가져오고, 없으면 초기 평점을 사용
+    const editedRating = parseInt(ratingContainer.getAttribute('data-current-rating') || ratingContainer.dataset.initialRating);
 
-    if (currentEditRating === 0) {
+    if (editedRating === 0) {
         return alert("별점을 선택해주세요.");
     }
     if (editedText.length < 5) {
         return alert("리뷰 내용을 5자 이상 입력해주세요.");
     }
     
+    // 버튼 비활성화 (중복 클릭 방지)
+    saveButton.disabled = true;
+
     const requestBody = {
         authorUserSeq: senderId, 
         targetUserSeq: targetUserSeqForReview, 
         careReview: editedText,
-        careRating: currentEditRating,
+        careRating: editedRating,
         targetRole: "provider" 
     };
 
     try {
-        // 이 API 경로는 사용자의 서버 환경에 맞게 조정되어야 합니다.
-        const response = await fetch(`/api/care-reviews/${currentEditReviewId}`, {
+        const response = await fetch(`/api/care-reviews/${reviewId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
@@ -1652,12 +1730,15 @@ async function saveEditReview() {
 
         alert("리뷰가 성공적으로 수정되었습니다!");
         
-        cancelEdit(); 
+        // 폼 닫고 전체 목록 새로고침
+        cancelEdit(reviewId); 
         fetchReviews(targetUserSeqForReview); 
 
     } catch (error) {
         console.error("리뷰 수정 오류:", error);
         alert(error.message || "리뷰 수정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+        saveButton.disabled = false; // 버튼 다시 활성화
     }
 }
 
@@ -1666,10 +1747,12 @@ async function deleteReview(reviewId) {
     if (!senderId) return alert("'보내는 사람'을 선택해야 삭제가 가능합니다. (API 호출에 필요)"); 
     if (!confirm("정말로 이 리뷰를 삭제하시겠습니까?")) return;
 
-    if (currentEditReviewId === reviewId) {
-        cancelEdit();
+    // 삭제 전에 혹시 수정 폼이 열려있었다면 닫습니다. (clean up)
+    const activeForm = document.querySelector('.edit-inline-form[data-is-editing="true"]');
+    if (activeForm && parseInt(activeForm.dataset.reviewId) === reviewId) {
+        activeForm.removeAttribute('data-is-editing');
     }
-
+    
     try {
         // 이 API 경로는 사용자의 서버 환경에 맞게 조정되어야 합니다.
         const response = await fetch(`/api/care-reviews/${reviewId}?authorUserSeq=${senderId}`, {
