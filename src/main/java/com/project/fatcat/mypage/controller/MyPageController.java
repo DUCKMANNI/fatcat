@@ -3,19 +3,19 @@ package com.project.fatcat.mypage.controller;
 
 import java.util.List;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.project.fatcat.SecurityUtils;
+import com.project.fatcat.care.service.CareSessionService;
 import com.project.fatcat.cats.service.CatService;
+import com.project.fatcat.coupon.service.CouponService;
 import com.project.fatcat.entity.Cat;
 import com.project.fatcat.entity.Order;
 import com.project.fatcat.entity.User;
+import com.project.fatcat.entity.UserCoupon;
 import com.project.fatcat.shopping.service.OrderService;
-import com.project.fatcat.users.repository.UserRepository;
-import com.project.fatcat.users.service.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j; // 로깅을 위해 추가
@@ -26,10 +26,9 @@ import lombok.extern.slf4j.Slf4j; // 로깅을 위해 추가
 public class MyPageController {
     
     private final CatService catService;
-    private final UserRepository userRepository;
-    
-    
     private final OrderService orderService;
+    private final CouponService couponService;
+    private final CareSessionService careSessionService;
 
     // 마이페이지 URL로 접속하면 이 메소드가 호출됩니다.
 //    @GetMapping("/mypage")
@@ -78,22 +77,13 @@ public class MyPageController {
     
     @GetMapping("/mypage")
     public String myPage(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-//            throw new IllegalStateException("로그인 필요");
-//        }
 
-        if (!(auth.getPrincipal() instanceof CustomUserDetails userDetails)) {
-            throw new IllegalStateException("인증된 사용자 정보 없음");
-        }
+        Integer userSeq = SecurityUtils.getCurrentUserSeq();
+        //String userEmail = SecurityUtils.getCurrentUser().getUsername();
 
-        Integer userSeq = userDetails.getUser().getUserSeq();
-        String userEmail = userDetails.getUser().getUserEmail();
-
-        User user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("Authenticated user [" + userEmail + "] not found in database."));
-
-        log.info("✅ 로그인 사용자: {}", userEmail);
+        
+        List<UserCoupon> coupons = couponService.getUserCoupons(userSeq);
+        model.addAttribute("coupons", coupons);
 
         // 고양이 정보
         List<Cat> cats = catService.findAllByUserId(userSeq);
@@ -102,14 +92,16 @@ public class MyPageController {
         // 주문 내역
         List<Order> orderList = orderService.getOrdersByUserId(userSeq);
         model.addAttribute("orderList", orderList);
+        
+        model.addAttribute("ownerSessions", careSessionService.getOwnerSessions(SecurityUtils.getCurrentUser().getUser()));
+        model.addAttribute("sitterSessions", careSessionService.getSitterSessions(SecurityUtils.getCurrentUser().getUser()));
 
         // 사용자 정보 + 인증 상태
-        model.addAttribute("user", user);
+        model.addAttribute("user", SecurityUtils.getCurrentUser());
         model.addAttribute("isAuthenticated", true);
 
         return "mypage/mypage";
     }
-    
     
 }
 

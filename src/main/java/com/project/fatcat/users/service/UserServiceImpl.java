@@ -76,6 +76,24 @@ public class UserServiceImpl implements UserService{
         }
     }
     
+    public SignupDTO getUserInfo(String userEmail) {
+        User user = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+
+        // 👉 엔티티 -> DTO 변환
+        return SignupDTO.builder()
+                .userEmail(user.getUserEmail())
+                .userName(user.getUserName())
+                .nickname(user.getNickname())
+                .phoneNumber(user.getPhoneNumber())
+                .zipCode(user.getZipCode())
+                .address1(user.getAddress1())
+                .address2(user.getAddress2())
+                .latitude(user.getLatitude())
+                .longitude(user.getLongitude())
+                .build();
+    }
+    
   //----------------------------------------------------------아래 미진 추가-------------------------------------------------------- 
    
     @Override

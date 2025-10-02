@@ -1,20 +1,21 @@
 package com.project.fatcat.shopping.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.project.fatcat.entity.Product;
 import com.project.fatcat.entity.ShoppingCart;
 import com.project.fatcat.shopping.dto.CartItemDTO;
 import com.project.fatcat.shopping.dto.CartSummaryDTO;
 import com.project.fatcat.shopping.service.CartServiceImpl;
-import com.project.fatcat.shopping.service.ProductServiceImpl;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,8 @@ public class ShoppingController {
 		cartServiceImpl.add(productCode, qty);
 	    return String.format("redirect:/products/detail?productCode=%s", productCode);
 	}
+
+
 
 	@PostMapping("/cart/update")
 	public String update(@RequestParam("productCode") String productCode,

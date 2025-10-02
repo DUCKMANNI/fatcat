@@ -1,9 +1,10 @@
 package com.project.fatcat.care.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 
 import com.project.fatcat.care.dto.CareSessionDto;
 import com.project.fatcat.care.repository.CareSessionRepository;
@@ -12,7 +13,7 @@ import com.project.fatcat.entity.User;
 import com.project.fatcat.entity.enums.CareSessionStatus;
 import com.project.fatcat.users.repository.UserRepository;
 
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -96,5 +97,17 @@ public class CareSessionServiceImpl implements CareSessionService {
                 .status(session.getStatus().name())
                 .confirmedDate(session.getConfirmedDate()) // ⭐ DTO에 포함
                 .build();
+    }
+    
+
+    // 내가 맡긴 예약들
+    public List<CareSession> getOwnerSessions(User user) {
+    	System.out.println("🔥 getOwnerSessions 실행됨, userSeq=" + user.getUserSeq());
+        return careSessionRepository.findByOwnerUser_UserSeq(user.getUserSeq());
+    }
+
+    // 내가 맡아주는 예약들
+    public List<CareSession> getSitterSessions(User user) {
+        return careSessionRepository.findBySitterUser_UserSeq(user.getUserSeq());
     }
 }

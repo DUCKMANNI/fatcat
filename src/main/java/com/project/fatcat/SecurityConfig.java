@@ -46,7 +46,7 @@ public class SecurityConfig {
                     .failureUrl("/users/login?error=true") // 실패 시
                     .usernameParameter("userEmail") // DTO에서 이메일을 username처럼 사용
                     .passwordParameter("userPassword")
-                    .defaultSuccessUrl("/mypage") // 로그인 성공 후 마이페이지로 이동
+                    .defaultSuccessUrl("/home") 
                 )
 
             .logout(logout -> logout

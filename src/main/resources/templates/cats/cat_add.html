@@ -1,34 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>고양이 정보 추가</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <div class="form-container">
-        <h1>고양이 정보 추가</h1>
-        <form th:action="@{/cats/add}" th:object="${catAddDTO}" method="post" enctype="multipart/form-data">
-            <div th:replace="fragments/cat_form :: catFormFragment"></div>
-            <center>
-                <button type="submit" class="btn btn-fatcat">등록하기</button>
-            </center>
-        </form>
-    </div>
-</div>
+	<div layout:fragment="content" class="custom-container"
+		style="text-align: center; padding: 40px 0;">
 
+		<h1
+			style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;">
+			고양이 정보 추가</h1>
+
+		<form th:action="@{/cats/add}" method="post" th:object="${catAddDTO}"
+			enctype="multipart/form-data"
+			style="max-width: 600px; margin: 0 auto;">
+
+			<!-- 프래그먼트 불러오기 -->
+			<div th:replace="~{cats/cat_form :: catFormFragment}"></div>
+
+			<button type="submit" class="login-btn mt-4">등록하기</button>
+		</form>
+	</div>
+	
+
+<th:block layout:fragment="script">
 <script>
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('current-image-preview').src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-    }
+function previewInline(input) {
+	  const fileName = document.getElementById('fileName');
+	  const thumb = document.getElementById('profileThumb');
+	  thumb.innerHTML = "";
+
+	  if (input.files && input.files[0]) {
+	    fileName.textContent = input.files[0].name; // 파일명 표시
+	    const reader = new FileReader();
+	    reader.onload = function(e) {
+	      const img = document.createElement("img");
+	      img.src = e.target.result;
+	      thumb.appendChild(img);
+	      thumb.style.display = "block";
+	    };
+	    reader.readAsDataURL(input.files[0]);
+	  } else {
+	    fileName.textContent = "선택된 파일 없음";
+	    thumb.style.display = "none";
+	  }
+	}
+	
+function showFileName(input, targetId) {
+	  const fileName = document.getElementById(targetId);
+
+	  if (input.files && input.files[0]) {
+	    fileName.textContent = input.files[0].name; // 파일명 표시
+	  } else {
+	    fileName.textContent = "선택된 파일 없음";
+	  }
+	}
+
+function toggleCustomBreed(select) {
+  const customInput = document.getElementById("customBreedInput");
+  if (!customInput) return;
+  if (select.value === "기타") {
+    customInput.style.display = "block";
+  } else {
+    customInput.style.display = "none";
+    customInput.value = "";
+  }
+}
 </script>
+</th:block>
+
 </body>
 
 </html>

@@ -1,7 +1,10 @@
 package com.project.fatcat.care.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.project.fatcat.care.dto.CareSessionDto;
 import com.project.fatcat.care.service.CareSessionService;
@@ -21,4 +24,6 @@ public class CareSessionController {
         CareSessionDto confirmed = careSessionService.confirmSession(sessionId);
         return ResponseEntity.ok(confirmed);
     }
+    
+   
 }

@@ -61,9 +61,10 @@
 
 						<div class="d-flex gap-2 mt-3">
 							<button class="btn btn-outline-dark flex-fill" type="submit"
-								style="font-size: 20px; border-radius: 999px;">장바구니</button>
-							<button class="btn btn-primary flex-fill" type="button"
-								style="font-size: 20px; border-radius: 999px;">바로구매</button>
+								style="font-size: 20px; border-radius: 999px;" onclick="addToCart('[[${product.productCode}]]')">장바구니</button>
+							<button class="btn btn-fatcat flex-fill" type="button"
+								style="font-size: 20px; border-radius: 999px;"
+								onclick="location.href='/orders/buyNow?productCode=[[${product.productCode}]]'">바로구매</button>
 						</div>
 					</form>
 
@@ -131,6 +132,21 @@
 
 			</div>
 		</div>
+		
+		<!-- 모달 -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; text-align:center;">
+      <div class="modal-body">
+        <p style="font-size:20px; font-weight:bold;">🛒 상품이 장바구니에 담겼습니다!</p>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <button class="btn btn-outline-brown" data-bs-dismiss="modal">계속 쇼핑하기</button>
+          <a href="/cart/list" class="btn btn-fatcat">장바구니로 가기</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 		<script th:inline="javascript">
 		(function () {
@@ -242,6 +258,31 @@
 
 		  // 리뷰가 없을 경우
 		  document.getElementById("starRating").innerHTML = renderStars(0, 0);
+		  
+		  /* function addToCart(productCode) {
+			  fetch("/cart/add", {
+			    method: "POST",
+			    headers: { "Content-Type": "application/json" },
+			    body: JSON.stringify({ productCode: productCode, qty: 1 })
+			  })
+			    .then(res => {
+			      if (!res.ok) throw new Error("HTTP 오류: " + res.status);
+			      return res.json();
+			    })
+			    .then(data => {
+			      if (data.result === "success") {
+			        new bootstrap.Modal(document.getElementById('cartModal')).show();
+			      } else {
+			        alert("장바구니 담기 실패!");
+			      }
+			    })
+			    .catch(err => {
+			      console.error(err);
+			      alert("장바구니 담기 중 오류 발생!");
+			    }); 
+		  }*/
+			
+
 
 </script>
 	</div>

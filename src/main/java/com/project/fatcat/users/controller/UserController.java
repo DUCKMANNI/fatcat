@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.project.fatcat.SecurityUtils;
 import com.project.fatcat.users.dto.SignupDTO;
 import com.project.fatcat.users.service.UserServiceImpl;
 
@@ -25,7 +26,10 @@ public class UserController {
 	}
 	
 	@GetMapping("/signup")
-	public String signUp() {
+	public String signUp(Model model) {
+		
+		model.addAttribute("SignupDTO", new SignupDTO());
+	    model.addAttribute("mode", "signup");
 		return "home/signup";
 	}
 	
@@ -40,4 +44,12 @@ public class UserController {
             return "home/signup";
         }
     }
+	
+	@GetMapping("/edit")
+	public String editForm(Model model) {
+		SignupDTO dto = userServiceImpl.getUserInfo(SecurityUtils.getCurrentUser().getUsername());
+	    model.addAttribute("SignupDTO", dto);
+	    model.addAttribute("mode", "update");
+	    return "home/signup";
+	}
 }

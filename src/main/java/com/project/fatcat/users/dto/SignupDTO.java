@@ -4,11 +4,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.fatcat.entity.enums.UserRole;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignupDTO {
 
 	// 🔹 로그인/인증 관련

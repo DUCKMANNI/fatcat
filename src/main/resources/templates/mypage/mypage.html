@@ -107,6 +107,18 @@
 	padding-bottom: 10px;
 }
 
+#cat-info h2 {
+  border-bottom: none !important;
+}
+
+#my-info h2 {
+  border-bottom: none !important;
+}
+
+#coupons h2 {
+  border-bottom: none !important;
+}
+
 .info-item, .cat-details p, .cat-details ul, .coupon-item p, .section p
 	{
 	font-size: var(--font-size-body);
@@ -355,6 +367,42 @@
 	transform: none !important;
 	background-color: transparent !important; 
 }
+
+/* 예약 테이블 (주문내역 스타일 통일) */
+.reservation-table {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 30px;
+  border-collapse: collapse;
+  font-size: 18px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.reservation-table thead {
+  background-color: #8B6B4A; /* 주문내역과 동일한 갈색 */
+  color: #fff;
+  font-weight: bold;
+}
+
+.reservation-table th, 
+.reservation-table td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.reservation-table tr:last-child td {
+  border-bottom: none;
+}
+
+.reservation-table tbody tr:hover {
+  background-color: #fdf8f3;
+}
+
+
 /* 🚀 CSS 수정 끝 */
 </style>
 
@@ -391,8 +439,8 @@
 
 						<li class="nav-item" role="presentation"><a class="nav-link"
 							id="cs-tab" data-bs-toggle="tab"
-							data-bs-target="#customer-service" href="#" role="tab"
-							aria-controls="customer-service" aria-selected="false">고객센터</a></li>
+							data-bs-target="#care-service" href="#" role="tab"
+							aria-controls="care-service" aria-selected="false">내 돌봄예약</a></li>
 					</ul>
 
 					<div class="tab-content" id="mypageTabContent">
@@ -400,25 +448,32 @@
 						<div class="tab-pane fade show active" id="my-info"
 							role="tabpanel" aria-labelledby="info-tab">
 							<div class="section">
-								<h2>내 정보</h2>
+								<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #ddd; padding-bottom:10px;">
+								    <h2 style="margin:0; ">내 정보</h2>
+								    <a th:href="@{/users/edit}" class="btn btn-fatcat"
+									style="font-size:20px;">내 정보 수정</a>
+								</div>
 								<ul class="info-list" style="padding-left: 20px;">
 									<li class="info-item"><strong>이름</strong>: <span
-										th:text="${user?.userName ?: '정보 없음'}"></span></li>
+										th:text="${user.userName ?: '정보 없음'}"></span></li>
 									<li class="info-item"><strong>이메일</strong>: <span
-										th:text="${user?.userEmail ?: '정보 없음'}"></span></li>
+										th:text="${user.username ?: '정보 없음'}"></span></li>
 									<li class="info-item"><strong>연락처</strong>: <span
-										th:text="${user?.phoneNumber ?: '정보 없음'}"></span></li>
-									<li class="info-item"><strong>회원 등급</strong>: 냥집사</li>
+										th:text="${user.formattedPhoneNumber ?: '정보 없음'}"></span></li>
+									<li class="info-item"><strong>회원등급</strong>: <span
+										th:text="${user.userGrade ?: '정보 없음'}"></span></li>
 								</ul>
-								<a th:href="@{/users/modify}" class="btn btn-fatcat"
-									style="font-size:25px;">정보 수정</a>
+
 							</div>
 						</div>
 
 						<div class="tab-pane fade" id="cat-info" role="tabpanel"
 							aria-labelledby="cat-tab">
 							<div class="section">
-								<h2>고양이 정보</h2>
+								<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #ddd; padding-bottom:10px;">
+								    <h2 style="margin:0; ">고양이 정보</h2>
+								    <a href="/cats/add" class="btn btn-fatcat" style="font-size:20px;">+ 고양이 추가</a>
+								</div>
 								<div th:if="${cats != null and not #lists.isEmpty(cats)}">
 									<div th:each="cat : ${cats}" class="cat-info-section">
 										<div class="profile-image-wrapper">
@@ -432,25 +487,27 @@
 										</div>
 
 										<div class="cat-details">
-											<h3 th:text="|🐱 ${cat?.catName ?: '미등록 고양이'}|">🐱 고양이
-												이름</h3>
+											<h3 th:text="|🐱 ${cat?.catName ?: '미등록 고양이'}|"></h3>
 											<ul class="info-list">
 												<li class="info-item"><strong>품종</strong>: <span
 													th:text="${cat?.catBreed ?: '미등록'}"></span></li>
 												<li class="info-item"><strong>출생일</strong>: <span
-													th:text="${cat?.catBirtthday != null ? #temporals.format(cat.catBirtthday, 'yyyy년 MM월 dd일') : '미등록'}"></span></li>
+													th:text="${cat?.catBirthday != null ? #temporals.format(cat.catBirthday, 'yyyy년 MM월 dd일') : '미등록'}"></span></li>
 												<li class="info-item"><strong>성별</strong>: <span
 													th:text="${cat?.catGender ?: '미등록'}"></span></li>
 											</ul>
 										</div>
-
+										<div style="display: flex; gap: 10px; justify-content: flex-end;">
 										<a th:href="@{|/cats/modify/${cat.catSeq}|}"
-											class="btn btn-fatcat" style="font-size:25px;">정보 수정</a>
+											class="btn btn-outline-brown" style="font-size:20px;">수정</a>
+											<a th:href="@{|/cats/modify/${cat.catSeq}|}"
+											class="btn btn-outline-danger" style="font-size:20px;">삭제</a>
+										</div>
 									</div>
 								</div>
 								<div th:unless="${cats != null and not #lists.isEmpty(cats)}">
 									<p style="padding: 0 20px; font-style: italic; color: #888;">
-										아직 등록된 고양이 정보가 없습니다. <a th:href="@{/cats/register}"
+										아직 등록된 고양이 정보가 없습니다. <a href="/cats/add"
 											style="color: var(--dark-tan-color); font-weight: bold;">새로
 											등록</a>해 주세요!
 									</p>
@@ -565,37 +622,96 @@
 						<div class="tab-pane fade" id="coupons" role="tabpanel"
 							aria-labelledby="coupon-tab">
 							<div class="section">
-								<h2>내 쿠폰함</h2>
+								<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #ddd; padding-bottom:10px;">
+								    <h2 style="margin:0; ">내 쿠폰함</h2>
+								    <a href="#" class="btn btn-fatcat" style="font-size:20px;">쿠폰 등록/사용</a>
+								</div>
 								<div style="padding: 0 20px;">
 									<div class="coupon-item">
-										<p>
-											<strong>🎁 10% 할인 쿠폰</strong> - 유효기간: ~2025.12.31
-										</p>
+										<div th:if="${#lists.isEmpty(coupons)}">
+									    <p>보유한 쿠폰이 없습니다.</p>
 									</div>
-									<div class="coupon-item">
-										<p>
-											<strong>🚚 무료배송 쿠폰</strong> - 유효기간: ~2025.10.31
-										</p>
+									<div th:each="uc : ${coupons}">
+									    <div class="coupon-card">
+									        <p><strong th:text="${uc.coupon.couponName}">쿠폰명</strong></p>
+									        <p>할인금액 : <span th:text="${uc.coupon.couponDiscount}"></span>원</p>
+									        <p>유효기간 : <span th:text="${uc.coupon.couponLimitdate}"></span></p>
+									        <p>사용여부 : <span th:text="${uc.isUsed} ? '사용됨' : '미사용'"></span></p>
+									    </div>
+									</div>
 									</div>
 									<p style="margin-top: 20px;">보유하신 쿠폰을 확인하고 쇼핑에 사용하세요.</p>
-									<a href="#" class="btn btn-fatcat" style="font-size:25px;">쿠폰
-										등록/사용</a>
+
 								</div>
 							</div>
 						</div>
 
-						<div class="tab-pane fade" id="customer-service" role="tabpanel"
-							aria-labelledby="cs-tab">
-							<div class="section">
-								<h2>고객센터</h2>
-								<div style="padding: 0 20px;">
-									<p>자주 묻는 질문(FAQ)을 확인하고 싶으시면 아래 링크를 클릭해주세요.</p>
-									<a th:href="@{/faq/list}" class="btn btn-fatcat" style="font-size:25px;">FAQ 보러가기</a>
-									<p style="margin-top: 15px;">기타 문의사항은 고객센터(1588-XXXX)로 연락
-										바랍니다.</p>
-								</div>
-							</div>
-						</div>
+						<div class="tab-pane fade" id="care-service" role="tabpanel" aria-labelledby="cs-tab">
+  <div class="section">
+    <h2>내 돌봄예약</h2>
+
+    <!-- 내가 맡긴 예약 -->
+<h3 style="margin-bottom:20px;">내가 맡긴 예약</h3>
+<table class="reservation-table">
+  <thead>
+    <tr>
+      <th>제목</th>
+      <th>시작일</th>
+      <th>종료일</th>
+      <th>시터</th>
+      <th>상태</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="cs : ${ownerSessions}">
+      <td th:text="${cs.careServiceBoard.careTitle}"></td>
+      <td th:text="${#temporals.format(cs.startDate, 'yyyy-MM-dd')}"></td>
+      <td th:text="${#temporals.format(cs.endDate, 'yyyy-MM-dd')}"></td>
+      <td th:text="${cs.sitterUser != null ? cs.sitterUser.nickname : '미배정'}"></td>
+      <td th:text="${cs.status != null ? cs.status.displayName : '상태없음'}"></td>
+    </tr>
+    <!-- 예약 없을 때 -->
+    <tr th:if="${ownerSessions == null or #lists.isEmpty(ownerSessions)}">
+      <td colspan="5" style="text-align:center; color:#888; font-style:italic;">
+        아직 맡아주는 예약이 없습니다.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- 내가 맡아주는 예약 -->
+<h3 style=" margin:40px 0 20px;">내가 맡아주는 예약</h3>
+<table class="reservation-table">
+  <thead>
+    <tr>
+      <th>제목</th>
+      <th>시작일</th>
+      <th>종료일</th>
+      <th>의뢰인</th>
+      <th>상태</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="cs : ${sitterSessions}">
+      <td th:text="${cs.careServiceBoard.careTitle}"></td>
+      <td th:text="${#temporals.format(cs.startDate, 'yyyy-MM-dd')}"></td>
+      <td th:text="${#temporals.format(cs.endDate, 'yyyy-MM-dd')}"></td>
+      <td th:text="${cs.ownerUser.nickname}"></td>
+      <td th:text="${cs.status != null ? cs.status.displayName : '상태없음'}"></td>
+
+    </tr>
+    <!-- 예약 없을 때 -->
+    <tr th:if="${sitterSessions == null or #lists.isEmpty(sitterSessions)}">
+      <td colspan="5" style="text-align:center; color:#888; font-style:italic;">
+        아직 맡아주는 예약이 없습니다.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</div>
+
 					</div>
 				</div>
 			</div>
