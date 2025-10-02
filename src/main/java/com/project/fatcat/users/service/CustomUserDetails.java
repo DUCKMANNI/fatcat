@@ -57,7 +57,6 @@ public class CustomUserDetails implements UserDetails{
 
         switch (user.getRole().toString()) {
             case "ROLE_USER":
-                // 👉 UserType 이 A냐 B냐에 따라 다르게
                 if ("A".equals(user.getUserType())) {
                     return "냥집사";
                 } else if ("B".equals(user.getUserType())) {
@@ -72,6 +71,11 @@ public class CustomUserDetails implements UserDetails{
                 return "정보 없음";
         }
     }
+    
+    public String getProfileImage() {
+        return user.getProfileImage();
+    }
+
     
     public String getUserType() {
     	return user.getUserType();

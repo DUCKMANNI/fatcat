@@ -146,6 +146,9 @@ public class OrderController {
 
         PaymentConfirmResponse response = tossPaymentServiceImpl.confirmPayment(paymentKey, orderNumber, amount, cartSeq);
         model.addAttribute("payment", response);
+        
+     // 장바구니 완료 처리
+        orderService.completeCart(cartSeq);
 
         return "order/success";
     }
