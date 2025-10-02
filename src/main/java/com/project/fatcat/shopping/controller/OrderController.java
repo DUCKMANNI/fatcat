@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.project.fatcat.SecurityUtils;
+import com.project.fatcat.entity.Product;
 import com.project.fatcat.entity.ShoppingCart;
+import com.project.fatcat.entity.User;
 import com.project.fatcat.shopping.dto.CartItemDTO;
 import com.project.fatcat.shopping.dto.CartSummaryDTO;
 import com.project.fatcat.shopping.dto.OrderDTO;
@@ -19,6 +22,7 @@ import com.project.fatcat.shopping.dto.OrderFormDTO;
 import com.project.fatcat.shopping.dto.PaymentConfirmResponse;
 import com.project.fatcat.shopping.service.CartServiceImpl;
 import com.project.fatcat.shopping.service.OrderService;
+import com.project.fatcat.shopping.service.ProductServiceImpl;
 import com.project.fatcat.shopping.service.TossPaymentServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,7 @@ public class OrderController {
     private final OrderService orderService;
     private final CartServiceImpl cartServiceImpl; 
     private final TossPaymentServiceImpl tossPaymentServiceImpl;
+    private final ProductServiceImpl productServiceImpl;
 
     /** 주문서 작성 화면 */
     @GetMapping("/form")
@@ -153,4 +158,24 @@ public class OrderController {
         model.addAttribute("errorMessage", message);
         return "order/fail";
     }
+    
+//    @GetMapping("/buyNow")
+//    public String buyNow(@RequestParam String productCode,
+//                         @RequestParam(defaultValue = "1") int qty,
+//                         Model model) {
+//
+//        // 1. 상품 조회
+//        Product product = productServiceImpl.getProductDetail(productCode);
+//
+//        // 2. 현재 사용자 가져오기
+//        User user = SecurityUtils.getCurrentUser().getUser();
+//
+//        // 3. 임시 장바구니 생성
+//        cartServiceImpl.add(productCode, qty);
+//
+//        // 4. /form 로 리다이렉트
+//        return "redirect:/orders/form?cartSeq=" + cart.getCartSeq();
+//    }
+
+
 }

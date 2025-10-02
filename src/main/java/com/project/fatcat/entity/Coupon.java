@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import jakarta.persistence.CascadeType;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import lombok.*;
@@ -32,7 +33,7 @@ public class Coupon {
     private Integer couponDiscount;
     
     @Column(nullable = false)
-    private String couponLimitdate;
+    private LocalDate couponLimitdate;
     
     @Builder.Default
     @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL)

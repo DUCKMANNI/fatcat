@@ -5,40 +5,47 @@
 	layout:decorate="~{shared/layout}">
 <head>
 <meta charset="UTF-8">
-<title>회원가입</title>
+<title th:text="${mode == 'signup'} ? '회원가입' : '회원정보 수정'"></title>
 </head>
 <body>
 
 	<div layout:fragment="content" class="custom-container"
 		style="text-align: center; padding: 40px 0;">
 		<!-- 제목 -->
-		<h1
-			style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;">
-			회원가입</h1>
+		 <h1 style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;"
+        th:text="${mode == 'signup'} ? '회원가입' : '회원정보 수정'"></h1>
 
 		<!-- 입력 폼 -->
-		<form th:action="@{/users/signup}" method="post" th:object="${userSignupDTO}" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
+		<form  th:action="${mode == 'signup'} ? @{/users/signup} : @{/users/edit}" method="post" th:object="${SignupDTO}" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
 
 			<!-- 🔹 기본 정보 -->
-		      <input type="email" name="userEmail" class="login-input" placeholder="E-mail (아이디)" required>
-		      <input type="password" name="userPassword" class="login-input" placeholder="비밀번호" required>
-		      <input type="password" name="passwordConfirm" class="login-input" placeholder="비밀번호 확인" required>
-		      <input type="text" name="userName" class="login-input" placeholder="이름" required>
-		      <input type="text" name="nickname" class="login-input" placeholder="닉네임" required>
-		      <input type="text" name="phoneNumber" class="login-input" placeholder="휴대폰 번호" required>
+			<!-- 🔹 이메일 (아이디) -->
+		      <input type="email" th:field="*{userEmail}" class="login-input" placeholder="E-mail (아이디)" th:readonly="${mode == 'update'}" required>
+		      <!-- 🔹 비밀번호 -->
+		      <div th:if="${mode == 'signup'}">
+            <input type="password" th:field="*{userPassword}" class="login-input" placeholder="비밀번호" required>
+            <input type="password" name="passwordConfirm" class="login-input" placeholder="비밀번호 확인" required>
+        </div>
+        <div th:if="${mode == 'update'}">
+            <input type="password" name="currentPassword" class="login-input" placeholder="현재 비밀번호">
+            <input type="password" name="newPassword" class="login-input" placeholder="새 비밀번호">
+            <input type="password" name="confirmPassword" class="login-input" placeholder="새 비밀번호 확인">
+        </div>
+        
+		      <input type="text" th:field="*{userName}" class="login-input" placeholder="이름" required>
+		      <input type="text" th:field="*{nickname}" class="login-input" placeholder="닉네임" required>
+		      <input type="text" th:field="*{phoneNumber}" class="login-input" placeholder="휴대폰 번호" required>
 
 			<!-- 🔹 주소 정보 -->
 		     <div class="address-group">
-				 <input type="text" id="zipCode" name="zipCode" class="login-input" placeholder="우편번호" readonly>
+				 <input type="text" id="zipCode" th:field="*{zipCode}" class="login-input" placeholder="우편번호" readonly>
 				 <button type="button" onclick="execDaumPostcode()" class="btn-fatcat">주소 검색</button>
 			  </div>
-		      <input type="text" id="address1" name="address1" class="login-input" placeholder="기본 주소" readonly>
-		      <input type="text" id="address2" name="address2" class="login-input" placeholder="상세 주소 입력">
-		
-		      <!-- 위도/경도 (hidden) -->
-		      <input type="hidden" id="latitude" name="latitude">
-		      <input type="hidden" id="longitude" name="longitude">
-			
+		      <input type="text" id="address1" th:field="*{address1}" class="login-input" placeholder="기본 주소" readonly>
+	        <input type="text" id="address2" th:field="*{address2}" class="login-input" placeholder="상세 주소 입력">
+	        <input type="hidden" id="latitude" th:field="*{latitude}">
+	        <input type="hidden" id="longitude" th:field="*{longitude}">
+				
 			<!-- 🔹 추가 정보 -->
 		      <!-- 프로필 이미지 -->
 			<div class="file-input-row">
@@ -63,10 +70,10 @@
 			</div>
 
 
-			<!-- 가입 버튼 -->
-			<button type="submit" class="login-btn mt-4">가입하기</button>
-
-		</form>
+			<!-- 버튼 -->
+        <button type="submit" class="login-btn mt-4"
+                th:text="${mode == 'signup'} ? '가입하기' : '수정하기'"></button>
+    </form>
 		
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <!-- 카카오 지도 API (좌표 변환용) -->

@@ -1,83 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
 <head>
 <meta charset="UTF-8">
 <title>고양이 정보</title>
 </head>
 <body>
 
-	<!-- fragments/cat_form.html -->
-	<div th:fragment="catFormFragment">
-		<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+<!-- src/main/resources/templates/fragments/cat_form.html -->
+<div th:fragment="catFormFragment">
 
-		<div class="form-group">
-			<label for="catName" class="required">이름</label> <input type="text"
-				id="catName" th:field="*{catName}">
-		</div>
+  <!-- 이름 -->
+  <input type="text" th:field="*{catName}" 
+         class="login-input" placeholder="고양이 이름" required>
 
-		<div class="form-group">
-			<label for="catBirthday">생일</label> <input type="date"
-				id="catBirthday" th:field="*{catBirthday}">
-		</div>
+  <!-- 생일 -->
+  <input type="date" th:field="*{catBirthday}" 
+         class="login-input" placeholder="생일">
 
-		<div class="form-group">
-			<label for="catGender" class="required">성별</label>
-			<div class="radio-group">
-				<input type="radio" id="male" th:field="*{catGender}"
-					th:value="MALE"> <label for="male">남아</label> <input
-					type="radio" id="female" th:field="*{catGender}" th:value="FEMALE">
-				<label for="female">여아</label>
-			</div>
-		</div>
+  <!-- 성별 -->
+  <div class="login-input" style="display:flex; flex-direction:column; gap:10px;">
+  <span style=" font-size:18px;">성별</span>
+  <div style="display:flex; justify-content:center; gap:30px;">
+    <label><input type="radio" th:field="*{catGender}" th:value="MALE"> 남아</label>
+  <label><input type="radio" th:field="*{catGender}" th:value="FEMALE"> 여아</label>
+  </div>
+</div>
 
-		<div class="form-group">
-			<label class="required">중성화 여부</label>
-			<div class="radio-group">
-				<input type="radio" id="neutered-yes" th:field="*{isNeutered}"
-					th:value="true"> <label for="neutered-yes">예</label> <input
-					type="radio" id="neutered-no" th:field="*{isNeutered}"
-					th:value="false"> <label for="neutered-no">아니오</label>
-			</div>
-		</div>
+<!-- 중성화 여부 -->
+<div class="login-input" style="display:flex; flex-direction:column; gap:10px;">
+  <span style=" font-size:18px;">중성화 여부</span>
+  <div style="display:flex; justify-content:center; gap:30px;">
+    <label><input type="radio" th:field="*{isNeutered}" th:value="true"> 예</label>
+    <label><input type="radio" th:field="*{isNeutered}" th:value="false"> 아니오</label>
+  </div>
+</div>
 
-		<div class="form-group">
-			<label for="catBreed">고양이 종</label> <select id="catBreed"
-				th:field="*{catBreed}">
-				<option value="">고양이 종 선택</option>
-				<option th:each="breed : ${breeds}" th:value="${breed}"
-					th:text="${breed}"></option>
-			</select>
-		</div>
 
-		<!-- 기존 이미지가 있을 경우만 표시 -->
-		<div class="form-group" th:if="${currentImageUrl}">
-			<label>기존 사진</label> <img th:src="@{${currentImageUrl}}"
-				alt="현재 고양이 프로필 사진"
-				style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
-		</div>
 
-		<!-- 업로드 -->
-		<div class="form-group mb-3">
-			<label for="catImageFile" class="form-label">프로필 사진</label>
-			<div class="image-preview-container">
-				<img id="current-image-preview"
-					th:src="${currentImageUrl} ? @{${currentImageUrl}} : @{/images/default-cat.png}"
-					class="profile-image-preview" alt="현재 프로필 사진">
-			</div>
-			<input type="file" class="form-control" id="catImageFile"
-				name="catImageFile" accept="image/*" onchange="previewImage(event);">
-		</div>
+  <!-- 품종 -->
+<div>
+  <select th:field="*{catBreed}" id="catBreedSelect" 
+          class="login-input" onchange="toggleCustomBreed(this)">
+    <option value="">고양이 종 선택</option>
+    <option th:each="breed : ${breeds}" th:value="${breed}" th:text="${breed}"></option>
+    <option value="기타">기타</option>
+  </select>
 
-		<div class="form-group">
-			<label for="hasDisease">질병</label> <input type="text" id="hasDisease"
-				th:field="*{hasDisease}">
-		</div>
+  <!-- 기타 입력창 (처음엔 숨김) -->
+  <input type="text" id="customBreedInput" th:field="*{customBreed}"
+         class="login-input" 
+         placeholder="품종을 입력하세요"
+         style="display:none; margin-top:10px;">
+</div>
 
-		<div class="form-group">
-			<label for="hasAllergy">알러지</label> <input type="text"
-				id="hasAllergy" th:field="*{hasAllergy}">
-		</div>
-	</div>
+  <!-- 프로필 이미지 -->
+  <div class="file-input-row">
+    <label for="profileImage">고양이 이미지</label>
+    <div class="file-input-wrapper">
+      <label for="profileImage" class="custom-file-label">파일 선택</label>
+      <span id="fileName" class="file-name">선택된 파일 없음</span>
+      <div id="profileThumb" class="profile-thumb"></div>
+      <input type="file" id="profileImage" name="catImageFile" 
+             accept="image/*" onchange="previewInline(this)">
+    </div>
+  </div>
 
+  <!-- 질병 -->
+  <input type="text" th:field="*{hasDisease}" 
+         class="login-input" placeholder="질병 (선택)">
+
+  <!-- 알러지 -->
+  <input type="text" th:field="*{hasAllergy}" 
+         class="login-input" placeholder="알러지 (선택)">
+
+</div>
 </body>
 </html>

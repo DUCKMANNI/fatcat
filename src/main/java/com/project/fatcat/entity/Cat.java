@@ -42,11 +42,12 @@ public class Cat {
     private String catName;
     
     // 생일
-    private LocalDate catBirtthday;
+    private LocalDate catBirthday;
     
     private String catImageUrl;
     
-    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createDate;
     
     private LocalDateTime updateDate;

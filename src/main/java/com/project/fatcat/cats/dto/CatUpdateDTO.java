@@ -27,7 +27,7 @@ public class CatUpdateDTO {
     @NotEmpty(message="고양이 이름은 필수입니다.")
     private String catName;
 
-    private LocalDate catBirtthday;
+    private LocalDate catBirthday;
 
     private String catImageUrl;
     private MultipartFile catImageFile;

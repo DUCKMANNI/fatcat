@@ -41,7 +41,7 @@ public class CareSession {
     private Integer sessionSeq;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "care_seq", nullable = true)
+    @JoinColumn(name = "care_seq")
     private CareServiceBoard careServiceBoard;
     
     @ManyToOne(fetch = FetchType.LAZY)

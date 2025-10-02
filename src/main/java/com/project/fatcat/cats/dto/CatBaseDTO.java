@@ -18,15 +18,15 @@ public class CatBaseDTO {
 	@NotEmpty(message = "고양이 이름은 필수입니다.")
 	private String catName;
 
-	private LocalDate catBirtthday;
+	private LocalDate catBirthday;
 
-	private String catImageUrl;
 	private MultipartFile catImageFile;
 
 	@NotNull(message = "성별은 필수입니다.")
 	private Cat.Gender catGender;
 
 	private String catBreed; // 종
+	private String customBreed;  // 기타 입력 값
 
 	@NotNull(message = "중성화 여부는 필수입니다.")
 	private Boolean isNeutered;
