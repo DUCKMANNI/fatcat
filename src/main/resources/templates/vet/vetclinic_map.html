@@ -18,6 +18,7 @@
 	margin: 20px auto;
 	width: fit-content;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+	
 }
 
 #controls select {
@@ -28,14 +29,13 @@
 	margin: 5px auto;
 	padding: 0 10px;
 }
-/*  #controls button {
+/* #controls button {
             cursor: pointer;
             border: none;
             background: #CD853F;
             color: #fff;
             font-weight: 600;
         } */
-        
 #mapListContainer {
 	display: flex;
 	width: calc(100% - 20px);
@@ -55,7 +55,7 @@
 	border: 1px solid #e5e5e5;
 	border-radius: 24px;
 	position: relative;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.12);
 }
 
 #menu_wrap {
@@ -138,7 +138,7 @@
 	color: #6C3C30;
 	pointer-events: none;
 }
-/*  .fixed-element button {
+/* .fixed-element button {
             display: block !important;
         } */
 #detailPanel {
@@ -187,8 +187,8 @@
 	box-sizing: border-box;
 	resize: vertical;
 }
-/*   #reviewForm textarea, */
-/*     #reviewForm button {
+/* #reviewForm textarea, */
+/* #reviewForm button {
             padding: 8px;
             border-radius: 5px;
             border: 1px solid #ccc;
@@ -222,7 +222,7 @@
 	margin-top: 5px;
 	text-align: right;
 }
-/*   .review-actions button {
+/* .review-actions button {
             background: #eee;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -232,23 +232,13 @@
         } */
 .update-form {
 	display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    padding: 0 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-top: 10px;
-    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
-}
-
-.update-form.show {
-    max-height: 500px; /* 충분히 큰 값 */
-    opacity: 1;
-    padding: 10px; 
-    
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	margin-top: 10px;
+    /* 수정 모드에서는 flex로 보여지고, 평상시에는 JS에서 display: none 처리 */
 }
 
 .update-form textarea {
@@ -259,21 +249,39 @@
 	box-sizing: border-box;
 	resize: vertical;
 }
-/*       .update-form button {
-            border: none;
-            padding: 6px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .update-form .save-btn {
-            background-color: #28a745;
-            color: white;
-        }
-        .update-form .cancel-btn {
-            background-color: #dc3545;
-            color: white;
-        } */
+
+/* 💡 추가: 저장/취소 버튼 스타일을 기존 수정/삭제 버튼 스타일과 맞춤 */
+.save-btn, .cancel-btn {
+	font-size: 16px;
+	border-radius: 999px;
+	padding: 5px 8px;
+	transition: all 0.3s ease;
+	cursor: pointer;
+   
+}
+
+/* 저장 버튼 스타일 (기존 .edit-btn 기반) */
+.save-btn {
+	border: 2px solid #8B4513; /* 녹색 계열 */
+	color: #8B4513;
+	background-color: transparent;
+}
+.save-btn:hover {
+	color: white;
+	background-color: #8B4513;
+}
+
+/* 취소 버튼 스타일 (기존 .delete-btn 기반) */
+.cancel-btn {
+	border: 2px solid #dc3545; /* 빨간색 계열 */
+	color: #dc3545;
+	background-color: transparent;
+}
+.cancel-btn:hover {
+	color: white;
+	background-color: #dc3545;
+}
+
 
 /* 기존 .btn-fatcat 스타일을 .edit-btn 및 .delete-btn에 적용 */
 .delete-btn {
@@ -313,25 +321,6 @@
 /* 버튼이 들어있는 부모 영역의 font-size: 20px 때문에 버튼이 커지는 것을 방지 */
 .review-actions button {
 	font-size: 0.75em; /* 부모 크기의 75%로 설정 (약 15px) */
-}
-
-/* .review-actions의 display 설정을 CSS로 명시 (인라인 스타일 제거 권장) */
-.review-actions {
-    margin-top: 5px;
-    text-align: right;
-    display: flex; /* 기본값 */
-    justify-content: flex-end; /* 기존 인라인 스타일 유지 */
-    gap: 5px; /* 기존 인라인 스타일 유지 */
-}
-
-/* 수정 폼이 나타나면서 리뷰 내용 숨기기 위한 클래스 */
-.review-item-content-hide {
-    display: none !important; /* 내용 숨김 시 확실하게 적용 */
-}
-
-/* 수정 버튼 영역 숨김/보임을 JS에서 확실히 제어하기 위한 클래스 */
-.review-actions.hidden-by-js {
-    display: none !important; /* 버튼 숨김 시 확실하게 적용 */
 }
 </style>
 </head>
@@ -524,6 +513,16 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
 
 
     function searchHospitals() {
+    	
+    	// ⭐ [추가 시작] 검색 버튼 클릭 시 상세 패널을 닫는 로직
+        const detailPanel = document.getElementById('detailPanel');
+        if (detailPanel.classList.contains('show')) {
+            detailPanel.classList.remove('show');
+            // 패널이 닫히면서 열려있던 장소 ID를 초기화합니다.
+            openedPlaceId = null; 
+        }
+        // ⭐ [추가 끝]
+        
         if (!$sido.value || !$sigungu.value) {
             alert('시/도와 시/군/구를 선택해주세요.');
             return;
@@ -619,12 +618,6 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
     }
 
     function renderList() {
-    	
-    	// 🔹 검색 시 이전 상세창 닫기
-        const detailPanel = document.getElementById('detailPanel');
-        detailPanel.classList.remove('show');
-        openedPlaceId = null;
-        
         clearMarkers();
         clearList();
         const start = (currentPage - 1) * pageSize,
@@ -740,12 +733,12 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
 
 
         renderPagination();
-	
-     		// 🔹 현재 페이지 마커만 화면에 보이도록 bounds 설정
-        if (document.getElementById('map').style.display !== 'none' && pagePlaces.length > 0) {
+
+        // ⭐ [수정] 지도 경계 설정 로직: 현재 페이지의 마커들을 기준으로 지도 경계를 설정
+        if (document.getElementById('map').style.display !== 'none' && pagePlaces.length > 0) { 
             const bounds = new kakao.maps.LatLngBounds();
             pagePlaces.forEach(p => bounds.extend(new kakao.maps.LatLng(p.y, p.x)));
-            map.setBounds(bounds, 50); 
+            map.setBounds(bounds, 20); // 20은 패딩 값
         }
     }
 
@@ -822,11 +815,12 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
                 body: JSON.stringify({ reviewContent: newContent, rating: parseInt(newRating) })
             });
             if (response.ok) {
+                // 💡 성공 시 alert 대신 커스텀 메시지 사용 권장 (현재는 alert 유지)
                 alert('리뷰가 성공적으로 수정되었습니다.');
+                // 수정 완료 후, 리스트를 다시 불러와 '저장/취소' 버튼을 '수정/삭제'로 복구
                 fetchReviews(document.getElementById('placeNameInput').value, document.getElementById('addressInput').value);
             } else { 
                 const errorText = await response.text();
-                // 💡 HTTP 상태 코드 추가
                 alert(`리뷰 수정에 실패했습니다: ${errorText} (상태코드: ${response.status})`); 
             }
         } catch (error) { alert('네트워크 오류로 리뷰 수정에 실패했습니다.'); }
@@ -848,65 +842,82 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
         } catch (error) { alert('네트워크 오류로 리뷰 삭제에 실패했습니다.'); }
     }
     
-/* vetclinic_map.html 484줄 부근의 fetchReviews 함수를 아래 코드로 대체 */
-    
-    // ⭐ Helper 함수: 원본 수정/삭제 버튼을 생성하고 리스너를 붙여 반환
-    function createOriginalActionDiv(vetReviewSeq, reviewContent, rating) {
-        const actionDivId = `review-actions-${vetReviewSeq}`;
-        const actionDivHTML = `
-            <div id="${actionDivId}" class="review-actions d-flex justify-content-end" style="font-size : 20px; gap: 5px;"> 
-                <button class="btn btn-outline-brown btn-sm edit-btn" style="font-size: 16px;">수정</button>
-                <button class="btn btn-outline-danger btn-sm delete-btn" style="font-size: 16px;">삭제</button>
-            </div>
-        `;
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(actionDivHTML, 'text/html');
-        const actionDiv = doc.body.firstChild;
-
-        // 원본 Edit/Delete 리스너를 다시 붙입니다.
-        actionDiv.querySelector('.edit-btn').addEventListener('click', () => {
-            handleUpdateReview(vetReviewSeq, reviewContent, rating);
-        });
-        actionDiv.querySelector('.delete-btn').addEventListener('click', () => {
-            deleteReview(vetReviewSeq);
-        });
-        
-        return actionDiv;
-    }
-
-
     async function fetchReviews(placeName, address) {
         try {
             const params = new URLSearchParams({ placeName, address });
             const response = await fetch(`/api/vet-clinics/reviews?${params.toString()}`);
             const data = await response.json();
 
+            // ⭐ [추가] 최신 날짜(createDate) 기준으로 내림차순 정렬
+            if (data.reviews && data.reviews.length > 0) {
+                data.reviews.sort((a, b) => new Date(b.createDate) - new Date(a.createDate));
+            }
+            
             const avgRatingEl = document.getElementById('avgRating');
             const reviewListEl = document.getElementById('reviewList');
             
-            // ... (평점 표시 로직 생략) ...
+            // 💡 평균 평점 별표 표시 로직
+            if (data.ratingAvg !== null) {
+                const avgRating = parseFloat(data.ratingAvg).toFixed(1); 
+                const starCount = Math.round(data.ratingAvg); 
+                
+                const filledStars = '<span style="color:#FFD700;">' + '★'.repeat(starCount) + '</span>';
+                const emptyStars = '<span style="color:#CCCCCC;">' + '★'.repeat(5 - starCount) + '</span>';
+                const starDisplay = filledStars + emptyStars;
+                
+                avgRatingEl.innerHTML = `${avgRating}점 ${starDisplay} (${data.ratingCount}명 참여)`;
+            } else {
+                avgRatingEl.textContent = "아직 평점이 없습니다.";
+            }
 
             reviewListEl.innerHTML = `<strong style="font-size : 25px;">등록된 리뷰</strong>`;
 
             if (data.reviews && data.reviews.length > 0) {
                 data.reviews.forEach(review => {
+                    // 💡 현재 로그인 사용자가 이 리뷰의 작성자인지 확인
                     const isAuthor = LOGGED_IN_USER_SEQ && LOGGED_IN_USER_SEQ === review.userSeq;
+
+                    // 💡 DTO의 'userName' 필드를 사용하여 작성자 이름을 표시 (익명 문제 해결)
                     const authorName = review.userName || '익명';
+                    
+                    // ⭐ 버튼에 data-action="edit" / "delete" 속성 추가
+                    const actionButtons = isAuthor ? `
+                        <div class="review-actions d-flex justify-content-end" style="font-size : 20px; display: flex; gap: 5px;">
+                            <button class="btn btn-outline-brown btn-sm edit-btn" data-action="edit" style="font-size: 16px;">수정</button>
+                            <button class="btn btn-outline-danger btn-sm delete-btn" data-action="delete" style="font-size: 16px;">삭제</button>
+                        </div>
+                    ` : '';
                     
                     const reviewItem = document.createElement('div');
                     reviewItem.id = `review-${review.vetReviewSeq}`;
                     reviewItem.innerHTML = `
                         <p class="review-meta" style="font-size : 20px; color:#555555;">작성자: ${authorName} | 별점: ${'★'.repeat(review.vetRating)}</strong> | 작성일자: ${review.createDate}</p>
-                        <p class="review-content-text" style="font-size : 20px;">${review.vetReview}</p>
+                        <p class="review-text" style="font-size : 20px;">${review.vetReview}</p>
+                        
+                        ${actionButtons}
                         <hr>
                     `;
                     reviewListEl.appendChild(reviewItem);
 
+                    // 💡 버튼이 생성된 경우에만 이벤트 리스너 연결
                     if (isAuthor) {
-                        // ⭐ Helper 함수를 사용하여 버튼 생성 및 리스너 연결
-                        const actionDiv = createOriginalActionDiv(review.vetReviewSeq, review.vetReview, review.vetRating);
-                        reviewItem.insertBefore(actionDiv, reviewItem.querySelector('hr'));
+                        const editBtn = reviewItem.querySelector('.edit-btn');
+                        const deleteBtn = reviewItem.querySelector('.delete-btn');
+                        
+                        // 이 리스너는 수정 모드 진입 기능을 담당합니다.
+                        editBtn.addEventListener('click', () => {
+                             // data-action을 확인하여 '수정' 모드일 때만 진입
+                            if (editBtn.dataset.action === 'edit') {
+                                handleUpdateReview(review.vetReviewSeq, review.vetReview, review.vetRating);
+                            }
+                        });
+                        // 삭제 버튼 리스너
+                        deleteBtn.addEventListener('click', () => {
+                             // data-action을 확인하여 '삭제' 모드일 때만 실행
+                             if (deleteBtn.dataset.action === 'delete') {
+                                deleteReview(review.vetReviewSeq);
+                             }
+                        });
                     }
                 });
             } else {
@@ -918,127 +929,153 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
         }
     }
     
-    /* vetclinic_map.html 567줄 부근의 handleUpdateReview 함수를 아래 코드로 대체 */
-    function handleUpdateReview(vetReviewSeq, reviewContent, rating) {
-        const reviewItem = document.getElementById(`review-${vetReviewSeq}`);
-        const existingForm = reviewItem.querySelector('.update-form');
-        // ⭐ 기존 버튼 영역 ID를 통해 선택 (fetchReviews에서 ID 부여됨)
-        const actionDiv = document.getElementById(`review-actions-${vetReviewSeq}`); 
-
-        // Helper 함수: 버튼을 원본(수정/삭제)으로 복구하고 폼을 제거합니다.
-        const revertAndCleanUp = () => {
-            // 원본 버튼 영역을 재 생성하여 리스너까지 복구합니다.
-            const originalActionDiv = createOriginalActionDiv(vetReviewSeq, reviewContent, rating);
-            
-            // Save/Cancel 상태의 버튼 영역을 원본으로 교체
-            actionDiv.parentNode.replaceChild(originalActionDiv, actionDiv);
-            
-            // 폼 제거
-            const currentForm = reviewItem.querySelector('.update-form');
-            if (currentForm) currentForm.remove();
-        };
-
-        // 1. 이미 수정 폼이 열려있다면 닫고 종료 (Cancel 기능)
-        if (existingForm) {
-            existingForm.classList.remove('show');
-            setTimeout(() => {
-                revertAndCleanUp();
-            }, 400);
-            return;
-        }
-        
-        // -----------------------------------------------------------
-        // 2. 버튼 토글을 위한 준비 (리스너 제거 및 새 리스너 부착을 위해 버튼 복제)
-        const editBtn = actionDiv.querySelector('.edit-btn');
-        const deleteBtn = actionDiv.querySelector('.delete-btn');
-
-        // 리스너를 안전하게 제거하기 위해 버튼 노드 복제 및 교체
-        const newEditBtn = editBtn.cloneNode(true);
-        const newDeleteBtn = deleteBtn.cloneNode(true);
-        editBtn.parentNode.replaceChild(newEditBtn, editBtn);
-        deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
-        
-        const saveBtn = newEditBtn;
-        const cancelBtn = newDeleteBtn;
-
-        // 외형 및 텍스트 변경: 수정 -> 저장, 삭제 -> 취소
-        saveBtn.textContent = '저장';
-        saveBtn.className = 'btn btn-outline-success btn-sm save-btn';
-        cancelBtn.textContent = '취소';
-        cancelBtn.className = 'btn btn-outline-secondary btn-sm cancel-btn';
-        
-        // -----------------------------------------------------------
-        // 3. 수정 폼 생성 (버튼 제거)
-        const updateForm = document.createElement('div');
-        updateForm.className = 'update-form';
-        updateForm.innerHTML = `
-            <div class="form-group" style="font-size: 20px;">
-                <label>별점:</label>
+    // ⭐ 별점 설정 HTML을 생성하는 헬퍼 함수
+    function createUpdateFormContent(content, rating) {
+        return `
+            <div class="form-group" style="font-size : 20px;">
+                <label >별점:</label>
                 <div class="star-rating update-stars">
-                    <span class="star" data-rating="1">★</span>
-                    <span class="star" data-rating="2">★</span>
-                    <span class="star" data-rating="3">★</span>
-                    <span class="star" data-rating="4">★</span>
-                    <span class="star" data-rating="5">★</span>
+                    ${'★'.repeat(5).split('').map((star, i) => 
+                        `<span class="star" data-rating="${i+1}" style="color:${i+1 <= rating ? '#FFD700' : '#ccc'};">${star}</span>`
+                    ).join('')}
                 </div>
                 <input type="hidden" class="update-rating-input" value="${rating}">
             </div>
             <div class="form-group">
-                <label style="font-size: 20px;">내용:</label>
-                <textarea class="update-content-input form-control" style="font-size: 20px;" rows="3">${reviewContent}</textarea>
+                <label style="font-size : 20px;">내용:</label>
+                <textarea class="update-content-input form-control" style="font-size : 20px;" rows="3">${content}</textarea>
             </div>
-        `; 
-        
-        // 기존 버튼 영역(actionDiv) 바로 앞에 폼 삽입
-        reviewItem.insertBefore(updateForm, actionDiv); 
-        
-        // -----------------------------------------------------------
-        // ⭐ 4. 스크롤 및 폼 보이기
-        setTimeout(() => {
-            updateForm.classList.add('show');
-            
-            // 스크롤: 폼이 화면 중앙에 보이도록 block: 'center'로 설정하여 확실하게 이동
-            updateForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-        }, 50);
+        `;
+    }
 
-        // -----------------------------------------------------------
-        // 5. 토글된 버튼에 저장/취소 리스너 부착
-        
-        // 저장 버튼 리스너
-        saveBtn.addEventListener('click', () => {
-            const newContent = updateForm.querySelector('.update-content-input').value;
-            const newRating = updateForm.querySelector('.update-rating-input').value;
-            updateReview(vetReviewSeq, newContent, newRating); // API 호출
-            
-            // 저장 후 폼 닫고 버튼 복구
-            setTimeout(() => {
-                revertAndCleanUp();
-            }, 50); 
-        });
+    // ⭐ 수정 폼의 별점 이벤트 리스너 설정 함수
+    function setupUpdateStarRating(formElement, initialRating) {
+        const updateStars = formElement.querySelectorAll('.star-rating .star');
+        const updateRatingInput = formElement.querySelector('.update-rating-input');
 
-        // 취소 버튼 리스너 (폼 닫고 버튼 복구)
-        cancelBtn.addEventListener('click', () => {
-            updateForm.classList.remove('show');
-            setTimeout(() => {
-                revertAndCleanUp();
-            }, 400);
-        });
-        
-        // -----------------------------------------------------------
-        // 6. 별점 로직
-        const updateStars = updateForm.querySelectorAll('.star-rating .star');
-        const updateRatingInput = updateForm.querySelector('.update-rating-input');
+        // 별점 클릭 이벤트 설정
         updateStars.forEach(star => {
-            if (parseInt(star.dataset.rating) <= rating) star.classList.add('selected');
             star.addEventListener('click', function() {
                 const newRating = parseInt(this.dataset.rating);
                 updateRatingInput.value = newRating;
                 updateStars.forEach(s => {
-                    if (parseInt(s.dataset.rating) <= newRating) s.classList.add('selected');
-                    else s.classList.remove('selected');
+                    s.style.color = parseInt(s.dataset.rating) <= newRating ? '#FFD700' : '#ccc';
                 });
             });
         });
+    }
+
+    // ⭐ 수정 모드를 종료하고 버튼과 내용을 원상 복구하는 헬퍼 함수
+    function exitUpdateMode(vetReviewSeq, originalEditHandler, originalDeleteHandler) {
+        const reviewItem = document.getElementById(`review-${vetReviewSeq}`);
+        const updateForm = reviewItem.querySelector('.update-form-container');
+        
+        // ⭐ [추가] 숨겼던 리뷰 내용 다시 표시
+        const reviewMeta = reviewItem.querySelector('.review-meta');
+        const reviewText = reviewItem.querySelector('.review-text');
+        const hr = reviewItem.querySelector('hr:last-of-type');
+
+        if (reviewMeta) reviewMeta.style.display = 'block'; 
+        if (reviewText) reviewText.style.display = 'block'; 
+        if (hr) hr.style.display = 'block'; 
+        // ⭐ [추가 끝]
+        
+        const saveBtn = reviewItem.querySelector('.review-actions button[data-action="save"]');
+        const cancelBtn = reviewItem.querySelector('.review-actions button[data-action="cancel"]');
+        
+        // 1. 폼 제거
+        if (updateForm) updateForm.remove();
+
+    
+        // 3. 버튼 텍스트와 기능 복구 (저장 -> 수정, 취소 -> 삭제)
+        
+        // '저장' 버튼을 '수정'으로 복구
+        saveBtn.textContent = '수정';
+        saveBtn.classList.remove('save-btn');
+        saveBtn.classList.add('edit-btn');
+        saveBtn.dataset.action = 'edit';
+        saveBtn.onclick = originalEditHandler; // 원래 이벤트 리스너 복구
+        
+        // '취소' 버튼을 '삭제'로 복구
+        cancelBtn.textContent = '삭제';
+        cancelBtn.classList.remove('cancel-btn');
+        cancelBtn.classList.add('delete-btn');
+        cancelBtn.dataset.action = 'delete';
+        cancelBtn.onclick = originalDeleteHandler; // 원래 이벤트 리스너 복구
+    }
+
+
+    // ⭐ 수정된 handleUpdateReview 함수 (수정 모드 진입 로직)
+    function handleUpdateReview(vetReviewSeq, reviewContent, rating) {
+        const reviewItem = document.getElementById(`review-${vetReviewSeq}`);
+        const reviewText = reviewItem.querySelector('.review-text');
+
+        // 기존에 열려있는 폼이 있다면 닫기
+        const existingForm = reviewItem.querySelector('.update-form-container');
+        if(existingForm) existingForm.remove();
+
+        // ⭐ [추가 시작] 기존 리뷰 내용 숨기기
+        const reviewMeta = reviewItem.querySelector('.review-meta');
+        const hr = reviewItem.querySelector('hr:last-of-type'); 
+        
+        if (reviewMeta) reviewMeta.style.display = 'none';
+        if (reviewText) reviewText.style.display = 'none';
+        if (hr) hr.style.display = 'none';
+        // ⭐ [추가 끝]
+
+        const editBtn = reviewItem.querySelector('.edit-btn');
+        const deleteBtn = reviewItem.querySelector('.delete-btn');
+        
+        // 기존 이벤트 핸들러를 저장합니다. (exitUpdateMode에서 복구하기 위함)
+        const originalEditHandler = editBtn.onclick;
+        const originalDeleteHandler = deleteBtn.onclick;
+
+      
+        
+        // 2. 수정 폼 생성 및 삽입
+        const updateFormContainer = document.createElement('div');
+        updateFormContainer.className = 'update-form-container update-form';
+        updateFormContainer.innerHTML = createUpdateFormContent(reviewContent, rating);
+        
+        // 💡 리뷰 텍스트 바로 뒤에 폼 삽입
+        reviewText.insertAdjacentElement('afterend', updateFormContainer);
+        
+        // 3. 버튼 텍스트와 기능 변경 (수정 -> 저장, 삭제 -> 취소)
+        
+        // 3-1. '수정' -> '저장' 버튼으로 변경
+        editBtn.textContent = '저장';
+        editBtn.classList.add('save-btn');
+        editBtn.classList.remove('edit-btn');
+        editBtn.dataset.action = 'save'; // 액션 변경
+        
+        editBtn.onclick = async () => {
+            const newContent = updateFormContainer.querySelector('.update-content-input').value;
+            const newRating = updateFormContainer.querySelector('.update-rating-input').value;
+            
+            // 저장 로직 호출
+            try {
+                // updateReview는 성공 시 fetchReviews를 호출하여 리스트 전체를 갱신합니다.
+                // 갱신 과정에서 버튼의 이벤트 리스너가 fetchReviews에서 다시 설정되어 복구됩니다.
+                await updateReview(vetReviewSeq, newContent, newRating);
+            } catch (error) {
+                // 실패 시 모드 유지 (사용자가 수정할 수 있도록)
+                console.error("업데이트 실패:", error);
+            }
+        };
+
+        // 3-2. '삭제' -> '취소' 버튼으로 변경
+        deleteBtn.textContent = '취소';
+        deleteBtn.classList.add('cancel-btn');
+        deleteBtn.classList.remove('delete-btn');
+        deleteBtn.dataset.action = 'cancel'; // 액션 변경
+        
+        deleteBtn.onclick = () => {
+            // 취소 로직 호출: 원본 핸들러를 전달하여 복구
+            exitUpdateMode(vetReviewSeq, originalEditHandler, originalDeleteHandler);
+        };
+
+        // 4. 별점 설정 및 이벤트 리스너 연결
+        setupUpdateStarRating(updateFormContainer, rating);
     }
     
     async function submitReview(reviewData) {

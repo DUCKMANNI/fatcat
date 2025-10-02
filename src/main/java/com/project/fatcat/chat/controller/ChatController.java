@@ -121,10 +121,16 @@ public class ChatController {
             System.out.println("DEBUG: SecurityUtils에서 사용자 ID를 찾을 수 없습니다. 임시 ID 10을 사용합니다.");
             loggedInUserSeq = 10; // 임시 로그인 사용자 ID (Integer)
         }
-
+        
+        	String receiverProfileImage = chatService.getUserProfileImage(targetUserSeq);
+        	
         // Model에 두 사용자 ID를 담아 뷰로 전달 (targetUserSeq는 receiverSeq와 동일)
         model.addAttribute("loggedInUserSeq", loggedInUserSeq);
         model.addAttribute("targetUserSeq", targetUserSeq); 
+        
+     // ⭐ 변경됨: 'receiverProfileImage' 변수를 'targetUserProfileImage'라는 이름으로 모델에 추가
+        model.addAttribute("targetUserProfileImage", receiverProfileImage != null ? receiverProfileImage : "/images/user_no_image.jpg");
+
         
 		return "chat/chat_form"; 
 	}

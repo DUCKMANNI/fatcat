@@ -39,6 +39,10 @@ public class ChatMessageDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String confirmedTime;
     
+ // ✅ 추가
+    private String senderProfileImage;
+    private String receiverProfileImage;
+    
     public ChatMessageDto(ChatMessageDto other) {
         this.chatRoomId = other.chatRoomId;
         this.senderId = other.senderId;
@@ -54,5 +58,7 @@ public class ChatMessageDto {
         this.sessionId = other.sessionId;
         this.timestamp = other.timestamp;
         this.confirmedTime = other.confirmedTime;
+        this.senderProfileImage = other.senderProfileImage;
+        this.receiverProfileImage = other.receiverProfileImage;
     }
 }
