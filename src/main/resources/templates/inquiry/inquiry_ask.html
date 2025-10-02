@@ -1,0 +1,149 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{shared/layout}">
+
+<body>
+	<div layout:fragment="content">
+	
+	<style>
+		/* === 색상 팔레트 === */
+		:root {
+			--tan-medium: #C3997A;      /* 주요 요소 (테두리) */
+			--tan-button: #D2B48C;      /* 버튼 기본 색상 */
+			--tan-button-hover: #a38b6a;/* 버튼 호버 색상 */
+			--tan-darker: #7E5F4D;      /* 텍스트, 라벨 */
+			--tan-darkest: #4C3C30;     /* 제목 */
+			--white: #FFFFFF;
+			--form-background: #F8F4EE; /* 폼 배경색 (아주 연한 탄색) */
+			--border-light: #E0D4C5;    /* 연한 테두리 */
+			--error-red: #d9534f;       /* 오류 메시지 색상 */
+		}
+
+		/* === 전체 레이아웃 === */
+		.ask-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			min-height: calc(100vh - 100px); 
+			padding: 50px 20px; /* 상하 패딩 증가 */
+		}
+
+		/* === 제목 스타일 === */
+		h1 {
+			color: var(--tan-darkest);
+			margin-bottom: 40px; /* 마진 증가 */
+			font-size: 50px; /* ⭐ 제목 크기 더 크게 ⭐ */
+			font-weight: bold;
+		}
+
+		/* === 폼 컨테이너 === */
+		.ask-form {
+			width: 100%;
+			max-width: 800px; /* ⭐ 폼 너비 더 크게 ⭐ */
+			background-color: var(--form-background);
+			padding: 50px; /* 폼 내부 패딩 증가 */
+			border-radius: 12px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+			display: flex;
+			flex-direction: column;
+			gap: 25px; /* 간격 증가 */
+			border: 1px solid var(--border-light);
+		}
+		
+		/* === 입력 필드 및 텍스트 영역 === */
+		.form-field {
+			width: 100%;
+		}
+		
+		.form-field label {
+			display: block;
+			font-size: 1.3em; /* ⭐ 라벨 폰트 크기 증가 ⭐ */
+			font-weight: bold;
+			color: var(--tan-darker);
+			margin-bottom: 10px; /* 마진 증가 */
+		}
+		
+		.form-field input[type="text"],
+		.form-field textarea {
+			width: 100%;
+			padding: 15px; /* ⭐ 입력 필드 패딩 증가 ⭐ */
+			border: 1px solid var(--border-light); 
+			border-radius: 8px; /* 모서리 약간 더 둥글게 */
+			font-size: 1.15em; /* ⭐ 입력 텍스트 폰트 크기 증가 ⭐ */
+			color: var(--tan-darker);
+			box-sizing: border-box;
+			transition: border-color 0.3s;
+		}
+		
+		.form-field textarea {
+			resize: vertical;
+			min-height: 200px; /* ⭐ 텍스트 영역 최소 높이 증가 ⭐ */
+		}
+
+		.form-field input[type="text"]:focus,
+		.form-field textarea:focus {
+			outline: none;
+			border-color: var(--tan-medium); 
+			box-shadow: 0 0 5px rgba(195, 153, 122, 0.5);
+		}
+
+		/* === 버튼 그룹 (중앙 정렬) === */
+		.button-group {
+			display: flex;
+			justify-content: center; 
+			gap: 15px;
+			margin-top: 20px; /* 마진 증가 */
+		}
+
+		/* === 버튼 스타일 (btn-fatcat) === */
+		.btn-fatcat {
+	background-color: #D2B48C;
+	color: #fff;
+	border-radius: 999px;
+	padding: 6px 16px;
+	border: none;
+	font-weight: 500;
+}
+
+
+.btn-fatcat:hover {
+	background-color: #a38b6a; /* hover 시 조금 진하게 */
+	color: #fff;
+}
+		
+		/* === 오류 메시지 스타일 === */
+		.error-message {
+            color: var(--error-red);
+            font-size: 1em; /* 오류 메시지 폰트 크기 증가 */
+            margin-top: 5px;
+            font-weight: 500;
+        }
+	</style>
+
+	<div class="ask-container">
+		<h1>1:1 문의 등록</h1>
+		
+		<form th:action="@{/inquiry/ask}" th:object="${inquiryForm}" method="post" class="ask-form">
+		
+			<div class="form-field">
+				<label for="inquiryTitle">제목</label>
+				<input type="text" id="inquiryTitle" th:field="*{inquiryTitle}" required placeholder="문의 제목을 입력해주세요.">
+				<p th:if="${#fields.hasErrors('inquiryTitle')}" th:errors="*{inquiryTitle}" class="error-message"></p>
+			</div>
+			
+			<div class="form-field">
+				<label for="inquiryContent">내용</label>
+				<textarea id="inquiryContent" th:field="*{inquiryContent}" required placeholder="궁금한 내용을 상세하게 입력해주세요. 문의하신 내용은 빠르게 확인하여 답변드리겠습니다."></textarea>
+				<p th:if="${#fields.hasErrors('inquiryContent')}" th:errors="*{inquiryContent}" class="error-message"></p>
+			</div>
+			
+			<div class="button-group">
+				<button type="submit" class="btn-fatcat">문의 등록</button>
+			</div>
+			
+		</form>
+	</div>
+	</div>
+</body>
+</html>

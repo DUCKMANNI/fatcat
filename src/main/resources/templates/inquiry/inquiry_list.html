@@ -1,0 +1,259 @@
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{shared/layout}">
+
+<body>
+  <div layout:fragment="content">
+
+    <style>
+:root{
+  --white-background:#FFFFFF;
+  --tan-medium:#D6A77A;
+  --tan-dark:#B58B63;
+  --tan-text:#5C4A3A;
+  --tan-border:#E6CCB2;
+  --mypage-border:#D1D1D1;
+}
+
+body{
+  background-color:var(--white-background);
+  color:var(--tan-text);
+  box-sizing: border-box;
+}
+
+/* 헤더 / 메뉴 / 검색 등은 원래대로 */
+.page-header{
+  margin-bottom:20px;
+  text-align:center;
+  color:var(--tan-text);
+  font-size:30px;
+  font-weight:bold;
+  width:80%;
+  max-width:1100px;
+  margin:20px auto;
+}
+.mypage-menu-container{ width:80%; max-width:1100px; margin:0 auto 40px; }
+.mypage-menu{ display:flex; justify-content:center; gap:40px; border-bottom:2px solid var(--mypage-border); padding-bottom:10px; }
+.mypage-menu a{ text-decoration:none; color:#707070; font-size:20px; font-weight:600; padding-bottom:10px; position:relative; transition:color .3s; }
+.mypage-menu a[href$="/inquiry/list"]{ color:var(--tan-dark); font-weight:bold; }
+.mypage-menu a[href$="/inquiry/list"]::after{ content:""; position:absolute; bottom:-12px; left:0; width:100%; height:4px; background-color:var(--tan-dark); }
+.search-container{ display:flex; justify-content:flex-end; margin:20px auto; width:80%; max-width:1100px; }
+.search-form{ display:flex; width:400px; }
+.search-form input{ flex-grow:1; padding:10px; border:1px solid var(--tan-medium); border-radius:5px 0 0 5px; font-size:20px; color:var(--tan-text); }
+.search-form input::placeholder{ color:var(--tan-text); opacity:0.6; }
+.search-form button{ padding:10px 18px; border:1px solid var(--tan-medium); border-left:none; border-radius:0 5px 5px 0; background-color:var(--tan-medium); color:white; cursor:pointer; font-size:20px; transition:background-color .3s; }
+.search-form button:hover{ background-color:var(--tan-dark); }
+
+/* 문의 목록 전체 컨테이너 */
+.inquiry-container{ width:80%; max-width:1100px; margin:0 auto; border-top:2px solid var(--tan-medium); font-size:20px; box-sizing:border-box; }
+
+.inquiry-item{ border-bottom:1px solid var(--tan-border); overflow:hidden; }
+
+/* 질문 제목 부분 (클릭해서 열림) */
+.inquiry-question{
+  padding:15px;
+  cursor:pointer;
+  background-color:var(--white-background);
+  display:flex;
+  justify-content:space-between;
+  align-items:center; /* 제목 라인 가운데 정렬 OK */
+  color:var(--tan-text);
+  font-size:20px;
+  font-weight:600;
+}
+.question-title{ font-size:20px; font-weight:600; }
+
+/* 답변 상태 아이콘 등 */
+.answer-status{ font-size:16px; font-weight:bold; padding:0; margin-left:20px; background:transparent; border:none; }
+.status-waiting{ color:#721C24; }
+.status-answered{ color:#155724; }
+
+/* .inquiry-answer: 닫혔을 때는 높이 0, 열리면 내부 내용을 정상적으로 보이게 함 */
+.inquiry-answer{
+  background-color:var(--white-background);
+  padding:0 15px;
+  max-height:0;
+  transition:max-height .3s ease-out, padding .3s ease-out;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+/* open 상태일 때 내부에 패딩 주기 (여기서 top 패딩을 줘서 라벨과 내용이 조금 떨어지게 할 수도 있음) */
+.inquiry-item.open .inquiry-answer{
+  max-height:1000px; /* 충분히 큰 값으로 변경하여 스무스하게 열리게 함 */
+  padding:15px;
+}
+
+/* 핵심: 질문/답변 박스 내부를 flex 컬럼으로 만들고 세로 정렬을 위로 고정 */
+/* 이렇게 하면 내부 텍스트(줄바꿈 포함)가 항상 위에서부터 시작함 */
+.inquiry-content,
+.answer-text{
+  border:1px solid var(--tan-border);
+  padding:15px;
+  background-color:var(--white-background);
+  white-space:pre-wrap;
+  margin-bottom:15px;
+  font-size:20px;
+  width:100%;
+  box-sizing:border-box;
+
+min-height: 150px;
+
+  display:flex;             /* <-- 블록이 아닌 flex 컨테이너로 변경 */
+  flex-direction:column;    /* <-- 세로로 쌓기 */
+  justify-content:flex-start; /* <-- 세로 시작(위)로 정렬 */
+  align-items:flex-start;   /* <-- 가로도 왼쪽 정렬 보장 */
+  text-align:left;
+  line-height:1.5;
+}
+
+/* 라벨(질문 내용 / 답변) */
+.answer-label, .question-label{
+  font-size:16px;
+  font-weight:600;
+  color:#707070;
+  margin-bottom:8px;
+  display:block;
+}
+
+/* 관리자 폼 */
+.admin-comment-form{ padding:15px; background-color:var(--white-background); border:1px solid var(--tan-border); margin-bottom:15px; box-sizing:border-box; }
+.admin-comment-form textarea{ width:100%; padding:10px; border:1px solid var(--tan-medium); border-radius:5px; resize:vertical; min-height:100px; margin-bottom:10px; font-size:16px; box-sizing:border-box; }
+.admin-comment-form button{ padding:10px 15px; background-color:var(--tan-medium); color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px; transition:background-color .3s; }
+.admin-comment-form button:hover{ background-color:var(--tan-dark); }
+
+.arrow{ transition:transform .3s ease; display:inline-block; }
+.inquiry-item.open .arrow{ transform:rotate(180deg); }
+
+/* 페이지네이션 (원래대로) */
+.pagination{ justify-content:center; margin-top:40px; margin-bottom:40px; }
+.page-item{ list-style:none; }
+.page-link{ display:block; padding:8px 16px; text-decoration:none; color:var(--tan-text); background-color:var(--white-background); border:1px solid var(--tan-medium); margin:0 4px; border-radius:5px; transition:background-color .3s, color .3s; }
+.page-link:hover{ background-color:var(--tan-medium); color:white; }
+.page-item.active .page-link{ background-color:var(--tan-medium); border-color:var(--tan-medium); color:white; }
+.page-item.disabled .page-link{ color:#A99380; pointer-events:none; background-color:var(--white-background); border-color:var(--tan-border); }
+
+    </style>
+
+    <h2 class="page-header">고객센터</h2>
+
+    <div class="mypage-menu-container">
+      <div class="mypage-menu">
+        <a th:href="@{/faq/list}">FAQ</a>
+        <a th:href="@{/inquiry/list}">나의 문의 목록</a>
+        <a th:href="@{/inquiry/ask}">질문 등록</a>
+      </div>
+    </div>
+
+    <div class="search-container">
+      <form th:action="@{/inquiry/list}" method="get" class="search-form">
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="검색어 (제목/내용)를 입력하세요">
+        <button type="submit">검색</button>
+      </form>
+    </div>
+
+    <div class="inquiry-container">
+      <div class="inquiry-item" th:each="inquiry : ${paging}">
+        <div class="inquiry-question">
+          <div>
+            <b class="question-title">Q:
+              <span th:text="${inquiry.inquiryTitle}">문의 제목입니다.</span>
+            </b>
+          </div>
+
+          <div style="display:flex; align-items:center;">
+            <span th:if="${inquiry.inquiryCommentList.isEmpty()}" class="answer-status status-waiting">
+              <span th:text="'답변 대기 중'"></span>
+            </span>
+
+            <span th:unless="${inquiry.inquiryCommentList.isEmpty()}" class="answer-status status-answered">
+              <span th:text="'✅ 답변 완료'"></span>
+            </span>
+
+            <span class="arrow" style="margin-left:10px;">▼</span>
+          </div>
+        </div>
+
+        <div class="inquiry-answer">
+          <span class="question-label">질문 내용</span>
+
+          <!-- 질문 내용은 내부가 flex column이므로 항상 위에서부터 시작 -->
+          <div class="inquiry-content">
+            <span th:text="${inquiry.inquiryContent}">질문 상세 내용입니다.</span>
+          </div>
+
+          <div th:if="${!inquiry.inquiryCommentList.isEmpty()}" th:with="comment=${inquiry.inquiryCommentList[0]}">
+            <span class="answer-label">A: 답변</span>
+            <div class="answer-text">
+              <span th:text="${comment.inquiryComment}">관리자 답변 내용입니다.</span>
+            </div>
+          </div>
+
+          <div th:unless="${!inquiry.inquiryCommentList.isEmpty()}">
+            <div sec:authorize="hasRole('ADMIN')">
+              <span class="answer-label">A: 답변 등록 (관리자 전용)</span>
+              <form th:action="@{|/inquiry/comment/create/${inquiry.inquirySeq}|}" method="post" class="admin-comment-form">
+                <textarea name="inquiryComment" placeholder="답변 내용을 입력하세요" required></textarea>
+                <button type="submit">답변 등록</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${paging.isEmpty()}" class="inquiry-question" style="justify-content:center; font-weight:normal;">
+        등록된 문의 내역이 없습니다.
+      </div>
+    </div>
+
+    <div th:if="${!paging.isEmpty()}">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${!paging.hasPrevious()} ? 'disabled'">
+          <a class="page-link" th:href="@{|/inquiry/list?page=${paging.number-1}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}"><</a>
+        </li>
+
+        <li th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
+            th:if="${page >= paging.number-5 and page <= paging.number+5}"
+            th:classappend="${page == paging.number} ? 'active'"
+            class="page-item">
+          <a th:text="${page+1}" class="page-link" th:href="@{|/inquiry/list?page=${page}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}"></a>
+        </li>
+
+        <li class="page-item" th:classappend="${!paging.hasNext()} ? 'disabled'">
+          <a class="page-link" th:href="@{|/inquiry/list?page=${paging.number+1}${keyword != null && !keyword.isEmpty() ? '&keyword=' + keyword : ''}|}">></a>
+        </li>
+      </ul>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const inquiryItems = document.querySelectorAll('.inquiry-item');
+
+        inquiryItems.forEach(item => {
+          const question = item.querySelector('.inquiry-question');
+
+          question.addEventListener('click', () => {
+            const isOpening = !item.classList.contains('open');
+
+            // 다른 열린 아이템 닫기
+            inquiryItems.forEach(otherItem => {
+              if (otherItem !== item && otherItem.classList.contains('open')) {
+                otherItem.classList.remove('open');
+              }
+            });
+
+            if (isOpening) {
+              item.classList.add('open');
+            } else {
+              item.classList.remove('open');
+            }
+          });
+        });
+      });
+    </script>
+
+  </div>
+</body>
+</html>
