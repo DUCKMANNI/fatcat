@@ -30,6 +30,7 @@ public class ChatMessageDto {
     private String status;      // "REQUESTED", "CONFIRMED", "CANCELLED"
     private String note;
     private Integer sessionId;
+    private Integer careSeq;
 
     // 저장된 시간
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -60,5 +61,8 @@ public class ChatMessageDto {
         this.confirmedTime = other.confirmedTime;
         this.senderProfileImage = other.senderProfileImage;
         this.receiverProfileImage = other.receiverProfileImage;
+        this.careSeq = other.careSeq;
     }
-}
+
+	
+	}

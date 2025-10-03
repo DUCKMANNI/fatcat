@@ -58,6 +58,7 @@ public class ChatController {
                         .endDate(endDate)
                         .status("REQUESTED")
                         .note(chatMessageDto.getNote())
+                        .careBoardSeq(chatMessageDto.getCareSeq()) // 💡 [추가] CareSeq 설정
                         .build();
 
                 CareSessionDto savedRequest = careSessionService.createSession(request);
@@ -127,6 +128,8 @@ public class ChatController {
         // Model에 두 사용자 ID를 담아 뷰로 전달 (targetUserSeq는 receiverSeq와 동일)
         model.addAttribute("loggedInUserSeq", loggedInUserSeq);
         model.addAttribute("targetUserSeq", targetUserSeq); 
+        
+    
         
      // ⭐ 변경됨: 'receiverProfileImage' 변수를 'targetUserProfileImage'라는 이름으로 모델에 추가
         model.addAttribute("targetUserProfileImage", receiverProfileImage != null ? receiverProfileImage : "/images/user_no_image.jpg");

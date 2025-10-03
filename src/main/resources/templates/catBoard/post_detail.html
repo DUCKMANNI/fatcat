@@ -453,25 +453,25 @@
 				    </form>
 				</div>
 			</div>
-
-			<form th:action="@{|/comment/create/${post.postSeq}|}" th:object="${commentForm}" method="post">
+	<!-- 잠시 주석!!! 시연영상용!!!!!!!!!!! -->
+		<!-- 	<form th:action="@{|/comment/create/${post.postSeq}|}" th:object="${commentForm}" method="post">
 				<h5 class="my-3 py-3 border-bottom" style="color: var(--tan-darkest) !important; border-color: var(--tan-medium) !important;">답변 작성</h5>
 				<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
 				
-				<!-- 로그인한 경우에만 댓글 작성 폼 표시 -->
+				로그인한 경우에만 댓글 작성 폼 표시
 				<th:block sec:authorize="isAuthenticated()">
 					<textarea class="form-control" rows="5" th:field="*{commentContent}" placeholder="답변 내용을 입력해주세요."></textarea>
 					<input class="btn btn-fatcat my-3" type="submit" value="답변 등록하기">
 				</th:block>
 				
-				<!-- 로그인하지 않은 경우 안내 메시지 표시 -->
+				로그인하지 않은 경우 안내 메시지 표시
 				<th:block sec:authorize="!isAuthenticated()">
 					<div class="alert alert-info my-3 text-center" style="background-color: var(--tan-lighter); border-color: var(--tan-medium); color: var(--tan-darkest); font-weight: 500;">
 						답변을 작성하려면 먼저 **로그인**해주세요.
 					</div>
 				</th:block>
-			</form>
-			
+			</form>                여기까지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+		
 			<script type='text/javascript' layout:fragment="script">
 				// 삭제 기능 스크립트 (기존 유지)
 				const delete_elements = document.getElementsByClassName("delete");

@@ -840,6 +840,9 @@ textarea::placeholder {
 		</div>
         
 		<div id="care-form">
+		
+		<input type="hidden" id="care-seq-input" name="careSeq" value="">
+			
 			<div class="care-form-group">
 				<label for="start-date">시작일:</label>
 				<input type="datetime-local" id="start-date">
@@ -858,6 +861,7 @@ textarea::placeholder {
 				<textarea id="session-note" rows="3" placeholder="메모를 입력하세요"></textarea>
 			</div>
 			<div class="care-form-group full-width button-container">
+				
 				<button id="confirm-care" class="btn btn-fatcat">예약 전송</button>
 			</div>
 		</div>
@@ -894,6 +898,8 @@ let chatRoomId = null;
 let stompClient = null;
 let targetUserSeqForReview = null; 
 let currentRating = 0; 
+let currentCareSeq = null; // 💡 careSeq 변수를 전역에서 초기화만 해둡니다.
+
 
 let userNames = {}; 
 
@@ -949,6 +955,15 @@ window.onload = function() {
     userNames[senderId] = '나'; 
     userNames[receiverId] = '상대방'; 
     
+ // 💡 [추가] care_map.html에서 임시 저장한 careSeq를 가져와 전역 변수에 저장
+    const initialCareSeq = sessionStorage.getItem('currentCareSeq');
+    if (initialCareSeq) {
+        currentCareSeq = parseInt(initialCareSeq); 
+        // 🚨 중요: 한 번 읽었으면 sessionStorage에서 제거하여 다른 채팅방 열 때 재사용을 막습니다.
+        sessionStorage.removeItem('currentCareSeq'); 
+        console.log(`DEBUG: Initial careSeq found: ${currentCareSeq}.`);
+    }
+    
 
     // ID 유효성 검사 및 채팅 초기화
     if (senderId && receiverId && senderId !== receiverId) {
@@ -973,13 +988,23 @@ window.onload = function() {
         if (e.key === 'Enter') sendMessage();
     });
 
-    // 돌봄 예약 토글 로직
+    // 💡 [수정] 돌봄 요청 폼 토글 로직 수정
     careToggle.addEventListener('click', () => {
     	 
     	        careForm.classList.toggle('active');
     	        
     	        if (careForm.classList.contains('active')) {
     	            careToggle.textContent = '예약 취소';
+    	            
+    	            // ⭐ [추가] 폼이 열릴 때 careSeq가 있다면 숨겨진 필드에 설정
+    	            const careSeqInput = document.getElementById('care-seq-input'); 
+    	            if (careSeqInput && currentCareSeq) {
+    	                careSeqInput.value = currentCareSeq;
+    	            } else if (careSeqInput) {
+                        // careSeq가 없으면 폼 필드를 비웁니다.
+                        careSeqInput.value = '';
+                    }
+
     	        } else {
     	            careToggle.textContent = '돌봄 예약';
     	        }
@@ -1012,6 +1037,17 @@ function sendCareRequest() {
     const startWithSeconds = startIsoFormat + ':00';
     const endWithSeconds = endIsoFormat + ':00';
     
+    
+    // 💡 [추가] 폼 내부의 숨겨진 careSeq 필드에서 값을 가져옵니다.
+    const careSeqInput = document.getElementById('care-seq-input');
+    const careSeqValue = careSeqInput && careSeqInput.value ? parseInt(careSeqInput.value) : null;
+    
+    if (!careSeqValue) {
+        console.warn("CARE_REQUEST: careSeq 값이 누락되었습니다. 일반적인 돌봄 요청으로 처리됩니다.");
+        // alert("돌봄 요청을 위해선 게시글 정보가 필요합니다. 다시 시도해 주세요.");
+        // return; // 필수라면 요청을 막습니다. (현재는 WARN 처리 후 진행)
+    }
+    
     const chatMessage = {
         chatRoomId: chatRoomId,
         senderId: senderId,
@@ -1021,7 +1057,8 @@ function sendCareRequest() {
         endDate: endWithSeconds,
         status: 'REQUESTED',
         note: document.getElementById('session-note').value,
-        content: `돌봄 요청: ${start} ~ ${end}`
+        content: `돌봄 요청: ${start} ~ ${end}`,
+        	careSeq: careSeqValue 
     };
 
     stompClient.send("/app/private-chat", {}, JSON.stringify(chatMessage));
@@ -1033,6 +1070,8 @@ function sendCareRequest() {
     startDateInput.value = '';
     endDateInput.value = '';
     document.getElementById('session-note').value = '';
+    
+   
 }
 
 function confirmCareRequest(sessionId, senderIdFromMsg) {
@@ -1449,6 +1488,18 @@ async function fetchReviews(targetSeq) {
         
         const reviews = await response.json();
         listArea.innerHTML = '';
+        
+     // ⭐ [추가] 리뷰를 createDate (시간 포함) 기준으로 최신순 정렬 ⭐
+        if (reviews && reviews.length > 0) {
+            reviews.sort((a, b) => {
+                // new Date()와 getTime()을 사용하여 밀리초 단위로 정확히 비교
+                const timeA = new Date(a.createDate).getTime();
+                const timeB = new Date(b.createDate).getTime();
+                
+                // 최신순 (내림차순) 정렬: timeB - timeA
+                return timeB - timeA;
+            });
+        }
         
         let totalRating = 0;
         

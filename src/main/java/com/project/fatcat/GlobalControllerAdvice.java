@@ -33,10 +33,12 @@ public class GlobalControllerAdvice {
         } else if (path.startsWith("/care")) {
             return "돌봄서비스";
         } else if (path.startsWith("/post/list/1")) {
-            return "고양이 지식방 - 수의사에게 질문하기";
+            return "수의사에게 질문하기";
         } else if (path.startsWith("/post/list/2")) {
-            return "고양이 지식방 - 냥꿀팁";
+            return "냥꿀팁";
         } else if (path.startsWith("/faq")) {
+            return "고객센터";
+        } else if (path.startsWith("/inquiry")) {
             return "고객센터";
         } else {
             return ""; // 기본값 (혹은 로고 옆에 아무것도 표시하지 않음)

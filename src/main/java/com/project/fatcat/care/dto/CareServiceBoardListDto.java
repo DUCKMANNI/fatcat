@@ -20,7 +20,7 @@ public class CareServiceBoardListDto {
     private Double longitude;
     private Integer price;
     private String authorNickname;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDate;
     private Integer userSeq;
 
