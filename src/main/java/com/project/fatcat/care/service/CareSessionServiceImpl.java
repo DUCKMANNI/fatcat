@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.fatcat.care.dto.CareSessionDto;
+import com.project.fatcat.care.repository.CareServiceBoardRepository;
 import com.project.fatcat.care.repository.CareSessionRepository;
+import com.project.fatcat.entity.CareServiceBoard;
 import com.project.fatcat.entity.CareSession;
 import com.project.fatcat.entity.User;
 import com.project.fatcat.entity.enums.CareSessionStatus;
@@ -21,12 +23,22 @@ public class CareSessionServiceImpl implements CareSessionService {
 
     private final CareSessionRepository careSessionRepository;
     private final UserRepository userRepository;
+    private final CareServiceBoardRepository careServiceBoardRepository;
 
     // 1. 돌봄 요청 생성
     @Override
     @Transactional
     public CareSessionDto createSession(CareSessionDto dto) {
         CareSession session = new CareSession();
+        
+        
+     // 1. DTO에서 careSeq를 받아 CareServiceBoard 엔티티를 조회 및 연결
+        if (dto.getCareBoardSeq() != null) { // ⭐ [추가] careSeq가 있는 경우에만 처리
+            CareServiceBoard board = careServiceBoardRepository.findById(dto.getCareBoardSeq())
+                    .orElseThrow(() -> new IllegalArgumentException("Care Board not found with seq: " + dto.getCareBoardSeq()));
+            session.setCareServiceBoard(board); // CareSession 엔티티에 setCareServiceBoard 메서드가 있다고 가정
+        }
+        
         session.setStartDate(dto.getStartDate());
         session.setEndDate(dto.getEndDate());
         session.setStatus(CareSessionStatus.REQUESTED);
@@ -48,6 +60,7 @@ public class CareSessionServiceImpl implements CareSessionService {
                 .startDate(saved.getStartDate())
                 .endDate(saved.getEndDate())
                 .status(saved.getStatus().name())
+                .careBoardSeq(saved.getCareServiceBoard() != null ? saved.getCareServiceBoard().getCareSeq() : null) // ⭐ [추가]
                 .build();
     }
 

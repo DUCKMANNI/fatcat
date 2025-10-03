@@ -357,6 +357,7 @@
 let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7, maxItems = 45;
 let openedPlaceId = null, originalCenter = null;
 let userLocationMarker = null; // 사용자 위치 마커 변수 추가
+let currentHoverOverlay = null; // ⭐⭐⭐ 이 줄을 추가해야 합니다! ⭐⭐⭐
 
 const markers = [];
 const geocoder = new kakao.maps.services.Geocoder();
@@ -599,20 +600,19 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
         const overlay = new kakao.maps.CustomOverlay({
        	 	position: pos,
             content: visualContent,
-            yAnchor: -0.1, // 1보다 크게 하면 위로 올라감
-            xAnchor: 0.4,
-            zIndex: 3
+            yAnchor: 0, // 1보다 크게 하면 위로 올라감
+            xAnchor: 0,
+            zIndex: 2
         });
         overlay.setMap(map);
         
         // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
         const transparentImage = new kakao.maps.MarkerImage(
             'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
-            new kakao.maps.Size(50, 50), // 사이즈 최소화
-            { offset: new kakao.maps.Point(25, -7) }
+            new kakao.maps.Size(40, 60), // 사이즈 최소화
+            { offset: new kakao.maps.Point(0, 7) }
         );
         
- const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
 
         
         const marker = new kakao.maps.Marker({
@@ -623,15 +623,32 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
             zIndex: 3 // Custom Overlay 뒤로 숨김
         });
         
-        // 📌 마커에 마우스 올렸을 때 infoWindow 보이게
+        
+        // ⭐ [수정 시작] 마커에 마우스 이벤트 리스너 다시 추가 및 로직 통일
         kakao.maps.event.addListener(marker, "mouseover", () => {
-            showInfo(marker, title);
+            // 리스트와 동일하게, 기존 오버레이가 있다면 닫고 새로 엽니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; 
+            }
+            
+            const newOverlay = showInfo(marker, title);
+            currentHoverOverlay = newOverlay;
         });
+
         kakao.maps.event.addListener(marker, "mouseout", () => {
-            infowindow.close();
+            // 마우스 아웃 시 오버레이를 닫습니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; 
+            }
         });
+        // ⭐ [수정 끝]
+        
+        
         
         markers.push({
+        		
             marker,
             overlay
         });
@@ -666,11 +683,26 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
             `;
 
             li.addEventListener('mouseover', () => {
-                showInfo(marker, place.place_name);
-                map.panTo(pos);
-            });
-            li.addEventListener('mouseout', () => infowindow.close());
+            // ⭐ 기존에 열려있는 CustomOverlay가 있다면 먼저 닫습니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; // 초기화
+            }
+            
+            // ⭐ showInfo 함수를 호출하고 반환된 CustomOverlay를 변수에 저장합니다.
+            const newOverlay = showInfo(marker, place.place_name);
+            currentHoverOverlay = newOverlay;
 
+            map.panTo(pos);
+        });
+        
+        li.addEventListener('mouseout', () => {
+            // ⭐ 저장된 CustomOverlay를 닫고 변수를 초기화합니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; // 초기화
+            }
+        });
             li.addEventListener('click', () => {
                 const detailPanel = document.getElementById('detailPanel');
                 if (openedPlaceId === place.id) {
@@ -784,10 +816,22 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
     }
 
     function showInfo(marker, title) {
-        infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
-        infowindow.open(map, marker);
-    }
+        const overlay = new kakao.maps.CustomOverlay({
+            content: `
+                <div style="padding:5px;font-size:13px;background:white;border:1px solid #888;">
+                    ${title}
+                </div>
+            `,
+            map: map,
+            position: marker.getPosition(),
+            xAnchor: 0.25, // ⭐ 가로 중앙 정렬 (0=왼쪽, 1=오른쪽)
+            yAnchor: 1.2  // ⭐ 마커 위쪽으로 조금 띄우기
+        });
 
+        return overlay;
+    }
+    
+    
     function toggleListView() {
         const mapDiv = document.getElementById('map');
         const btn = document.getElementById('btn');
@@ -871,10 +915,21 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
             const params = new URLSearchParams({ placeName, address });
             const response = await fetch(`/api/vet-clinics/reviews?${params.toString()}`);
             const data = await response.json();
+            
 
-            // ⭐ [추가] 최신 날짜(createDate) 기준으로 내림차순 정렬
+	
+            
             if (data.reviews && data.reviews.length > 0) {
-                data.reviews.sort((a, b) => new Date(b.createDate) - new Date(a.createDate));
+                data.reviews.sort((a, b) => {
+                    // new Date() 객체를 getTime()으로 변환하여 밀리초 단위로 정확하게 비교합니다.
+                    // createDate 필드에 'YYYY-MM-DD HH:MM:SS'와 같이 시간 정보가 반드시 포함되어야 
+                    // 같은 날짜 내에서도 최신 순으로 정렬됩니다.
+                    const timeA = new Date(a.createDate).getTime();
+                    const timeB = new Date(b.createDate).getTime();
+                    
+                    // 최신순 (내림차순) 정렬: timeB - timeA
+                    return timeB - timeA;
+                });
             }
             
             const avgRatingEl = document.getElementById('avgRating');
@@ -901,6 +956,9 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
                     // 💡 현재 로그인 사용자가 이 리뷰의 작성자인지 확인
                     const isAuthor = LOGGED_IN_USER_SEQ && LOGGED_IN_USER_SEQ === review.userSeq;
 
+                    const displayDate = review.createDate ? review.createDate.substring(0, 10) : '날짜 정보 없음';
+
+                    
                     // 💡 DTO의 'userName' 필드를 사용하여 작성자 이름을 표시 (익명 문제 해결)
                     const authorName = review.userName || '익명';
                     
@@ -915,7 +973,7 @@ const map = new kakao.maps.Map(document.getElementById('map'), {
                     const reviewItem = document.createElement('div');
                     reviewItem.id = `review-${review.vetReviewSeq}`;
                     reviewItem.innerHTML = `
-                        <p class="review-meta" style="font-size : 20px; color:#555555;">작성자: ${authorName} | 별점: ${'★'.repeat(review.vetRating)}</strong> | 작성일자: ${review.createDate}</p>
+                        <p class="review-meta" style="font-size : 20px; color:#555555;">작성자: ${authorName} | 별점: ${'★'.repeat(review.vetRating)}</strong> | 작성일자: ${displayDate}</p>
                         <p class="review-text" style="font-size : 20px;">${review.vetReview}</p>
                         
                         ${actionButtons}

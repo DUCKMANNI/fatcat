@@ -263,6 +263,7 @@
     let REGION_DATA = {}, allPlaces = [], currentPage = 1, pageSize = 7;
     let openedPlaceId = null, originalCenter = null;
     let userLocationMarker = null;
+    let currentHoverOverlay = null; // ⭐⭐⭐ 이 줄을 추가해야 합니다! ⭐⭐⭐
 
     const markers = [];
     const $sido = document.getElementById('sido');
@@ -452,6 +453,16 @@
             })
             .then(data => {
                 allPlaces = data;
+                
+             // 🌟 추가: allPlaces 배열을 createDate 기준으로 최신순(내림차순) 정렬
+                allPlaces.sort((a, b) => {
+                    // Date 객체로 변환하여 밀리초 단위로 비교 (날짜+시간 포함)
+                    const dateA = new Date(a.createDate).getTime();
+                    const dateB = new Date(b.createDate).getTime();
+
+                    // 최신순 (내림차순) 정렬: B - A
+                    return dateB - dateA;
+                });
                 currentPage = 1;
 
                 if (allPlaces.length === 0) {
@@ -475,7 +486,7 @@
 
     $searchBtn.addEventListener('click', fetchCareList);
 
-    function addMarker(pos, idx) {
+    function addMarker(pos, idx, title) {
         
         // 1. 시각적으로 보이는 Custom Overlay (핀 이미지 + 번호)
         const visualContent = `
@@ -498,9 +509,9 @@
         const overlay = new kakao.maps.CustomOverlay({
        	 	position: pos,
             content: visualContent,
-            yAnchor: -0.1, // 1보다 크게 하면 위로 올라감
-            xAnchor: 0.4,
-            zIndex: 3
+            yAnchor: 0, // 1보다 크게 하면 위로 올라감
+            xAnchor: 0,
+            zIndex: 2
         });
         overlay.setMap(map);
         
@@ -510,11 +521,10 @@
         // 2. 인포윈도우 앵커 역할을 위한 투명 마커 생성 (size 1x1, opacity 0.0, zIndex 1로 숨김)
         const transparentImage = new kakao.maps.MarkerImage(
             'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==', // 1x1 투명 GIF
-            new kakao.maps.Size(50, 50), // 사이즈 최소화
-            { offset: new kakao.maps.Point(25, -7) }
+            new kakao.maps.Size(40, 60), // 사이즈 최소화
+            { offset: new kakao.maps.Point(0, 7) }
         );
         
-        const infowindowPos = new kakao.maps.LatLng(pos.getLat() + 0.00025, pos.getLng()-0.00003); 
 
         
         const marker = new kakao.maps.Marker({
@@ -525,22 +535,31 @@
             zIndex: 3 // Custom Overlay 뒤로 숨김
         });
         
-        kakao.maps.event.addListener(marker, 'mouseover', function() {
-            infowindow.setContent('<div style="padding:5px;font-size:13px;">' + allPlaces[idx].careTitle + '</div>');
-            infowindow.open(map, marker);
+     kakao.maps.event.addListener(marker, "mouseover", () => {
+            // 리스트와 동일하게, 기존 오버레이가 있다면 닫고 새로 엽니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; 
+            }
+            
+            // 💡 여기서 전달받은 title 변수를 showInfo 함수에 전달
+            const newOverlay = showInfo(marker, title);
+            currentHoverOverlay = newOverlay;
         });
 
-        // 투명 마커에 마우스 아웃 이벤트를 등록합니다.
-        kakao.maps.event.addListener(marker, 'mouseout', function() {
-            infowindow.close();
+        kakao.maps.event.addListener(marker, "mouseout", () => {
+            // 마우스 아웃 시 오버레이를 닫습니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; 
+            }
         });
+        // ⭐ [수정 끝]
         
-        // 4. markers 배열에 저장 (제거 시 CustomOverlay와 투명 마커 모두 제거)
         markers.push({ overlay, marker, pos });
 
-        return { overlay, pos, marker };
+        return { overlay, marker };
     }
-
 
     function renderList() {
     	
@@ -564,7 +583,10 @@
 
         pagePlaces.forEach((place, i) => {
             const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
-            const { marker } = addMarker(pos, i + start);
+            const { marker } = addMarker(pos, i + start, place.careTitle);
+            
+            const displayDate = place.createDate ? place.createDate.substring(0, 10) : '날짜 정보 없음';
+
 
 
             // ⭐ 목록 리스트 항목 생성
@@ -581,18 +603,30 @@
                     
                     <p class="price"> ${formattedPrice} 원</p>
                     
-                    <p class="date">${place.createDate}</p>
+                    <p class="date">${displayDate}</p>
                 </div>
             `;
+          li.addEventListener('mouseover', () => {
+            // ⭐ 기존에 열려있는 CustomOverlay가 있다면 먼저 닫습니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; // 초기화
+            }
             
-            // 마우스 오버 시 지도에서 정보 창을 표시
-            li.addEventListener('mouseover', () => {
-                showInfo(marker, place.careTitle); 
-                map.panTo(pos);
-            });
-            
-            li.addEventListener('mouseout', () => infowindow.close());
+            // ⭐ showInfo 함수를 호출하고 반환된 CustomOverlay를 변수에 저장합니다.
+            const newOverlay = showInfo(marker, place.careTitle);
+            currentHoverOverlay = newOverlay;
 
+            map.panTo(pos);
+        });
+        
+        li.addEventListener('mouseout', () => {
+            // ⭐ 저장된 CustomOverlay를 닫고 변수를 초기화합니다.
+            if (currentHoverOverlay) {
+                currentHoverOverlay.setMap(null);
+                currentHoverOverlay = null; // 초기화
+            }
+        });
             li.addEventListener('click', () => {
                 const detailPanel = document.getElementById('detailPanel');
                 const detailContent = document.getElementById('detailContent');
@@ -617,12 +651,19 @@
                         `;
                     }
                     
-                    // 💡 문제 2 해결: 로그인 상태 여부에 따라 채팅 버튼을 분리
+                 // 💡 문제 2 해결: 로그인 상태 여부에 따라 채팅 버튼을 분리 (아래 2줄을 수정합니다.)
                     if (LOGGED_IN_USER_SEQ && !isAuthor) {
-                        // 로그인했고, 작성자 본인이 아닐 경우: 상대방 userSeq를 넘겨 채팅 활성화
-                        chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup(${place.userSeq})">채팅하기</button>`;
+                        // 로그인했고, 작성자 본인이 아닐 경우: 상대방 userSeq와 careSeq를 넘겨 채팅 활성화
+                        // [수정 전]: chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup(${place.userSeq})">채팅하기</button>`;
+                        
+                        // ⭐ [수정 후]: careSeq를 함께 전달합니다.
+                        chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup(${place.userSeq}, ${place.careSeq})">채팅하기</button>`;
+                        
                     } else if (!LOGGED_IN_USER_SEQ) {
                         // 비로그인 상태: userSeq 없이 openChatPopup() 호출 (함수 내에서 로그인 유도)
+                        // [수정 전]: chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup()">채팅하기</button>`;
+                        
+                        // ⭐ [수정 후]: careSeq는 전달할 필요 없이, 로그인 유도 시 careSeq를 인자로 받지 않게 수정합니다.
                         chatButton = `<button class="btn btn-darkbrown" style="font-size : 20px" onclick="openChatPopup()">채팅하기</button>`;
                     }
 
@@ -738,12 +779,20 @@
         }
     }
 
-    // showInfo 함수 (첫 번째 인수로 마커 객체를 받음)
     function showInfo(marker, title) {
-        if (!map) return;
-        infowindow.setContent('<div style="padding:5px;font-size:13px;">' + title + '</div>');
-        // 마커 객체를 전달하여 b.v is not a function 오류 해결
-        infowindow.open(map, marker); 
+        const overlay = new kakao.maps.CustomOverlay({
+            content: `
+                <div style="padding:5px;font-size:13px;background:white;border:1px solid #888;">
+                    ${title}
+                </div>
+            `,
+            map: map,
+            position: marker.getPosition(),
+            xAnchor: 0.25, // ⭐ 가로 중앙 정렬 (0=왼쪽, 1=오른쪽)
+            yAnchor: 1.2  // ⭐ 마커 위쪽으로 조금 띄우기
+        });
+
+        return overlay;
     }
     
     function toggleListView() {
@@ -777,7 +826,7 @@
     }
     
     
-    function openChatPopup(userSeq) {
+    function openChatPopup(userSeq, careSeq) {
         // 💡 1. 비로그인 상태 체크: LOGGED_IN_USER_SEQ가 null이면 무조건 로그인 유도
         if (!LOGGED_IN_USER_SEQ) {
             alert('로그인 후 이용 가능합니다.');
@@ -796,8 +845,21 @@
             alert("자신의 글에는 채팅을 요청할 수 없습니다.");
             return;
         }
+        
+       
 
-        const url = `/chat/start?senderSeq=${LOGGED_IN_USER_SEQ}&receiverSeq=${userSeq}`;
+
+ 		const url = `/chat/start?senderSeq=${LOGGED_IN_USER_SEQ}&receiverSeq=${userSeq}`;
+ 
+ 
+ 		// 💡 [핵심] careSeq를 sessionStorage에 임시 저장
+ 		if (careSeq) {
+     		sessionStorage.setItem('currentCareSeq', careSeq);
+ 		} else {
+     		sessionStorage.removeItem('currentCareSeq');
+ 		}
+
+
         
         const width = 700;
         const height = 900;

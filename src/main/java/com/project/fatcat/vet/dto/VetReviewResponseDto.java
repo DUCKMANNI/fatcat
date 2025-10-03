@@ -23,7 +23,7 @@ public class VetReviewResponseDto {
         private Integer userSeq;
         private String vetReview;
         private Integer vetRating;
-        @JsonFormat(pattern = "yyyy-MM-dd")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createDate;
         private LocalDateTime visitDate;
         private String userName;
