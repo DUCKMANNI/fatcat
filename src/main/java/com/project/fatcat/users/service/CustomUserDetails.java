@@ -2,22 +2,48 @@ package com.project.fatcat.users.service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.project.fatcat.entity.User;
 
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Getter
-public class CustomUserDetails implements UserDetails{
+public class CustomUserDetails implements UserDetails, OAuth2User{
 
 	private final User user;
+	 private Map<String, Object> attributes; // ✅ 소셜 로그인용 추가
 
+	// 일반 로그인 생성자
     public CustomUserDetails(User user) {
         this.user = user;
+    }
+    
+    // 소셜 로그인 생성자
+    public CustomUserDetails(User user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
+    }
+    
+    // OAuth2User 인터페이스용
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        // 구글 로그인 시 `name` 혹은 userName 반환
+    	
+    	log.info("getUSerName : " + user.getUserName());
+        return user.getUserName() != null ? user.getUserName() : (String) attributes.get("name");
     }
 
     @Override
@@ -36,8 +62,36 @@ public class CustomUserDetails implements UserDetails{
     }
     
     public String getUserName() {
-        return user.getUserName(); // 이메일을 로그인 아이디로 사용
+        // DB 값 우선
+        if (user.getUserName() != null) {
+            return user.getUserName();
+        }
+
+        // OAuth2 attributes fallback
+        if (attributes != null) {
+            // ✅ 구글
+            if (attributes.get("name") != null) {
+                return (String) attributes.get("name");
+            }
+
+            // ✅ 카카오
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            if (kakaoAccount != null) {
+                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+                if (profile != null && profile.get("nickname") != null) {
+                    return (String) profile.get("nickname");
+                }
+            }
+        }
+
+        // fallback
+        return "사용자";
     }
+
+    
+//    public String getUserName() {
+//        return user.getUserName(); // 이메일을 로그인 아이디로 사용
+//    }
     
     public String getPhoneNumber() {
         return user.getPhoneNumber();
