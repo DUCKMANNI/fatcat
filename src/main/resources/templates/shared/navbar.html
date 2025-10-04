@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+		xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 	<div th:fragment="navbarFragment">
 		<!-- 네비게이션 바 -->
@@ -26,7 +27,9 @@
 		
 		      <!-- ✅ 로그인 했을 때 -->
 		      <span sec:authorize="isAuthenticated()" class="me-3" style="font-size:18px;">
-		        <b th:text="${#authentication.principal.userName}"></b> 님 환영합니다
+		      
+		        <b th:if="${#authentication.principal instanceof T(com.project.fatcat.users.service.CustomUserDetails)}"
+     				th:text="${#authentication.principal.user.userName}">사용자</b> 님 환영합니다
 		      </span>
 		      <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()" class="btn btn-fatcat me-3"
 		         style="font-size:18px;">로그아웃</a>

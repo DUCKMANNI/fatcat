@@ -43,7 +43,8 @@ public class OauthAccount {
 	@Column( nullable = false)
 	private String providerUserId;
 	
-	@Column(columnDefinition = "DATETIME DEFAULT CURRENTTIMESTAMP")
+	@Column(insertable = false, updatable = false,
+	        columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime connectedDate;
 
 }
