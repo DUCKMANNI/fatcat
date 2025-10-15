@@ -6,48 +6,82 @@
 <head>
 <meta charset="UTF-8">
 <title th:text="${mode == 'signup'} ? '회원가입' : '회원정보 수정'"></title>
+<style>
+/* 🚨 오류 메시지 스타일 (예시) - CSS 파일에 포함되어 있다면 생략 가능 */
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: -10px; /* 입력 필드와의 간격 조정 */
+    margin-bottom: 10px;
+    text-align: left;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* 폼 전체 오류 스타일 (예시) */
+.form-global-error {
+    color: white;
+    background-color: #dc3545;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
 </head>
 <body>
 
 	<div layout:fragment="content" class="custom-container"
 		style="text-align: center; padding: 40px 0;">
-		<!-- 제목 -->
-		 <h1 style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;"
+		<h1 style="font-family: 'BagelFat', sans-serif; font-size: 60px; color: #CD853F; margin-bottom: 30px;"
         th:text="${mode == 'signup'} ? '회원가입' : '회원정보 수정'"></h1>
 
-		<!-- 입력 폼 -->
 		<form  th:action="${mode == 'signup'} ? @{/users/signup} : @{/users/edit}" method="post" th:object="${SignupDTO}" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
-
-			<!-- 🔹 기본 정보 -->
-			<!-- 🔹 이메일 (아이디) -->
-		      <input type="email" th:field="*{userEmail}" class="login-input" placeholder="E-mail (아이디)" th:readonly="${mode == 'update'}" required>
-		      <!-- 🔹 비밀번호 -->
+				
+			<div th:replace="~{shared/form_errors :: formErrorsFragment}"></div>
+            
+			<input type="email" th:field="*{userEmail}" class="login-input" placeholder="E-mail (아이디)" th:readonly="${mode == 'update'}" required>
+			  <div th:if="${#fields.hasErrors('userEmail')}" th:errors="*{userEmail}" class="error-message"></div>
+              
 		      <div th:if="${mode == 'signup'}">
-            <input type="password" th:field="*{userPassword}" class="login-input" placeholder="비밀번호" required>
-            <input type="password" name="passwordConfirm" class="login-input" placeholder="비밀번호 확인" required>
-        </div>
-        <div th:if="${mode == 'update'}">
-            <input type="password" name="currentPassword" class="login-input" placeholder="현재 비밀번호">
-            <input type="password" name="newPassword" class="login-input" placeholder="새 비밀번호">
-            <input type="password" name="confirmPassword" class="login-input" placeholder="새 비밀번호 확인">
-        </div>
+                <input type="password" th:field="*{userPassword}" class="login-input" placeholder="비밀번호" required>
+				<div th:if="${#fields.hasErrors('userPassword')}" th:errors="*{userPassword}" class="error-message"></div>
+
+                <input type="password" name="passwordConfirm" class="login-input" placeholder="비밀번호 확인" required>
+                </div>
+            <div th:if="${mode == 'update'}">
+                <input type="password" name="currentPassword" class="login-input" placeholder="현재 비밀번호">
+                <input type="password" name="newPassword" class="login-input" placeholder="새 비밀번호">
+                <input type="password" name="confirmPassword" class="login-input" placeholder="새 비밀번호 확인">
+            </div>
         
 		      <input type="text" th:field="*{userName}" class="login-input" placeholder="이름" required>
-		      <input type="text" th:field="*{nickname}" class="login-input" placeholder="닉네임" required>
-		      <input type="text" th:field="*{phoneNumber}" class="login-input" placeholder="휴대폰 번호" required>
+			  <div th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}" class="error-message"></div>
 
-			<!-- 🔹 주소 정보 -->
-		     <div class="address-group">
+		      <input type="text" th:field="*{nickname}" class="login-input" placeholder="닉네임" required>
+			  <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="error-message"></div>
+              
+		      <input type="text" th:field="*{phoneNumber}" class="login-input" placeholder="휴대폰 번호" required>
+			  <div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}" class="error-message"></div>
+
+			<div class="address-group">
 				 <input type="text" id="zipCode" th:field="*{zipCode}" class="login-input" placeholder="우편번호" readonly>
 				 <button type="button" onclick="execDaumPostcode()" class="btn-fatcat">주소 검색</button>
 			  </div>
+			  <div th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}" class="error-message"></div>
+
 		      <input type="text" id="address1" th:field="*{address1}" class="login-input" placeholder="기본 주소" readonly>
+			  <div th:if="${#fields.hasErrors('address1')}" th:errors="*{address1}" class="error-message"></div>
+
 	        <input type="text" id="address2" th:field="*{address2}" class="login-input" placeholder="상세 주소 입력">
 	        <input type="hidden" id="latitude" th:field="*{latitude}">
 	        <input type="hidden" id="longitude" th:field="*{longitude}">
+			<div th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}" class="error-message"></div>
+			<div th:if="${#fields.hasErrors('longitude')}" th:errors="*{longitude}" class="error-message"></div>
 				
-			<!-- 🔹 추가 정보 -->
-		      <!-- 프로필 이미지 -->
 			<div class="file-input-row">
 			  <label for="profileImage">프로필 이미지 (선택)</label>
 			  <div class="file-input-wrapper">
@@ -59,8 +93,7 @@
 			</div>
 
 
-		      <!-- 수의사 면허 이미지 -->
-			<div class="file-input-row">
+		      <div class="file-input-row">
 			  <label for="vetLicenseImage">수의사 면허 이미지 (선택)</label>
 			  <div class="file-input-wrapper">
 			    <label for="vetLicenseImage" class="custom-file-label">파일 선택</label>
@@ -70,14 +103,12 @@
 			</div>
 
 
-			<!-- 버튼 -->
-        <button type="submit" class="login-btn mt-4"
+			<button type="submit" class="login-btn mt-4"
                 th:text="${mode == 'signup'} ? '가입하기' : '수정하기'"></button>
     </form>
 		
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<!-- 카카오 지도 API (좌표 변환용) -->
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=94d1c331dbd40471d2fb9d113ba5d78b&libraries=services"></script>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=4c15890a040537b9e018efed80761b21&libraries=services"></script>
 <script>
 
 
