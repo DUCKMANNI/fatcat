@@ -1,52 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-		xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 	<div th:fragment="navbarFragment">
 		<!-- 네비게이션 바 -->
 		<nav class="navbar navbar-light bg-light border-bottom">
-		  <div class="container-fluid">
-		    <!-- 로고 + 브랜드 -->
-		    <div class="d-flex align-items-center">
-		        <a class="navbar-brand d-flex align-items-center" href="/">
-		          <img th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100" class="me-2">
-		          <img th:src="@{/images/logo.png}" alt="로고" width="70" height="100">
-		        </a>
-				<label class="ms-3 mb-2" 
-				style="font-family: 'BagelFat', sans-serif; font-size: 40px; color: #CD853F;"
-				th:text="(${pageTitle} ?: '')">
-				</label>
-		    </div> 
-			
-		    <!-- 오른쪽 영역 -->
-		    <div class="d-flex align-items-center">
-		
-		      <!-- ✅ 로그인 안 했을 때 -->
-		      <a th:href="@{/users/login}" sec:authorize="isAnonymous()" class="btn btn-fatcat me-3"
-		         style="font-size:18px;">로그인</a>
-		
-		      <!-- ✅ 로그인 했을 때 -->
-		      <span sec:authorize="isAuthenticated()" class="me-3" style="font-size:18px;">
-		      
-		        <b th:if="${#authentication.principal instanceof T(com.project.fatcat.users.service.CustomUserDetails)}"
-     				th:text="${#authentication.principal.user.userName}">사용자</b> 님 환영합니다
-		      </span>
-		      <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()" class="btn btn-fatcat me-3"
-		         style="font-size:18px;">로그아웃</a>
-		
-		      <!-- 장바구니 버튼 -->
-		      <a class="btn btn-fatcat me-3" th:href="@{/shopping/cart}" style="font-size: 18px;">
-		        장바구니
-		      </a>
-		
-		      <!-- 햄버거 버튼 -->
-		      <button class="navbar-toggler" type="button"
-		              data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
-		              aria-controls="sidebarMenu" aria-label="Toggle navigation">
-		        <span class="navbar-toggler-icon"></span>
-		      </button>
-		    </div>
-		  </div>
+			<div class="container-fluid">
+				<!-- 로고 + 브랜드 -->
+				<div class="d-flex align-items-center">
+					<a class="navbar-brand d-flex align-items-center" href="/"> <img
+						th:src="@{/images/fatcat.png}" alt="문구" width="130" height="100"
+						class="me-2"> <img th:src="@{/images/logo.png}" alt="로고"
+						width="70" height="100">
+					</a> <label class="ms-3 mb-2"
+						style="font-family: 'BagelFat', sans-serif; font-size: 40px; color: #CD853F;"
+						th:text="(${pageTitle} ?: '')"> </label>
+				</div>
+
+				<!-- 오른쪽 영역 -->
+				<div class="d-flex align-items-center">
+
+					<!-- ✅ 로그인 안 했을 때 -->
+					<a th:href="@{/users/login}" sec:authorize="isAnonymous()"
+						class="btn btn-fatcat me-3" style="font-size: 18px;">로그인</a>
+
+					<!-- ✅ 로그인 했을 때 -->
+					<span sec:authorize="isAuthenticated()" class="me-3"
+						style="font-size: 18px;"> <b
+						th:if="${#authentication.principal instanceof T(com.project.fatcat.users.service.CustomUserDetails)}"
+						th:text="${#authentication.principal.user.userName}">사용자</b> 님
+						환영합니다
+					</span> <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()"
+						class="btn btn-fatcat me-3" style="font-size: 18px;">로그아웃</a>
+
+					<!-- 장바구니 버튼 -->
+					<a class="btn btn-fatcat me-3" th:href="@{/shopping/cart}"
+						sec:authorize="isAuthenticated()" style="font-size: 18px;">
+						장바구니 </a> <a href="javascript:void(0);"
+						onclick="alert('로그인 후 이용하세요.'); window.location.href='/users/login';"
+						sec:authorize="isAnonymous()" class="btn btn-fatcat me-3"
+						style="font-size: 18px;"> 장바구니 </a>
+
+					<!-- 햄버거 버튼 -->
+					<button class="navbar-toggler" type="button"
+						data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"
+						aria-controls="sidebarMenu" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				</div>
+			</div>
 		</nav>
 
 
@@ -60,53 +62,50 @@
 					height="90">
 				<!-- 오른쪽 버튼 그룹 -->
 				<div class="d-flex align-items-center">
-					<a class="btn btn-fatcat me-2" th:href="@{/users/login}"  sec:authorize="isAnonymous()"
-						style="font-size: 18px;">로그인</a>
-					<a th:href="@{/user/logout}" sec:authorize="isAuthenticated()" class="btn btn-fatcat me-2"
-		         		style="font-size:18px;">로그아웃</a>
+					<a class="btn btn-fatcat me-2" th:href="@{/users/login}"
+						sec:authorize="isAnonymous()" style="font-size: 18px;">로그인</a> <a
+						th:href="@{/user/logout}" sec:authorize="isAuthenticated()"
+						class="btn btn-fatcat me-2" style="font-size: 18px;">로그아웃</a>
 					<button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
 				</div>
 			</div>
 			<div class="offcanvas-body">
 				<div class="d-flex align-items-start mb-3">
 					<img th:src="@{/images/mypage_cat.png}" alt="마이페이지" width="60"
-						height="50"> 
-					<a class="ms-2 mt-1 d-inline-block"
+						height="50"> <a class="ms-2 mt-1 d-inline-block"
 						th:href="@{/mypage}"
 						style="font-size: 30px; text-decoration: none; color: black;">마이페이지</a>
 				</div>
 				<div class="d-flex align-items-start mb-3">
 					<img th:src="@{/images/shopping_cat.png}" alt="쇼핑몰" width="60"
-						height="50"> 
-					<a class="ms-2 mt-1 d-inline-block"
+						height="50"> <a class="ms-2 mt-1 d-inline-block"
 						th:href="@{/shopping}"
-						style="font-size: 30px; text-decoration: none; color: black;">고양이 전용 쇼핑몰</a>
+						style="font-size: 30px; text-decoration: none; color: black;">고양이
+						전용 쇼핑몰</a>
 				</div>
 				<div class="d-flex align-items-start mb-3">
 					<img th:src="@{/images/vet_cat.png}" alt="동물병원" width="60"
-						height="50"> 
-					<a class="ms-2 mt-1 d-inline-block"
+						height="50"> <a class="ms-2 mt-1 d-inline-block"
 						th:href="@{/vetclinic}"
-						style="font-size: 30px; text-decoration: none; color: black;">동물병원 정보</a>
+						style="font-size: 30px; text-decoration: none; color: black;">동물병원
+						정보</a>
 				</div>
 				<div class="d-flex align-items-start mb-3">
 					<img th:src="@{/images/care_cat.png}" alt="돌봄" width="60"
-						height="50"> 
-					<a class="ms-2 mt-1 d-inline-block"
+						height="50"> <a class="ms-2 mt-1 d-inline-block"
 						th:href="@{/care}"
 						style="font-size: 30px; text-decoration: none; color: black;">돌봄서비스</a>
 				</div>
 				<div class="d-flex align-items-start mb-3">
 					<img th:src="@{/images/board_cat.png}" alt="고지방" width="60"
-						height="50"> 
-					<a class="ms-2 mt-1 d-inline-block"
+						height="50"> <a class="ms-2 mt-1 d-inline-block"
 						th:href="@{|/post/list/1|}"
-						style="font-size: 30px; text-decoration: none; color: black;">고양이 지식방</a>
+						style="font-size: 30px; text-decoration: none; color: black;">고양이
+						지식방</a>
 				</div>
 				<div class="d-flex align-items-start">
 					<img th:src="@{/images/Customer_cat.png}" alt="고객센터" width="60"
-						height="50"> 
-					<a class="ms-2 mt-1 d-inline-block"
+						height="50"> <a class="ms-2 mt-1 d-inline-block"
 						th:href="@{/inquiry/list}"
 						style="font-size: 30px; text-decoration: none; color: black;">고객센터</a>
 				</div>
