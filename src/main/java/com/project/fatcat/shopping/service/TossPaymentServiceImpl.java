@@ -35,8 +35,8 @@ public class TossPaymentServiceImpl implements PaymentService{
 	private final RestTemplate restTemplate = new RestTemplate();
     private final ShoppingCartRepository shoppingCartRepository;
 	
-	@Value("${toss.payments.secret-key}")
-    private String secretKey;
+	/* @Value("${toss.payments.secret-key}") */
+    private String secretKey = "test_sk_DpexMgkW36zN776bZ9Q93GbR5ozO";
 	
     @Transactional
     public PaymentConfirmResponse confirmPayment(String paymentKey, String orderNum, int amount, Integer cartSeq) {
