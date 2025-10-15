@@ -72,6 +72,9 @@ public class fatcatSftp {
             session.setTimeout(timeout); //타임아웃 설정
             
             //log.info("connect.. " + connIp);
+            System.out.println("id.. " + id);
+            System.out.println("pw.. " + pw);
+            System.out.println("port.. " + port);
             System.out.println("connect.. " + connIp);
             session.connect();	//접속
             
@@ -117,7 +120,7 @@ public class fatcatSftp {
 		FileInputStream in = null;
 		
 		try{ 
-			sftpInit("ivisus.iptime.org", 9022, "kwlee", "Rmsdn760223!", null);
+			sftpInit("ivisus.iptime.org", 22, "kwlee", "Rmsdn760223!", null);
 			//파일을 가져와서 inputStream에 넣고 저장경로를 찾아 업로드 
 			in = new FileInputStream(localPath+uploadFileNm);
 			channelSftp.cd(uploadPath);
@@ -165,7 +168,7 @@ public class fatcatSftp {
 		InputStream is = mpf.getInputStream();
 		
 		try{ 
-			sftpInit("ivisus.iptime.org", 2202, "edu", "Edu13@$", null); 
+			sftpInit("ivisus.iptime.org", 22, "edu", "Edu13@$", null); 
 			channelSftp.cd(uploadDir);
 			channelSftp.put(is, mpf.getOriginalFilename());
 			System.out.println("sftpFileUpload success.. ");
@@ -203,7 +206,7 @@ public class fatcatSftp {
 	public void sftpFileUpload(MultipartFile mpf, String uploadDir, String uploadFileNm) throws Exception {
 	    InputStream is = null;
 	    try {
-	        sftpInit("ivisus.iptime.org", 2202, "edu", "Edu13@$", null);
+	        sftpInit("ivisus.iptime.org", 22, "edu", "Edu13@$", null);
 
 	        // 디렉토리 이동
 	        channelSftp.cd(uploadDir);
