@@ -165,7 +165,7 @@ public class fatcatSftp {
 		InputStream is = mpf.getInputStream();
 		
 		try{ 
-			sftpInit("ivisus.iptime.org", 2202, "red", "Red13@$", null); 
+			sftpInit("ivisus.iptime.org", 2202, "edu", "Edu13@$", null); 
 			channelSftp.cd(uploadDir);
 			channelSftp.put(is, mpf.getOriginalFilename());
 			System.out.println("sftpFileUpload success.. ");
@@ -203,7 +203,7 @@ public class fatcatSftp {
 	public void sftpFileUpload(MultipartFile mpf, String uploadDir, String uploadFileNm) throws Exception {
 	    InputStream is = null;
 	    try {
-	        sftpInit("ivisus.iptime.org", 2202, "red", "Red13@$", null);
+	        sftpInit("ivisus.iptime.org", 2202, "edu", "Edu13@$", null);
 
 	        // 디렉토리 이동
 	        channelSftp.cd(uploadDir);
