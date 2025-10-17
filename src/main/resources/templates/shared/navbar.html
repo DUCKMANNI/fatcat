@@ -27,11 +27,10 @@
 					<!-- ✅ 로그인 했을 때 -->
 					<span sec:authorize="isAuthenticated()" class="me-3"
 						style="font-size: 18px;"> <b
-						th:if="${#authentication.principal instanceof T(com.project.fatcat.users.service.CustomUserDetails)}"
-						th:text="${#authentication.principal.user.userName}">사용자</b> 님
-						환영합니다
-					</span> <a th:href="@{/user/logout}" sec:authorize="isAuthenticated()"
-						class="btn btn-fatcat me-3" style="font-size: 18px;">로그아웃</a>
+						th:text="${#authentication.principal.userName}"></b> 님 환영합니다
+					</span> <a th:href="@{/user/logout}"
+						sec:authorize="isAuthenticated()" class="btn btn-fatcat me-3"
+						style="font-size: 18px;">로그아웃</a>
 
 					<!-- 장바구니 버튼 -->
 					<a class="btn btn-fatcat me-3" th:href="@{/shopping/cart}"

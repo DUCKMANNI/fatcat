@@ -28,7 +28,6 @@ public class SignupDTO {
     @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")
     private String userPassword;     // 비밀번호
     
-    // 비밀번호 확인은 DTO에서는 유효성 검사 제외 (Controller나 Service에서 직접 비교)
     private String passwordConfirm;	 // 비밀번호 확인
 
     // 🔹 기본 회원 정보
@@ -41,7 +40,6 @@ public class SignupDTO {
     @NotBlank(message = "휴대폰 번호는 필수 입력 항목입니다.")
     private String phoneNumber;      // 휴대폰 번호
 
-    // 🔹 주소/위치 (모두 필수 항목인 경우 NotBlank 추가)
     @NotBlank(message = "우편번호는 필수 입력 항목입니다.")
     private String zipCode;          
     
@@ -50,7 +48,6 @@ public class SignupDTO {
     
     private String address2;         
     
-    // latitude, longitude는 주소 검색 성공 시 값이 들어가므로, DB NOT NULL에 맞춰 @NotNull 등을 추가할 수 있습니다.
     private Double latitude;         // 위도 (지도 API로 변환)
     private Double longitude;        // 경도
 
@@ -58,7 +55,6 @@ public class SignupDTO {
     private UserRole role;      
     private String userType;    
 
-    // 🚨 DTO 내부에 MultipartFile 필드는 유지 (Service에서 사용해야 하므로)
     private MultipartFile profileImageFile;
     private MultipartFile vetLicenseImageFile;
 }
